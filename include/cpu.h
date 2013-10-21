@@ -357,54 +357,78 @@ class CPU{
 
 		// *** 8-Bit Arithmetic group*** 
 
-		// ADD A,r
-		// Add contents of 8-bit register to A
+		// ADD A,s
+		// Adds an a 8-bit value to the accumulater
+		// ADD A,r 
 		// OpCodes: 0x80, 0x81, 0x82, 0x83 ,0x84 ,0x85 ,0x87
-		void ADD8BitRegToA( uint8_t &reg );
-
 		// ADD A,n
 		// Add an 8-bit integer to register A
 		// OpCodes: 0xC6
-		void ADD8BitIntToA( uint8_t val );
-
 		// ADD A,(HL)
 		// Add the value at the address of HL to register A
 		// OpCodes: 0x86
-		void ADDAddrsOfHLToA();
-
 		// ADD A,(IX+d)
 		// Add the value at address of IX plus offset to register A
 		// OpCodes: 0xDD86 
-		void ADDAddrsOfIXOffsetToA();
-	
 		// ADD A,(IY+d)
 		// Add the value at address of IX plus offset to register A
-		// OpCodes: 0xFD86 
-		void ADDAddrsOfIYOffsetToA();
+		// OpCodes: 0xFD86 	
+		void ADD8BitValToA( uint8_t val );
 
 		// ADC A,r
 		// Add an 8-bit integer + C Flag to register A  
 		// OpCodes: 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8F
-		
 		// ADC A,n
 		// Add an 8-bit integer + C Flag to register A
 		// OpCodes: 0xCE
-
 		// ADC A,(HL)
 		// Add the value at the address of HL + C Flag to register A
 		// OpCodes: 0x8E
-
 		// ADC A,(IX+d)
 		// Add the value at address of IX plus offset + C Flag to register A
 		// OpCodes: 0xDD8E
-	
-		// ADD A,(IY+d)
+		// ADC A,(IY+d)
 		// Add the value at address of IX plus offset + C Flag to register A
 		// OpCodes: 0xFD8E
+		void ADC8BitValToA( uint8_t val );
+	
+		// SUB A,s
+		// Subtract an a 8-bit value from the accumulater
+		// SUB A,r 
+		// OpCodes: 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x97 
+		// SUB A,n
+		// Subtract an 8-bit integer from register A
+		// OpCodes: 0xD6
+		// SUB A,(HL)
+		// Subtract the value at the address of HL from register A
+		// OpCodes: 0x96
+		// SUB A,(IX+d)
+		// Subtract the value at address of IX plus offset from register A
+		// OpCodes: 0xDD96
+		// SUB A,(IY+d)
+		// Subtract the value at address of IX plus offset from register A
+		// OpCodes: 0xFD96
+		void SUB8BitValFromA( uint8_t val ); 	
+				
 		
-		// SUB s
-		//
-		// SBC A,s
+		// SBC A,r
+		// Subtract an 8-bit integer - C Flag from register A  
+		// OpCodes: 0x9F, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D 
+		// SBC A,n
+		// Subtract an 8-bit integer - C Flag from register A
+		// OpCodes: 0xDE
+		// SBC A,(HL)
+		// Subtract the value at the address of HL - C Flag from register A
+		// OpCodes: 0x9E
+		// SBC A,(IX-d)
+		// Subtract the value at address of IX plus offset - C Flag from register A
+		// OpCodes: 0xDD9E
+		// ADD A,(IY-d)
+		// Subtract the value at address of IX plus offset - C Flag from register A
+		// OpCodes: 0xFD9E
+		void SBC8BitValFromA( uint8_t val );
+	
+
 		//
 		// AND A,s
 		//
