@@ -388,19 +388,19 @@ class CPU{
 		
 		// ADC A,n
 		// Add an 8-bit integer + C Flag to register A
-		// OpCodes:
+		// OpCodes: 0xCE
 
 		// ADC A,(HL)
 		// Add the value at the address of HL + C Flag to register A
-		// OpCodes:
+		// OpCodes: 0x8E
 
 		// ADC A,(IX+d)
 		// Add the value at address of IX plus offset + C Flag to register A
-		// OpCodes:
+		// OpCodes: 0xDD8E
 	
 		// ADD A,(IY+d)
 		// Add the value at address of IX plus offset + C Flag to register A
-		// OpCodes:
+		// OpCodes: 0xFD8E
 		
 		// SUB s
 		//
