@@ -1091,46 +1091,6 @@ void CPU::execute( uint8_t* opcode ){
 }
 
 
-// Implements the bitwise Exclusive OR operator, commonly used to zero a register 
-void CPU::XOR( uint8_t &val ){
-	val = val ^ val; 
-	pc++;
-}
-
-// Output the contents of A to port n
-void CPU::OUTA( uint8_t ioAddrs, uint8_t* val){
-	pc++;
-}
-
-void CPU::JP( uint8_t *byte1, uint8_t *byte2 ){
-
-	uint16_t word = 0x00;
-	
-	word = (word | *byte1);
-
-	word <<= 8;
-
-	word = (word | *byte2);
-
-	setPC( word );
-}
-
-// Decrement the 16-bit ADDRESS pointer by 1
-void CPU::DEC(uint8_t &HOreg, uint8_t &LOreg){
-
-	// Join the 8-bit registers together to determine the 16-bit address
-	uint16_t addrs = byteToWord(&HOreg, &LOreg);
-
-	// Decrement the address by 1
-	addrs--;
-
-	// Get LObyte and copy to LOreg
-	LOreg = getLOByte(&addrs);
-	HOreg = getHOByte(&addrs);
-
-	pc++;
-}
-
 void CPU::start(){
 	
 	// Begin executing from 0x00
@@ -1166,76 +1126,6 @@ uint8_t CPU::getLOByte(uint16_t *word){
 // Returns the HO byte of a word
 uint8_t CPU::getHOByte(uint16_t *word){
 	return ((*word ^ 0xff) >> 8); // XOR the word with 1111111100000000 to zeros the HO byte then bit shift 8 places to the right
-}
-
-// Compare register
-void CPU::CP(uint8_t &reg){
-	// Subtract register from register A, the value sets the flags in the Flags register F
-	regF = regA - reg;
-	pc++;
-}
-
-// Jump relative - Jump by val if Z in flags zero
-void CPU::JRZ( uint8_t *val){
-	// Logically AND register with 0x40 (01000000)
-	if(!(regF & 0x40)){
-		pc += *val;
-	}
-	pc++; // Always shift one more even when given a value it means jump x amount of bytes from the next address
-}
-
-// Jump relative - Jump by val if Z in flags is non-zero
-void CPU::JRNZ( uint8_t *val){
-	// Logically AND register with 0x40 (01000000)
-	if(regF & 0x40){
-		pc += *val;
-	}
-	pc++; // Always shift one more even when given a value it means jump x amount of bytes from the next address
-}
-
-void CPU::JRNC( uint8_t *val ){
-	// Logically AND register with 0x01 (0000001)
-	if(regF & 0x01){
-		pc += *val;
-	}
-	pc++;
-}
-
-// Logically AND the register with itself
-void CPU::AND(uint8_t &reg){
-	reg &= reg;
-	pc++;
-}
-
-// Subtract w/ carry flag the second 16-bit register value from the first 16-bit register value, store in the first 
-void CPU::SBC(uint8_t &reg1, uint8_t &reg2, uint8_t &reg3, uint8_t &reg4){
-	uint16_t result = ( byteToWord(&reg1, &reg2) - byteToWord(&reg3, &reg4) ) - (regF & 0x01);
-	reg1 = getHOByte(&result);
-	reg2 = getLOByte(&result);
-	pc++;
-}
-
-// ADD the first 16-bit register to the second and store in the first
-void CPU::ADD(uint8_t &reg1, uint8_t &reg2, uint8_t &reg3, uint8_t &reg4){
-	uint16_t result = ( byteToWord(&reg1, &reg2) + byteToWord(&reg3, &reg4) );
-	reg1 = getHOByte(&result);
-	reg2 = getLOByte(&result);
-	pc++;
-}
-
-// INC 16-bit
-void CPU::INC(uint8_t &reg1, uint8_t &reg2){
-	uint16_t val = byteToWord(&reg1, &reg2);
-	val++;
-	reg1 = getHOByte(&val);
-	reg2 = getLOByte(&val);
-	pc++;
-}
-
-// INC 8-bit
-void CPU::INC(uint8_t &reg){
-	reg++;
-	pc++;
 }
 
 // Memory handling

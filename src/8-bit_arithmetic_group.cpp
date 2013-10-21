@@ -18,7 +18,40 @@
 // ADD A,(IY+d)
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
-void ADD8BitValToA( uint8_t val );
+void CPU::ADD8BitValToA( uint8_t val ){
+	// Add the value to the register A
+	regA += val;
+
+	// Alter flags
+	
+	// Is result negative set S flag
+	if( regA < 0 ){
+		setBitInByte( regA, 8, 1 );
+	}else{
+		setBitInByte( regA, 8, 0 );
+	}
+
+	// If zero set z flag
+	if( regA == 0 ){
+		setBitInByte( regA, 7, 1 );
+	}else{
+		setBitInByte( regA, 7, 0 );	
+	}
+
+
+	// Supposed to set the H bit?? Not sure here
+	//
+	
+        // P/V is set if overflow
+        
+	// N is reset
+	setBitInByte( regA, 2, 0 );
+
+	// C is set if carry from bit 7
+	
+
+	pc++;
+}
 
 // ADC A,r
 // Add an 8-bit integer + C Flag to register A  
