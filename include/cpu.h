@@ -382,9 +382,25 @@ class CPU{
 		// OpCodes: 0xFD86 
 		void ADDAddrsOfIYOffsetToA();
 
-		// ADC A,s
-		// 
-		// OpCodes: 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8F  
+		// ADC A,r
+		// Add an 8-bit integer + C Flag to register A  
+		// OpCodes: 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8F
+		
+		// ADC A,n
+		// Add an 8-bit integer + C Flag to register A
+		// OpCodes:
+
+		// ADC A,(HL)
+		// Add the value at the address of HL + C Flag to register A
+		// OpCodes:
+
+		// ADC A,(IX+d)
+		// Add the value at address of IX plus offset + C Flag to register A
+		// OpCodes:
+	
+		// ADD A,(IY+d)
+		// Add the value at address of IX plus offset + C Flag to register A
+		// OpCodes:
 		
 		// SUB s
 		//
