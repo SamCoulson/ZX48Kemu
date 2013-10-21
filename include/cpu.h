@@ -409,8 +409,7 @@ class CPU{
 		// Subtract the value at address of IX plus offset from register A
 		// OpCodes: 0xFD96
 		void SUB8BitValFromA( uint8_t val ); 	
-				
-		
+					
 		// SBC A,r
 		// Subtract an 8-bit integer - C Flag from register A  
 		// OpCodes: 0x9F, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D 
@@ -428,27 +427,119 @@ class CPU{
 		// OpCodes: 0xFD9E
 		void SBC8BitValFromA( uint8_t val );
 	
-
-		//
 		// AND A,s
-		//
-		// OR s
-		//
-		// XOR s
-		//
-		// CP s
-		//
+		// Logical AND an a 8-bit value with the accumulater
+		// AND A,r 
+		// OpCodes: 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA7  
+		// AND A,n
+		// Logical AND an 8-bit integer with register A
+		// OpCodes: 0xE6
+		// AND A,(HL)
+		// Logical AND the value at the address of HL with register A
+		// OpCodes: 0xA6
+		// AND A,(IX+d)
+		// Logical AND the value at address of IX plus offset with register A
+		// OpCodes: 0xDDA6 
+		// AND A,(IY+d)
+		// Logical AND the value at address of IX plus offset with register A
+		// OpCodes: 0xFDA6
+		void AND8BitValWithA( uint8_t val ); 	
+
+		// OR,s		
+		// OR A,s
+		// Logical OR an a 8-bit value with the accumulater
+		// OR A,r 
+		// OpCodes: 0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB7  
+		// OR A,n
+		// Logical OR an 8-bit integer with register A
+		// OpCodes: 0xF6
+		// OR A,(HL)
+		// Logical OR the value at the address of HL with register A
+		// OpCodes: 0xB6
+		// OR A,(IX+d)
+		// Logical OR the value at address of IX plus offset with register A
+		// OpCodes: 0xDDB6
+		// OR A,(IY+d)
+		// Logical OR the value at address of IX plus offset with register A
+		// OpCodes: 0xFDB6
+		void OR8BitValWithA( uint8_t val ); 	
+		
+		// XOR,s		
+		// Logical XOR an a 8-bit value with the accumulater
+		// XOR A,r 
+		// OpCodes: 0xA8, 0xA9,0xAA, 0xAB, 0xAC, 0xAD, 0xAF   
+		// XOR A,n
+		// Logical XOR an 8-bit integer with register A
+		// OpCodes: 0xEE
+		// XOR A,(HL)
+		// Logical XOR the value at the address of HL with register A
+		// OpCodes: 0xAE
+		// XOR A,(IX+d)
+		// Logical XOR the value at address of IX plus offset with register A
+		// OpCodes: 0xDDAE
+		// XOR A,(IY+d)
+		// Logical XOR the value at address of IX plus offset with register A
+		// OpCodes: 0xFDAE
+		void XOR8BitValWithA( uint8_t val ); 	
+		
+		// CP,s		
+		// Logical CP an a 8-bit value with the accumulater
+		// CP A,r 
+		// OpCodes: 0xB8, 0xB9,0xBA, 0xBB, 0xBC, 0xBD, 0xBF    
+		// CP A,n
+		// Logical CP an 8-bit integer with register A
+		// OpCodes: 0xFE
+		// CP A,(HL)
+		// Logical CP the value at the address of HL with register A
+		// OpCodes: 0xBE
+		// CP A,(IX+d)
+		// Logical CP the value at address of IX plus offset with register A
+		// OpCodes: 0xDDBE 
+		// CP A,(IY+d)
+		// Logical CP the value at address of IX plus offset with register A
+		// OpCodes: 0xFDBE
+		void CP8BitValWithA( uint8_t val ); 	
+		
 		// INC r
-		//
+		// Increment an 8-Bit register
+		// OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
+		void INC8BitReg( uint8_t &reg );
+
 		// INC(HL)
-		//
+		// Increment the contents on address pointed to by HL register
+		// OpCodes: 0x34
+		void INCAddrsOfHL( uint8_t &reg );
+	
 		// INC(IX+d)
-		//
+		// Increment the contents of address plus offset in IX register
+		// OpCodes: 0xDD34
+		void INCAddrsOfIXOffset( uint8_t &reg );
+
 		// INC(IY+d)
-		//
-		// DEC m
+		// Increment the contents of address plus offset in IX register
+		// OpCodes: 0xFD34
+		void INCAddrsOfIYOffset( uint8_t &reg );
 
+		// DEC r
+		// Decrement an 8-Bit register
+		// OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
+		void DEC8BitReg( uint8_t &reg );
 
+		// DEC(HL)
+		// Decrement the contents on address pointed to by HL register
+		// OpCodes: 0x34
+		void DECAddrsOfHL( uint8_t &reg );
+	
+		// DEC(IX+d)
+		// Decrement the contents of address plus offset in IX register
+		// OpCodes: 0xDD34
+		void DECAddrsOfIXOffset( uint8_t &reg );
+
+		// DEC(IY+d)
+		// Decrement the contents of address plus offset in IX register
+		// OpCodes: 0xFD34
+		void DECAddrsOfIYOffset( uint8_t &reg );
+		
 		// CONTROL FLOW
 
 		// Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
