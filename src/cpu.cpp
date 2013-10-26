@@ -601,11 +601,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xAD:
 			break;
 		case 0xAE:
-			break;
+			break;*/
 		case 0xAF:
 			std::cout << "XOR A";
-				XOR(regA);
-			break;
+			XOR8BitValWithA( regA );
+			break;/*
 		case 0xB0:
 			break;
 		case 0xB1:
@@ -948,11 +948,11 @@ void CPU::execute( uint8_t* opcode ){
 			POP( regA, regF );
 			break;/*
 		case 0xF2:
-			break;
+			break;*/
 		case 0xF3:
-			std::cout <<"DI (Not implement yet!)";
-			pc++;
-		break;
+			std::cout <<"DI";
+			DI();
+		break;/*
 		case 0xF4:
 			break;*/
 		case 0xF5:
@@ -1085,9 +1085,9 @@ void CPU::execute( uint8_t* opcode ){
 		default:
 			break;
 		} 
-		pc++;
+		
 
-		printf("\n");
+		std::cout << "\n";
 }
 
 

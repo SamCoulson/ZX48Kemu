@@ -158,7 +158,10 @@ void OR8BitValWithA( uint8_t val );
 // XOR A,(IY+d)
 // Logical XOR the value at address of IX plus offset with register A
 // OpCodes: 0xFDAE
-void XOR8BitValWithA( uint8_t val ); 	
+void CPU::XOR8BitValWithA( uint8_t val ){
+	regA ^= val;
+	pc++;		
+} 	
 
 // CP,s		
 // Logical CP an a 8-bit value with the accumulater
