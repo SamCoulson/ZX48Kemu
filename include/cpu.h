@@ -527,7 +527,7 @@ class CPU{
 
 		// DEC(HL)
 		// Decrement the contents on address pointed to by HL register
-		// OpCodes: 0x34
+		// OpCodes: 0x35
 		void DECAddrsOfHL( uint8_t &reg );
 	
 		// DEC(IX+d)
@@ -539,49 +539,6 @@ class CPU{
 		// Decrement the contents of address plus offset in IX register
 		// OpCodes: 0xFD34
 		void DECAddrsOfIYOffset( uint8_t &reg );
-		
-		// CONTROL FLOW
-
-		// Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
-		void JP( uint8_t *byte1, uint8_t *byte2 );
-
-		// Jump relative when z not 0 - Jump by val if Z in flags is non-zero
-		void JRNZ( uint8_t *val );
-
-		// Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
-		void JRNC( uint8_t *val );
-
-		// Jump relative when z flag is 0
-		void JRZ( uint8_t *val );
-
-		void OUTA( uint8_t ioAddrs, uint8_t* val);
-
-		// Compare the value in a single8-bit register
-		void CP(uint8_t &reg);
-
-		// Utility functions
-
-		// Memory handling
-
-		// Read byte from memory given 16-bit address
-		uint8_t readByte( uint16_t romAddrs );
-
-		// Write byte to memory given 16-bit address
-		void writeByte( uint16_t addrs, uint8_t val );
-
-		// Set the given bit in a byte to either 1 or 0
-		void setBitInByte(uint8_t &byte, uint8_t pos, uint8_t val);
-
-		bool IsBitSet( uint8_t &byte, uint8_t pos );
-
-		// But first byte in to HO byte, and second byte in to LO byte of a word
-		uint16_t byteToWord(uint8_t *byte1, uint8_t *byte2);
-
-		// Return the LO from a word
-		uint8_t getLOByte(uint16_t *word);
-
-		// Return the Ho from a word
-		uint8_t getHOByte(uint16_t *word);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -610,6 +567,7 @@ class CPU{
 		// NOP
 		// Perform no operation during the machine cycle
 		// OpCodes: 0x00
+		void NOP();
 
 		// HALT
 		// Suspend CPU operation until an interupt is received
@@ -636,6 +594,216 @@ class CPU{
 		// Set interrupt mode 2
 		// OpCodes: 0xED5E
 
+		/////////////////////////////////////////////////////////////////////////////////////////////
+	
+		// *** 16-bit Arithmetic group***
+		//
+
+		// ADD HL,ss
+		// Any of the register pairs BC, DE, HL or SP are added to the contents
+		// of the HL register
+		// OpCodes: 0x09, 0x19, 0x29, 0x39
+		
+		// ADC HL,ss
+		// Any of the register pairs BC, DE, HL or SP with the Carry flag 
+		// are added to the contents of the HL register
+		// OpCodes: 0xED4A, 0xED5A, 0xED6A, 0x0xED7A
+		
+		// SBC HL,ss
+		// Any of the register pairs BC, DE, HL or SP with the Carry flag 
+		// are subtracted to the contents of the HL register
+		// OpCodes: 0xED42, 0xED52, 0xED62, 0xED72
+		
+		// ADD IX,pp
+		// Any of the register pairs BC, DE, HL or SP are added to the contents
+		// of the IX register
+		// OpCodes: 0xDD09, 0xDD19, 0xDD29, 0xDD39
+ 
+		// ADD IY,rr
+		// Any of the register pairs BC, DE, HL or SP are added to the contents
+		// of the IY register
+		// OpCodes: 0xFD09, 0xFD19, 0xFD29, 0xFD39
+ 
+		// INC ss
+		// Any of the register pairs BC, DE, HL or SP are incremented
+		// OpCodes: 0x03, 0x13, 0x23, 0x33
+		
+		// INC IX
+		// Contents of IX register is incremnted
+		// OpCodes: 0xDD23
+		
+		// INC IY
+		// Contents of IX register is incremnted
+		// OpCodes: 0xFD23
+		
+	
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		//
+		// *** Jump group ***
+
+		// JP nn
+		// Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
+		// OpCodes: 0xC3
+		void JP( uint8_t byte1, uint8_t byte2 );
+
+		// JP cc, nn
+		// Jump according to the condition (cc) of the F-register to a 16-bit address 
+		// OpCodes: 0xC2, 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
+		void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 );
+
+		// JR e
+		// Jump relative given 8-bit value
+		// OpCodes: 0x18
+		void JR( uint8_t val );
+		
+		// JR C,e
+		// Jump relative on according to state of the carry flag
+		// OpCodes: 0x38
+		void JRC( uint8_t val );
+
+		// JR NC,e
+		// Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
+		// OpCodes: 0x30
+		void JRNC( uint8_t val );
+	
+		// JR Z, e
+		// Jump relative when z flag is 0
+		// OpCodes: 0x28 
+		void JRZ( uint8_t val );
+
+		// JR NZ, e
+		// Jump relative when z not 0 - Jump by val if Z in flags is non-zero
+		// OpCodes: 0x20
+		void JRNZ( uint8_t val );
+
+		// JP(HL)
+		// Load program counter with contents of address pointed to by HL register
+		// OpCodes: 0xE9
+		void JPHL();
+
+		// JP(IX)
+		// Load program counter with contents of address pointed to by IX register
+		// OpCodes: 0xDDE9
+		void JPIX(); 
+
+		// JP(IY)
+		// Load program counter with contents of address pointed to by IY register
+		// OpCodes: 0xFDE9
+		void JPIY();		
+
+		// DJNZ, e
+		// Jump on the condition of B reg being non-zero
+		// OpCodes: 0x10
+		void DJNZ( uint8_t val );
+
+		//////////////////////////////////////////////////////////////////////////
+		
+		// *** Input and Output group ***
+
+		// IN A,(n)
+		// Read in one byte from IO mapped port (n) into register A 
+		// OpCodes: 0xDB
+		void INA( uint8_t val );
+
+		// IN r,(C)
+		// IO ported is slected through contents of register C and one 
+		// byte copied in to register r
+		// OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
+		void INAddrsOfRegCTo8BitReg( uint8_t &reg );
+
+		// INI
+		// IO port is selected by the contents of register C, the byte is 
+		// read in and placed into the contents of the HL register, the byte
+		// counter is decremented and the HL incremented
+		// OpCodes: 0xEDA2
+		void INI();
+
+		// INIR
+		// IO port is selected by the contents of register C, the byte is 
+		// read in and placed into the contents of the HL register, if B is non-zero
+		// repeat instruction
+		// OpCodes: 0xEDB2
+		void INIR();
+	
+		// IND
+		// IO port is selected by the contents of register C, the byte is 
+		// read in and placed into the contents of the HL register, the byte
+		// counter is incremented and the HL incremented
+		// OpCodes: 0xEDAA
+		void IND();
+		
+		// INDR
+		// IO port is selected by the contents of register C, the byte is 
+		// read in and placed into the contents of the HL register, if B is non-zero
+		// repeat instruction
+		// OpCodes: 0xEDBA
+		void INDR();	
+	
+		// OUT (n),A
+		// The output port is selected with address (almost always FE) of the integer along with 
+		// register A, the byte in register A is copied to the address where the bits in the byte 
+		// are read the action taken depending on which bits are on/off
+		// OpCodes: 0xD3
+		void OUTA( uint8_t val ); 
+
+		// OUT (C),r
+		// Contents of register C is used to select an ouput port, byte in register
+		// r is copied to the port
+		// OpCodes: 0xED41, 0xED49, 0xED51, 0xED59, 0xED61, 0xED69, 0xED79
+		void OUTC( uint8_t &reg );
+
+		// OUTI
+		// Output to port referecne by contents of address in HL register
+		// register B is used as a counter and is decremented
+		// OpCodes: 0xEDA3
+		void OUTI();
+		
+		// OTIR
+		// Output to port referecne by contents of address in HL register
+		// register B is used as a counter and is decremented, the instruction is 
+		// repeated if B is non-zero
+		// OpCodes: 0xEDB3
+		void OTIR();	
+
+		// OUTD
+		// Output to port referecne by contents of address in HL register
+		// register B is used as a counter and is decremented
+		// OpCodes: 0xEDAB
+		void OUTD();	
+
+		// OTDR
+		// Output to port referecne by contents of address in HL register
+		// register B is used as a counter and is decremented, the instruction is 
+		// repeated if B is non-zero
+		// OpCodes: 0xEDBB
+		void OTDR();	
+
+		// Utility functions
+
+		// Memory handling
+
+		// Read byte from memory given 16-bit address
+		uint8_t readByte( uint16_t romAddrs );
+
+		// Write byte to memory given 16-bit address
+		void writeByte( uint16_t addrs, uint8_t val );
+
+		// Set the given bit in a byte to either 1 or 0
+		void setBitInByte(uint8_t &byte, uint8_t pos, uint8_t val);
+
+		bool IsBitSet( uint8_t &byte, uint8_t pos );
+
+		// But first byte in to HO byte, and second byte in to LO byte of a word
+		uint16_t byteToWord(uint8_t *byte1, uint8_t *byte2);
+
+		// Return the LO from a word
+		uint8_t getLOByte(uint16_t *word);
+
+		// Return the Ho from a word
+		uint8_t getHOByte(uint16_t *word);
+		
+		
 
 };
 

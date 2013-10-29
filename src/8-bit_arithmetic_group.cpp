@@ -159,8 +159,7 @@ void OR8BitValWithA( uint8_t val );
 // Logical XOR the value at address of IX plus offset with register A
 // OpCodes: 0xFDAE
 void CPU::XOR8BitValWithA( uint8_t val ){
-	regA ^= val;
-	pc++;		
+	regA ^= val;		
 } 	
 
 // CP,s		
@@ -208,7 +207,7 @@ void DEC8BitReg( uint8_t &reg );
 
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
-// OpCodes: 0x34
+// OpCodes: 0x35
 void DECAddrsOfHL( uint8_t &reg );
 
 // DEC(IX+d)

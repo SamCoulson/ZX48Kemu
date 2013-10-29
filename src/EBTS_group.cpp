@@ -187,8 +187,6 @@ void CPU::LDI(){
 
 	// N flag rest
 	setBitInByte(regF, 5, 0 );
-
-	pc++;
 }
 
 // LDIR *Changes flags*
@@ -229,8 +227,6 @@ void CPU::LDIR(){
 	setBitInByte( regF, 5, 0 );
 	setBitInByte( regF, 3, 0 );
 	setBitInByte( regF, 2, 0 );
-
-	pc++;
 }
 
 // LDD *Changes flags* 
@@ -316,9 +312,6 @@ void CPU::LDDR(){
 	setBitInByte( regF, 5, 0 );
 	setBitInByte( regF, 3, 0 );
 	setBitInByte( regF, 2, 0 );
-
-	pc++;
-	
 }
 
 // CPI *Changes flags*

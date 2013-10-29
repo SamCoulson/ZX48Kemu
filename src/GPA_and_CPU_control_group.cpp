@@ -25,6 +25,9 @@
 // NOP
 // Perform no operation during the machine cycle
 // OpCodes: 0x00
+void CPU::NOP(){
+	// Suposed to wait 6 T-cycles
+}
 
 // HALT
 // Suspend CPU operation until an interupt is received
@@ -37,8 +40,7 @@ void CPU::DI(){
 	// Disable maskable interrupt so that maskable interrupt requests
 	// are ignored` 
 	IFF1 = false;
-	IFF2 = false;
-	pc++;	
+	IFF2 = false;	
 }
 
 // EI

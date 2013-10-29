@@ -14,7 +14,6 @@
 void CPU::LD8BitRegTo8BitReg( uint8_t &dstReg, uint8_t &srcReg ){
 	// Copy the source register values into the destination register
 	dstReg = srcReg;
-	pc++;
 }
 
 // LD r,n
@@ -23,7 +22,6 @@ void CPU::LD8BitRegTo8BitReg( uint8_t &dstReg, uint8_t &srcReg ){
 void CPU::LD8BitIntTo8BitReg( uint8_t &dst, uint8_t src ){
 	// Copy the source values into the registers
 	dst = src;
-	pc++;
 }
 
 // LD r,(HL)
@@ -32,7 +30,7 @@ void CPU::LD8BitIntTo8BitReg( uint8_t &dst, uint8_t src ){
 void CPU::LDAddrsOfHLTo8BitReg( uint8_t &reg ){
 	// Read the value of the PC to determine which operation we are doing
 	reg = readByte(byteToWord(&regH, &regL));
-	pc++;
+	
 }
 
 // LD r,(IX+d)
@@ -40,7 +38,7 @@ void CPU::LDAddrsOfHLTo8BitReg( uint8_t &reg ){
 // OpCodes: 0xDD46, 0xDD4E, 0xDD56, 0xDD5E, 0xDD66, 0xDD6E, 0xDD7E
 void CPU::LDAddrsOfIXdTo8BitReg( uint8_t &reg, uint8_t disp ){
 	reg = readByte( indexIX+disp );
-	pc++;
+	
 }
 
 // LD r,(IY+d)
@@ -225,7 +223,6 @@ void CPU::LDRToA(){
 // OpCodes: 0xED47
 void CPU::LDAToI(){
 	regI = regA;
-	pc++;
 }
 
 // LD R,A
@@ -233,5 +230,4 @@ void CPU::LDAToI(){
 // OpCodes: 0xED4F
 void CPU::LDAToR(){
 	regR = regA;
-	pc++;
 }

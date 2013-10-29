@@ -54,10 +54,10 @@ void CPU::execute( uint8_t* opcode ){
 	std::cout << std::showbase << std::hex << pc << std::dec << std::noshowbase <<"\t";
 
 	switch( *opcode ){
-		/*case 0x00:
-			std::cout << "NOP";
-			pc++;
-		break;*/
+		case 0x00:
+			std::cout << "NOP (Not implemented yet!)";
+			NOP();
+			break;
 		case 0x01:
 			LD16BitConstTo16BitReg(regB, regC, readByte(++pc), readByte(pc++) );
 			std::cout << "LD BC,"<< std::hex << (int)regB << (int)regC;
@@ -220,7 +220,7 @@ void CPU::execute( uint8_t* opcode ){
 			break;*/
 		case 0x36:
 			LD8BitIntToAddrsOfHL( readByte( ++pc ) );
-			std::cout << "LD (HL),+" << readByte( pc-1 );
+			std::cout << "LD (HL),+" << (int)readByte( pc-1 );
 			break;/*
 		case 0x37:
 			std::cout << "SCF";
@@ -232,7 +232,7 @@ void CPU::execute( uint8_t* opcode ){
 			printf("");
 			break;*/
 		case 0x3A:
-			std::cout << "LD A,(" << readByte( pc+1 ) << readByte( pc+2 ) << ")";
+			std::cout << "LD A,(" << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << ")";
 			LDAddrsOf16BitIntToA( regA, readByte( ++pc ), readByte( ++pc ) );
 			break;/*
 		case 0x3B:
@@ -245,8 +245,8 @@ void CPU::execute( uint8_t* opcode ){
 			std::cout << "DEC A";
 		break;*/
 		case 0x3E:
-			std::cout << "LD A," << readByte(++pc);
-			LD8BitIntTo8BitReg( regA, readByte(pc) );
+			std::cout << "LD A," << std::hex << (int)readByte(pc+1);
+			LD8BitIntTo8BitReg( regA, readByte(++pc) );
 		break;/*
 		case 0x3F:
 			std::cout << "CCF";
@@ -650,11 +650,11 @@ void CPU::execute( uint8_t* opcode ){
 			POP( regB, regC );
 			break;/*
 		case 0xC2:
-			break;
+			break;*/
 		case 0xC3:
-			std::cout << "JP " << std::hex << (unsigned int)*memPtr->getByte( pc+2 ) << (unsigned int)*memPtr->getByte( pc+1 );
-			JP(memPtr->getByte( pc+=1 ), memPtr->getByte( pc+=1 ) );
-		break;
+			std::cout << "JP " << std::hex << (int)readByte( pc+2 ) << (int)readByte( pc+1 );
+			JP( readByte( ++pc ), readByte( ++pc ) );
+		break;/*
 		case 0xC4:
 			break;*/
 		case 0xC5:
@@ -693,11 +693,11 @@ void CPU::execute( uint8_t* opcode ){
 			POP( regD, regE );
 			break;/*
 		case 0xD2:
-			break;
+			break;*/
 		case 0xD3:
-			OUTA(*memPtr->getByte( pc++ ), &regA);
-			std::cout << "OUT (" << (unsigned int)*memPtr->getByte( pc-1 ) << "),A";
-			break;
+			std::cout << std::hex << "OUT (" << (int)readByte( pc+1 ) << "),A (Not implemented yet!)";
+			OUTA( readByte( ++pc ) );
+			break;/*
 		case 0xD4:
 			std::cout << "CALL NC,%X%X";
 			break;*/
@@ -723,7 +723,7 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xDC:
 			break;*/
 		case 0xDD:
-			switch( ++pc ){
+			switch( (int)readByte( ++pc ) ){
 			case 0x21:
 				std::cout << "LD IX," << (int)readByte( pc+1 ) << (int)readByte(pc+2);
 				LD16BitIntToIXReg( readByte(++pc), readByte(++pc) );
@@ -862,7 +862,7 @@ void CPU::execute( uint8_t* opcode ){
 			printf("");
 			break;*/
 		case 0xED:
-			switch( ++pc ){
+			switch( (int)readByte( ++pc ) ){
 			case 0x43:
 				std::cout << "LD (" << readByte(pc+1) << readByte(pc+2) << "),BC";
 				LD16BitRegToAddrsOf16BitInt( readByte( ++pc ),readByte( ++pc ), regB, regC );				
@@ -979,7 +979,7 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xFC:
 			break;*/
 		case 0xFD:
-			switch( ++pc ){
+			switch( (int)readByte( ++pc ) ){
 			case 0x21:
 				std::cout << "LD IY," << (int)readByte(pc+1) << (int)readByte(pc+2);
 				LD16BitIntToIYReg( readByte(++pc), readByte(++pc) );				
@@ -1100,7 +1100,7 @@ void CPU::start(){
 		
 		// Execute the opcode pointed to by program counter
 		execute( memPtr->getByte( pc ) );
-
+		pc++;
 	}
 }
 

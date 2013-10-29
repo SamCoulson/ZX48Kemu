@@ -9,8 +9,7 @@
 // OpCodes: 0x01, 0x11, 0x21, 0x31
 void CPU::LD16BitConstTo16BitReg( uint8_t &dstHO, uint8_t &dstLO, uint8_t srcHO, uint8_t srcLO ){
 	dstHO = srcHO;
-	dstLO = srcLO;
-	pc++;	
+	dstLO = srcLO;	
 }
 
 // LD IX,nn
