@@ -194,18 +194,22 @@ void CPU::LDI(){
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
 void CPU::LDIR(){
+
+	// Transfer byte pointed to by HL to location pointed to by BC
+	uint8_t byte = readByte( byteToWord( &regH, &regL ) );
+	writeByte( byteToWord( &regD, &regE ), byte );
+
 	// If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-	if( byteToWord(&regB, &regC) == 0x00){
+	if( byteToWord(&regB, &regC) == 0x0000){
 		regB = 0xFA;
 		regC = 0x00;
 	}
 
-	while( byteToWord( &regB, &regC ) > 0x00 ){
-
+	while( ( regB != 0x00 ) && ( regC != 0x00 ) ){
 		// Decrement program counter by two
 		pc-=2;
 
-		// Decrement HL, DE, and BC until BC is 0
+		// increment HL, DE, and BC until BC is 0
 		uint16_t word = byteToWord(&regD, &regE);
 		word++;
 		regD = getLOByte(&word);
@@ -213,14 +217,15 @@ void CPU::LDIR(){
 
 		word = byteToWord(&regH, &regL);
 		word++;
-		regH = getLOByte(&word);
-		regL = getHOByte(&word);
+		regH = (int)getLOByte(&word);
+		regL = (int)getHOByte(&word);
 
 		// Decrement BC
 		word = byteToWord(&regB, &regC);
 		word--;
-		regB = getLOByte(&word);
-		regC = getHOByte(&word);
+		
+		regB = (int)getLOByte(&word);
+		regC = (int)getHOByte(&word);
 	}
 
 	// Reset flags H, P/V, and N

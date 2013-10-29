@@ -116,9 +116,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0x13:
 			break;
 		case 0x14:
-			break;
-		case 0x15:
 			break;*/
+		case 0x15:
+			std::cout << "DEC D";
+			DEC8BitReg( regD );
+			break;
 		case 0x16:
 			std::cout << "LD D," << (int)readByte(++pc);
 			LD8BitIntTo8BitReg( regD, readByte(pc) );
@@ -147,19 +149,18 @@ void CPU::execute( uint8_t* opcode ){
 			LD8BitIntTo8BitReg( regE, readByte(pc) );
 			break;/*
 		case 0x1F:
-			break;
-		case 0x20:
-			JRNZ( memPtr->getByte( ++pc ) );
-			std::cout << "JR NZ," << (unsigned int)*memPtr->getByte( pc );
 			break;*/
+		case 0x20:
+			std::cout << "JR NZ," << (int)(int8_t)readByte( pc+1 );
+			JRNZ( (int8_t)readByte( ++pc ) );
+			break;
 		case 0x21:
 			LD16BitConstTo16BitReg(regH, regL, readByte(++pc), readByte(pc++) );
 			std::cout << "LD HL,"<< std::hex << (int)regH << (int)regL;
 			break;
 		case 0x22:
 			std::cout << "LD (" << std::hex << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << std::dec << "),HL";
-			LDHLRegToAddrsOf16BitInt( readByte( ++pc ), readByte( ++pc ) );
-							
+			LDHLRegToAddrsOf16BitInt( readByte( ++pc ), readByte( ++pc ) );							
 			break;/*
 		case 0x23:
 			std::cout << "INC HL";
@@ -184,11 +185,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0x2A:
 			std::cout << "LD HL,(" << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << ")"; 
 			LDAddrsOf16BitIntToHLReg( readByte( ++pc ), readByte( ++pc )  );
-			break;/*
+			break;
 		case 0x2B:
 			std::cout << "DEC HL";
-			DEC(regH,regL);
-		break;
+			DEC16BitReg( regH, regL);
+			break;/*
 		case 0x2C:
 			break;
 		case 0x2D:
@@ -219,8 +220,8 @@ void CPU::execute( uint8_t* opcode ){
 			printf("");
 			break;*/
 		case 0x36:
+			std::cout << "LD (HL),+" << (int)readByte( pc+1 );
 			LD8BitIntToAddrsOfHL( readByte( ++pc ) );
-			std::cout << "LD (HL),+" << (int)readByte( pc-1 );
 			break;/*
 		case 0x37:
 			std::cout << "SCF";
@@ -630,11 +631,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xBA:
 			break;
 		case 0xBB:
-			break;
+			break;*/
 		case 0xBC:
 			std::cout << "CP H";
-			CP(regH);
-		break;
+			CP8BitValWithA( regH );
+			break;/*
 		case 0xBD:
 			break;
 		case 0xBE:
@@ -648,9 +649,12 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xC1:
 			std::cout << "POP BC";
 			POP( regB, regC );
-			break;/*
+			break;
 		case 0xC2:
-			break;*/
+			std::cout << "JP NZ " << std::hex << (int)readByte( pc+2 ) <<
+			       	(int)readByte( pc+1 );
+			JPCondition( "NZ", readByte( ++pc ), readByte( ++pc ) );
+			break;
 		case 0xC3:
 			std::cout << "JP " << std::hex << (int)readByte( pc+2 ) << (int)readByte( pc+1 );
 			JP( readByte( ++pc ), readByte( ++pc ) );
@@ -1096,8 +1100,8 @@ void CPU::start(){
 	// Begin executing from 0x00
 	setPC(0x00);
 
-	for(int i = 0; i < 125; i++){
-		
+	//for(int i = 0; i < 94000; i++ ){
+	while( memPtr->getByte( pc ) ){	
 		// Execute the opcode pointed to by program counter
 		execute( memPtr->getByte( pc ) );
 		pc++;

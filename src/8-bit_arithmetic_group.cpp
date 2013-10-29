@@ -178,7 +178,21 @@ void CPU::XOR8BitValWithA( uint8_t val ){
 // CP A,(IY+d)
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
-void CP8BitValWithA( uint8_t val ); 	
+void CPU::CP8BitValWithA( uint8_t val ){
+	// If the values are equal set the Z flag to 1 and S flag to 0
+	if( val == regA ){
+		setBitInByte( regF, 7, 1 );
+		setBitInByte( regF, 8, 0 );
+	}else{
+		setBitInByte( regF, 7, 0 );
+		setBitInByte( regF, 8, 1 );
+	}
+
+	// ** Overflow bits need to be set ?? Not sure how yet **
+
+	// N is set
+	setBitInByte( regF, 2, 1 );	
+}	
 
 // INC r
 // Increment an 8-Bit register
@@ -203,7 +217,9 @@ void INCAddrsOfIYOffset( uint8_t &reg );
 // DEC r
 // Decrement an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void DEC8BitReg( uint8_t &reg );
+void CPU::DEC8BitReg( uint8_t &reg ){
+	reg--;
+}
 
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register

@@ -55,7 +55,7 @@ void CPU::LDAddrsOfIYdTo8BitReg( uint8_t &reg, uint8_t disp ){
 void CPU::LD8BitRegToAddrsOfHL( uint8_t &reg ){
 	// Read the value of the PC to determine which operation we are doing
 	writeByte(byteToWord(&regH, &regL), reg);
-	pc++;
+
 }
 
 // LD (IX+d),r
@@ -63,15 +63,13 @@ void CPU::LD8BitRegToAddrsOfHL( uint8_t &reg ){
 // OpCodes: 0xFD70, 0xFD71, 0xFD72, 0xFD73, 0xFD74, 0xFD75, 0xFD77
 void CPU::LD8BitRegToAddrsOfIXd( uint8_t &reg, uint8_t disp ){
 	writeByte( indexIX + disp, reg );
-	pc++;
 }
 
 // LD (IY+d),r
 // Copy value from 8-bit register to address in IY+d 
 // OpCodes: 0xDD70, 0xDD71, 0xDD72, 0xDD73, 0xDD74, 0xDD75, 0xDD77
 void CPU::LD8BitRegToAddrsOfIYd( uint8_t &reg, uint8_t disp ){
-	writeByte( indexIY + disp, reg );
-	pc++;
+	writeByte( indexIY + disp, reg );	
 }
 
 // LD (HL),n
@@ -80,7 +78,6 @@ void CPU::LD8BitRegToAddrsOfIYd( uint8_t &reg, uint8_t disp ){
 void CPU::LD8BitIntToAddrsOfHL( uint8_t val ){
 	// Read the value of the PC to determine which operation we are doing
 	writeByte(byteToWord(&regH, &regL), val);
-	pc++;
 }
 
 // LD (IX+d),n
@@ -88,7 +85,6 @@ void CPU::LD8BitIntToAddrsOfHL( uint8_t val ){
 // OpCodes: 0xDD36
 void CPU::LD8BitIntToAddrsOfIXd( uint8_t disp, uint8_t val ){
 	writeByte( indexIX + disp, val );
-	pc++;
 }
 
 // LD (IY+d),n
@@ -96,7 +92,6 @@ void CPU::LD8BitIntToAddrsOfIXd( uint8_t disp, uint8_t val ){
 // OpCodes: 0xFD36
 void CPU::LD8BitIntToAddrsOfIYd( uint8_t disp, uint8_t val ){
 	writeByte( indexIY + disp, val );
-	pc++;
 }
 
 // LD A,(BC)
@@ -104,7 +99,6 @@ void CPU::LD8BitIntToAddrsOfIYd( uint8_t disp, uint8_t val ){
 // OpCodes: 0x0A
 void CPU::LDAddrsOfBCToA(){
 	regA = readByte( byteToWord(&regB, &regC) );
-	pc++;
 }
 
 // LD A,(DE)

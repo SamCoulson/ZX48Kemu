@@ -11,7 +11,18 @@ void CPU::JP( uint8_t byte1, uint8_t byte2 ){
 // JP cc, nn
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
 // OpCodes: 0xC2, 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
-void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 );
+void CPU::JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 ){
+	// first byte is LO of 16 bit address
+	
+	if( flag == "NZ" ){
+		// If N and Z are non-zero jump to address
+		if( ( IsBitSet( regF, 7 ) != true ) && ( IsBitSet( regF, 2 ) != true ) ){
+			pc = byteToWord( &byte2, &byte1 );
+		}
+	}
+}
+
+
 
 // JR e
 // Jump relative given 8-bit value
@@ -36,7 +47,21 @@ void JRZ( uint8_t val );
 // JR NZ, e
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
 // OpCodes: 0x20
-void JRNZ( uint8_t val );
+void CPU::JRNZ( int8_t val ){
+	// IF Z is 0 jump
+	
+	if( IsBitSet( regF, 7 ) != true ){
+		// jump to val but -2 from the value first,
+		// 1 for because jump happens from the
+		// opcode location and 2 because the loop will autoincrement on
+		// execution of next instruction
+		val +=2;		
+		pc += val;	
+	}
+
+	std::cout << "HL reg " << std::hex << (int)regH << (int)regL << std::endl;
+	// If not, do nothing
+}
 
 // JP(HL)
 // Load program counter with contents of address pointed to by HL register

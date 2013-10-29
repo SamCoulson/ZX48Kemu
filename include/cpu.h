@@ -595,7 +595,7 @@ class CPU{
 		// OpCodes: 0xED5E
 
 		/////////////////////////////////////////////////////////////////////////////////////////////
-	
+		//	
 		// *** 16-bit Arithmetic group***
 		//
 
@@ -603,41 +603,62 @@ class CPU{
 		// Any of the register pairs BC, DE, HL or SP are added to the contents
 		// of the HL register
 		// OpCodes: 0x09, 0x19, 0x29, 0x39
-		
+		void ADD16BitRegToHL( uint8_t &HOreg, uint8_t &LOreg );
+
 		// ADC HL,ss
 		// Any of the register pairs BC, DE, HL or SP with the Carry flag 
 		// are added to the contents of the HL register
 		// OpCodes: 0xED4A, 0xED5A, 0xED6A, 0x0xED7A
+		void ADC16BitRegToHL( uint8_t &HOreg, uint8_t &LOreg );	
 		
 		// SBC HL,ss
 		// Any of the register pairs BC, DE, HL or SP with the Carry flag 
 		// are subtracted to the contents of the HL register
 		// OpCodes: 0xED42, 0xED52, 0xED62, 0xED72
-		
+		void SBC16BitRegToHL( uint8_t &HOreg, uint8_t &LOreg );	
+
 		// ADD IX,pp
 		// Any of the register pairs BC, DE, HL or SP are added to the contents
 		// of the IX register
 		// OpCodes: 0xDD09, 0xDD19, 0xDD29, 0xDD39
- 
+		void ADD16BitRegToIX( uint8_t &HOreg, uint8_t &LOreg );
+
 		// ADD IY,rr
 		// Any of the register pairs BC, DE, HL or SP are added to the contents
 		// of the IY register
 		// OpCodes: 0xFD09, 0xFD19, 0xFD29, 0xFD39
- 
+		void ADD16BitRegToIY( uint8_t &HOreg, uint8_t &LOreg );
+
 		// INC ss
 		// Any of the register pairs BC, DE, HL or SP are incremented
 		// OpCodes: 0x03, 0x13, 0x23, 0x33
-		
+		void INC16BitReg( uint8_t &HOreg, uint8_t &LOreg );		
+
 		// INC IX
 		// Contents of IX register is incremnted
 		// OpCodes: 0xDD23
-		
+		void INCIX();	
+
 		// INC IY
 		// Contents of IX register is incremnted
 		// OpCodes: 0xFD23
+		void INCIY();	
+
+		// DEC ss
+		// Any of the register pairs BC, DE, HL or SP are decremented
+		// OpCodes: 0x0B, 0x1B, 0x2B, 0x3B
+		void DEC16BitReg( uint8_t &HOreg, uint8_t &LOreg );		
+
+		// DEC IX
+		// Contents of IX register is decremnted
+		// OpCodes: 0xDD2B
+		void DEXIX();
 		
+		// DEC IY
+		// Contents of IX register is decremnted
+		// OpCodes: 0xFD2B
+		void DECIY();
 	
-		
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		//
 		// *** Jump group ***
@@ -674,8 +695,9 @@ class CPU{
 
 		// JR NZ, e
 		// Jump relative when z not 0 - Jump by val if Z in flags is non-zero
+		// Note: has signed int type because value may be + or -
 		// OpCodes: 0x20
-		void JRNZ( uint8_t val );
+		void JRNZ( int8_t val );
 
 		// JP(HL)
 		// Load program counter with contents of address pointed to by HL register
@@ -696,6 +718,38 @@ class CPU{
 		// Jump on the condition of B reg being non-zero
 		// OpCodes: 0x10
 		void DJNZ( uint8_t val );
+		
+		//////////////////////////////////////////////////////////////////////////
+		
+		// *** Call and Return group ***
+
+		// CALL nn
+		// Save PC to external memory stack and load in nn to PC
+		// OpCodes: 0xCD
+
+		// CALL cc,nn
+		// Save PC to external memory stack and load in nn to PC under a condition
+		// OpCodes: 0xDC, 0xFC, 0xD4, 0xC4, 0xF4, 0xEC, 0xE4, 0xCC
+		
+		// RET
+		// Copy stack pointer address to HO and stack pointer+1 to LO of PC
+		// OpCodes: 0xC9
+		// RET cc
+		// Copy stack pointer address to HO and stack pointer+1 to LO of PC	
+		// OpCodes: 0xD8, 0xF8, 0xD0, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
+
+		// RETI
+		// Return from interrupt
+		// OpCodes: 0xED4D
+
+		// RETN
+		// Return from non-maskable interrupt
+		// OpCodes: 0xED45
+
+		// RST p
+		// Execute page zero routines
+		// OpCodes: 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7, 0xFF 
+
 
 		//////////////////////////////////////////////////////////////////////////
 		

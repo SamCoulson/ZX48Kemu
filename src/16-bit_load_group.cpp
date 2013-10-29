@@ -18,7 +18,6 @@ void CPU::LD16BitConstTo16BitReg( uint8_t &dstHO, uint8_t &dstLO, uint8_t srcHO,
 void CPU::LD16BitIntToIXReg( uint8_t srcHO, uint8_t srcLO ){
 	uint16_t word = byteToWord(&srcHO, &srcLO);
 	indexIX = word;
-	pc++;
 }
 // LD IY,nn
 // Copy 2-byte integer value into IY 16-bit register
@@ -26,7 +25,6 @@ void CPU::LD16BitIntToIXReg( uint8_t srcHO, uint8_t srcLO ){
 void CPU::LD16BitIntToIYReg( uint8_t srcHO, uint8_t srcLO ){
 	uint16_t word = byteToWord(&srcHO, &srcLO);
 	indexIX = word;
-	pc++;
 }
 
 // LD HL,(nn)
@@ -35,7 +33,6 @@ void CPU::LD16BitIntToIYReg( uint8_t srcHO, uint8_t srcLO ){
 void CPU::LDAddrsOf16BitIntToHLReg( uint8_t srcIntHO, uint8_t srcIntLO ){		
 	regL = readByte( byteToWord( &srcIntHO, &srcIntLO ) );
 	regH = readByte( byteToWord( &srcIntHO, &srcIntLO )+1 );
-	pc++;
 }
 
 // LD dd,(nn)
@@ -46,7 +43,6 @@ void CPU::LDAddrsOf16BitIntTo16BitReg( uint8_t &regHO, uint8_t &regLO, uint8_t s
 	
 	regLO = readByte( byteToWord( &srcIntHO, &srcIntLO ) );
 	regHO = readByte( byteToWord( &srcIntHO, &srcIntLO )+1 );
-	pc++;
 }
 
 
@@ -69,10 +65,9 @@ void CPU::LD16BitAddrsOf16BitIntToIX( uint8_t srcIntHO, uint8_t srcIntLO ){
 	uint8_t HObyte = readByte( srcWord );
 
 	// Write the both bytes to the 16-bit register IX register
-	indexIX = byteToWord( &HObyte, &LObyte );	
-
-	pc++;
+	indexIX = byteToWord( &HObyte, &LObyte );		
 }
+
 // LD IY,(nn)
 // Copy value into 16-bit HL IY register at the 16-bit integer address
 // OpCodes: 0xFD2A
@@ -92,8 +87,6 @@ void CPU::LD16BitAddrsOf16BitIntToIY( uint8_t srcIntHO, uint8_t srcIntLO ){
 
 	// Write the both bytes to the 16-bit register IX register
 	indexIX = byteToWord( &HObyte, &LObyte );	
-
-	pc++;
 }
 
 // LD(nn),HL
@@ -101,7 +94,6 @@ void CPU::LD16BitAddrsOf16BitIntToIY( uint8_t srcIntHO, uint8_t srcIntLO ){
 // OpCodes: 0x22
 void CPU::LDHLRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 	LD16BitRegToAddrsOf16BitInt( dstIntHO, dstIntLO, regH, regL );
-	pc++;
 }
 
 // LD(nn),dd
@@ -114,8 +106,6 @@ void CPU::LD16BitRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO, uint8
 
 	// Copy value in HO reg in to address nn+1
 	writeByte( byteToWord( &dstIntHO, &dstIntLO)+1, srcRegHO );
-
-	pc++;
 }
 
 // LD(nn),IX
@@ -124,7 +114,6 @@ void CPU::LD16BitRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO, uint8
 void CPU::LDIXRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 	writeByte( byteToWord( &dstIntHO, &dstIntLO ), getLOByte( &indexIX ) );
 	writeByte( byteToWord( &dstIntHO, &dstIntLO )+1, getLOByte( &indexIX ) );
-	pc++;
 }
 
 // LD(nn),IY
@@ -133,7 +122,6 @@ void CPU::LDIXRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 void CPU::LDIYRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 	writeByte( byteToWord( &dstIntHO, &dstIntLO ), getLOByte( &indexIY ) );
 	writeByte( byteToWord( &dstIntHO, &dstIntLO )+1, getLOByte( &indexIY ) );
-	pc++;
 }
 
 // LD SP,HL
@@ -141,7 +129,6 @@ void CPU::LDIYRegToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 // OpCodes: 0xF9
 void CPU::LDHLRegToSPReg(){
 	sp = byteToWord( &regH, &regL );
-	pc++;
 }
 
 // LD SP,IX
@@ -149,7 +136,7 @@ void CPU::LDHLRegToSPReg(){
 // OpCodes: 0xDDF9
 void CPU::LDIXRegToSPReg(){
 	sp = indexIX;
-	pc++;
+
 }
 
 // LD SP,IY
@@ -157,7 +144,7 @@ void CPU::LDIXRegToSPReg(){
 // OpCodes: 0xFDF9
 void CPU::LDIYRegToSPReg(){
 	sp = indexIY;
-	pc++;
+
 }
 
 // PUSH qq
@@ -175,7 +162,7 @@ void CPU::PUSH( uint8_t &regHO, uint8_t &regLO ){
 
 	// Write the LO reg value into the address specified by SP
 	writeByte( sp, regLO );
-	pc++;
+	
 }
 
 // PUSH IX
@@ -194,7 +181,7 @@ void CPU::PUSHIX(){
 	// Write the LO reg value into the address specified by SP
 	writeByte( sp, getLOByte( &indexIX ) );
 		
-	pc++;
+
 }
 
 // PUSH IY
@@ -213,7 +200,7 @@ void CPU::PUSHIY(){
 	// Write the LO reg value into the address specified by SP
 	writeByte( sp, getLOByte( &indexIY ) );
 		
-	pc++;	
+	
 }
 
 // POP qq
@@ -229,7 +216,7 @@ void CPU::POP( uint8_t &regHO, uint8_t &regLO ){
 	// Copy value at new stack pointer
 	regHO = sp;	
 
-	pc++;
+
 }
 
 // POP IX
@@ -247,8 +234,6 @@ void CPU::POPIX(){
 
 	// Combine LO and Ho byte in to a word and copy to IX
 	indexIX = byteToWord( &HObyte, &LObyte );
-
-	pc++;
 }
 
 // POP IY
@@ -266,7 +251,5 @@ void CPU::POPIY(){
 
 	// Combine LO and Ho byte in to a word and copy to IX
 	indexIY = byteToWord( &HObyte, &LObyte );
-
-	pc++;
 }	
 
