@@ -1,5 +1,7 @@
-#include "../include/call_and_return_group.h"
+#ifndef INC_CALLANDRETUNGROUP_H
+#define INC_CALLANDRETUNGROUP_H
 
+#include <stdint.h>
 //////////////////////////////////////////////////////////////////////////
 
 // *** Call and Return group ***
@@ -7,9 +9,7 @@
 // CALL nn
 // Save PC to external memory stack and load in nn to PC
 // OpCodes: 0xCD
-void CALL( uint8_t HObyte, uint8_t LObyte ){
-
-}
+void CALL( uint8_t HObyte, uint8_t LObyte );
 
 // CALL cc,nn
 // Save PC to external memory stack and load in nn to PC under a condition
@@ -41,4 +41,4 @@ void RETN();
 // OpCodes: 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7, 0xFF 
 void RST( uint8_t routine );
 
-
+#endif // INC_CALLANDRETUNGROUP_H 

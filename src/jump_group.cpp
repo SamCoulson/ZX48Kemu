@@ -37,12 +37,27 @@ void JRC( uint8_t val );
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 // OpCodes: 0x30
-void JRNC( uint8_t val );
+void CPU::JRNC( int8_t val ){
+	// Id C flag is 0 jump relative to val
+	if( IsBitSet( regF, 1 ) != true ){
+		// Add value to pc
+		pc += val;
+	}
+	// Else do nothing	
+}
 
 // JR Z, e
 // Jump relative when z flag is 0
 // OpCodes: 0x28 
-void JRZ( uint8_t val );
+void CPU::JRZ( uint8_t val ){
+	// If Z flag is 0 jump relative to val
+	if( IsBitSet( regF, 7 ) != true ){
+		// Add value to pc
+		pc += val;
+	}
+	// Else do nothing	
+}
+
 
 // JR NZ, e
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
@@ -55,11 +70,10 @@ void CPU::JRNZ( int8_t val ){
 		// 1 for because jump happens from the
 		// opcode location and 2 because the loop will autoincrement on
 		// execution of next instruction
-		val +=2;		
+		//val +=2 **Not sure about the above as leaving along works fine for now		
 		pc += val;	
 	}
 
-	std::cout << "HL reg " << std::hex << (int)regH << (int)regL << std::endl;
 	// If not, do nothing
 }
 

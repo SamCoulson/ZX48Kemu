@@ -19,7 +19,6 @@ void CPU::EXDEHL(){
 	regE = regL;
 	regL = tmp;
 
-	pc++;
 }
 
 // EX AF,AF'
@@ -36,9 +35,7 @@ void CPU::EXAFAltAF(){
 	// Swap F with F'
 	tmp = regE;
 	regE = regL;
-	regL = tmp;
-
-	pc++;	
+	regL = tmp;	
 }
 
 // EXX
@@ -73,8 +70,6 @@ void CPU::EXX(){
 	tmpHL = regL;
 	regL = aregL;
 	aregL = tmpHL;
-
-	pc++;
 }
 
 // EX (SP),HL
@@ -94,7 +89,6 @@ void CPU::EXHLToAddrsOfSP(){
 	regH = readByte( sp+1 );
 	writeByte( sp+1, tmp );
 	
-	pc++;
 }
 
 // EX (SP),IX
@@ -119,7 +113,6 @@ void CPU::EXIXToAddrsOfSP(){
 	writeByte( sp, idxLObyte );
 	writeByte( sp+1, idxHObyte );
 
-	pc++;
 }
 
 // EX (SP),IY
@@ -142,8 +135,6 @@ void CPU::EXIYToAddrsOfSP(){
 	// Write the index values to the locations at SP
 	writeByte( sp, idxLObyte );
 	writeByte( sp+1, idxHObyte );
-
-	pc++;
 }
 
 // LDI *Changes flags*
@@ -275,8 +266,6 @@ void CPU::LDD(){
 
 	// N flag reset
 	setBitInByte(regF, 5, 0 );
-
-	pc++;
 }
 
 // LDDR *Changes flags*
@@ -284,14 +273,18 @@ void CPU::LDD(){
 // Decrement both HL and BC, and decrement BC
 // OpCodes: 0xEDB8
 void CPU::LDDR(){
+	
+	// Transfer byte pointed to by HL to location pointed to by BC
+	uint8_t byte = readByte( byteToWord( &regH, &regL ) );
+	writeByte( byteToWord( &regD, &regE ), byte );
+
 	// If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-	if( byteToWord(&regB, &regC) == 0x00){
+	if( byteToWord(&regB, &regC) == 0x0000){
 		regB = 0xFA;
 		regC = 0x00;
 	}
 
-	while( byteToWord( &regB, &regC ) > 0x00 ){
-
+	while( ( regB != 0x00 ) && ( regC != 0x00 ) ){
 		// Decrement program counter by two
 		pc-=2;
 
@@ -303,21 +296,21 @@ void CPU::LDDR(){
 
 		word = byteToWord(&regH, &regL);
 		word--;
-		regH = getLOByte(&word);
-		regL = getHOByte(&word);
+		regH = (int)getLOByte(&word);
+		regL = (int)getHOByte(&word);
 
 		// Decrement BC
 		word = byteToWord(&regB, &regC);
 		word--;
-		regB = getLOByte(&word);
-		regC = getHOByte(&word);
+		
+		regB = (int)getLOByte(&word);
+		regC = (int)getHOByte(&word);
 	}
 
 	// Reset flags H, P/V, and N
 	setBitInByte( regF, 5, 0 );
 	setBitInByte( regF, 3, 0 );
-	setBitInByte( regF, 2, 0 );
-}
+	setBitInByte( regF, 2, 0 );}
 
 // CPI *Changes flags*
 // Contents of HL compared with contents of A
@@ -356,8 +349,6 @@ void CPU::CPI(){
 	}
 
 	setBitInByte( regF, 2, 1 ); // N is set
-
-	pc++;
 }
 
 // CPIR *Change flags*
@@ -416,9 +407,7 @@ void CPU::CPIR(){
 		setBitInByte(regF, 3, 0 );
 	}
 
-	setBitInByte( regF, 2, 1 ); // N is set
-
-	pc++;	
+	setBitInByte( regF, 2, 1 ); // N is set	
 }
 
 // CPD
@@ -459,8 +448,6 @@ void CPU::CPD(){
 	}
 
 	setBitInByte( regF, 2, 1 ); // N is set
-
-	pc++;
 	
 }
 
@@ -520,7 +507,5 @@ void CPU::CPDR(){
 	}
 
 	setBitInByte( regF, 2, 1 ); // N is set
-
-	pc++;
 }
 

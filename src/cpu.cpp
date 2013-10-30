@@ -1,6 +1,11 @@
 #include "../include/cpu.h"
 #include <assert.h>
-#include "stdio.h"
+#include <iomanip>
+#include <stdio.h>
+#include <conio.h>
+#include <cstring>
+
+#define BUF_SIZE 5
 
 CPU::CPU(Memory* memPtr){
 		
@@ -49,7 +54,7 @@ void CPU::setPC(uint16_t mem){
 	pc = mem;
 }
 
-void CPU::execute( uint8_t* opcode ){
+void CPU::execute( uint8_t* opcode ){	
 
 	std::cout << std::showbase << std::hex << pc << std::dec << std::noshowbase <<"\t";
 
@@ -68,11 +73,11 @@ void CPU::execute( uint8_t* opcode ){
 			break;/*
 		case 0x03:
 			std::cout << "JR NC,";
-		break;
+		break;*/
 		case 0x04:
-			std::cout << "INC B";
-			INC(regB);
-			break;
+			printf( "INC B" );
+			INC8BitReg( regB );
+			break;/*
 		case 0x05:
 			break;*/
 		case 0x06:
@@ -129,11 +134,11 @@ void CPU::execute( uint8_t* opcode ){
 			break;
 		case 0x18:
 			std::cout << "JR 00%X";
-			break;
+			break;*/
 		case 0x19:
 			std::cout << "ADD HL,DE";
-			ADD(regH, regL, regD, regE);
-			break;*/
+			ADD16BitRegToHL( regD, regE );
+			break;
 		case 0x1A:
 			std::cout << "LD A,(DE)";
 			LDAddrsOfDEToA();
@@ -161,11 +166,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0x22:
 			std::cout << "LD (" << std::hex << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << std::dec << "),HL";
 			LDHLRegToAddrsOf16BitInt( readByte( ++pc ), readByte( ++pc ) );							
-			break;/*
-		case 0x23:
-			std::cout << "INC HL";
-			INC(regH, regL);
 			break;
+		case 0x23:
+			printf( "INC HL" );
+			INC16BitReg( regH, regL );
+			break;/*
 		case 0x24:
 			break;
 		case 0x25:
@@ -175,11 +180,11 @@ void CPU::execute( uint8_t* opcode ){
 			LD8BitIntTo8BitReg( regH, readByte(pc) );
 			break;/*
 		case 0x27:
-			break;
+			break;*/
 		case 0x28:
-			std::cout << "JR Z," << (unsigned int)*memPtr->getByte( pc+2 );
-			JRZ( memPtr->getByte( ++pc ) );
-			break;
+			printf( "JR Z, %d", readByte( pc+2 ) );
+			JRZ( readByte( ++pc ) );
+			break;/*
 		case 0x29:
 			break;*/
 		case 0x2A:
@@ -199,11 +204,11 @@ void CPU::execute( uint8_t* opcode ){
 			LD8BitIntTo8BitReg( regL, readByte(pc) );
 			break;/*
 		case 0x2F:
-			break;
+			break;*/
 		case 0x30:
-			std::cout << "JR NC," << (unsigned int)*memPtr->getByte( pc+1 );
-			JRNC( memPtr->getByte( ++pc ) );
-			break;
+			printf("JR NC,%d", readByte( pc+1 ) );
+			JRNC( (int)readByte( ++pc ) );
+			break;/*
 		case 0x31:
 			LD(regS, regP, readByte(pc+=2), readByte(pc-1) );
 			std::cout << "LD SP,"<< std::hex << (int)regH << (int)regL;
@@ -215,10 +220,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0x33:
 			break;
 		case 0x34:
-			break;
-		case 0x35:
-			printf("");
 			break;*/
+		case 0x35:
+			printf("DEC HL");
+			DECAddrsOfHL();
+			break;
 		case 0x36:
 			std::cout << "LD (HL),+" << (int)readByte( pc+1 );
 			LD8BitIntToAddrsOfHL( readByte( ++pc ) );
@@ -584,11 +590,11 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xA5:
 			break;
 		case 0xA6:
-			break;
+			break;*/
 		case 0xA7:
-			std::cout << "AND A";
-			AND(regA);
-		break;
+			printf( "AND A" );
+			AND8BitValWithA( regA );
+		break;/*
 		case 0xA8:
 			break;
 		case 0xA9:
@@ -740,6 +746,10 @@ void CPU::execute( uint8_t* opcode ){
 				std::cout << "LD IX(" << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << ")";
 				LD16BitAddrsOf16BitIntToIX( readByte( ++pc ), readByte( ++pc ) );
 				break;
+			case 0x35:
+				printf( "DEC IX +%d", readByte( pc+1 ) );
+				DECAddrsOfIXOffset( readByte( ++pc ) );
+				break;
 			case 0x36:
 				std::cout << "LD (IX+"<< (int)readByte(pc+1) << ")" << (int)readByte(pc+2);
 				LD8BitIntToAddrsOfIXd( readByte(++pc), readByte(++pc) );
@@ -868,7 +878,7 @@ void CPU::execute( uint8_t* opcode ){
 		case 0xED:
 			switch( (int)readByte( ++pc ) ){
 			case 0x43:
-				std::cout << "LD (" << readByte(pc+1) << readByte(pc+2) << "),BC";
+				std::cout << "LD (" << std::hex << (int)readByte(pc+1) << (int)readByte(pc+2) << "),BC";
 				LD16BitRegToAddrsOf16BitInt( readByte( ++pc ),readByte( ++pc ), regB, regC );				
 				break;
 			case 0x47:
@@ -876,26 +886,25 @@ void CPU::execute( uint8_t* opcode ){
 				LDAToI();
 				break;
 			case 0x4B:
-				std::cout << "LD BC(" << readByte( pc+2 ) << readByte( pc+1 ) << ")";
+				std::cout << "LD BC(" << (int)readByte( pc+2 ) << (int)readByte( pc+1 ) << ")";
 				LDAddrsOf16BitIntTo16BitReg( regB, regC, readByte( ++pc ), readByte( ++pc ) );
 				break;
 			case 0x4F:
 				std::cout << "LD R,A";
 				LDAToR();
-				break;/*
+				break;
 			case 0x52:
 				std::cout << "SBC HL,DE";
-				SBC(regH,regL, regD, regE);
-				break;*/
+				SBC16BitRegToHL( regD, regE );
+				break;
 			case 0x53:
-				std::cout << "LD (" << readByte(pc+1) << readByte(pc+2) << "),DE";
+				std::cout << "LD (" << (int)readByte(pc+1) << (int)readByte(pc+2) << "),DE";
 				LD16BitRegToAddrsOf16BitInt( readByte( ++pc ),readByte( ++pc ), regD, regE );				
-				break;/*
+				break;
 			case 0x56:
-				std::cout << "IM1 (not yet implemented)"; 
-				// Need to work out how the most is determined by the code, i.e. do we set a flag to set the mode??
-				pc++;
-				break;*/
+				printf( "IM1" ); 
+				IM1();
+				break;
 			case 0x57:
 				std::cout << "LD A,I";
 				LDIToA();
@@ -975,11 +984,11 @@ void CPU::execute( uint8_t* opcode ){
 			LDHLRegToSPReg();
 			break;/*
 		case 0xFA:
-			break;
+			break;*/
 		case 0xFB:
-			std::cout << "EI (not implemented yet)";
-			pc++;
-			break;
+			printf( "EI" );
+			EI();
+			break;/*
 		case 0xFC:
 			break;*/
 		case 0xFD:
@@ -995,10 +1004,11 @@ void CPU::execute( uint8_t* opcode ){
 			case 0x2A:
 				std::cout << "LD IY(" << (int)readByte( pc+1 ) << (int)readByte( pc+2 ) << ")";
 				LD16BitAddrsOf16BitIntToIY( readByte( ++pc ), readByte( ++pc ) );
-				break;/*
+				break;
 			case 0x35:
-				std::cout << "DEC IY+" << (unsigned int)*memPtr->getByte( pc+1 );
-				break;*/
+				printf( "DEC IY +%d", readByte( pc+1 ) );
+				DECAddrsOfIYOffset( readByte( ++pc ) );
+				break;
 			case 0x36:
 				std::cout << "LD (IY+"<< (int)readByte(pc+1) << ")" << (int)readByte(pc+2);
 				LD8BitIntToAddrsOfIYd( readByte(++pc), readByte(++pc) );
@@ -1096,15 +1106,42 @@ void CPU::execute( uint8_t* opcode ){
 
 
 void CPU::start(){
-	
-	// Begin executing from 0x00
-	setPC(0x00);
 
-	//for(int i = 0; i < 94000; i++ ){
-	while( memPtr->getByte( pc ) ){	
+	// Begin executing from 0x00
+	setPC( 0x11E2 );
+
+	//While less that 16k rom
+	while( pc < 0x12A2 ){			
+
 		// Execute the opcode pointed to by program counter
 		execute( memPtr->getByte( pc ) );
 		pc++;
+
+		//system("cls");
+		/*
+		printf("\nMain registers\tAlternate registers\n");
+		printf("AF: %02x %02x", regA, regF );  
+		printf("\tAF': %02x %02x\n",aregA, aregF );
+		printf("BC: %02x %02x",regB, regC );  
+		printf("\tBC': %02x %02x\n",aregB, aregC );
+		printf("DE: %02x %02x",regD, regE );  
+		printf("\tDE': %02x %02x\n", aregD, aregE );
+
+		printf("HL: %02x %02x",regH, regL );  
+		printf("\tHL': %02x %02x\n", aregH, aregL );
+
+		printf("\nSP: %04x",sp );
+	      	printf( "\nPC: %04x",pc );	
+
+		printf("\nIX: %04x",indexIX);
+		printf("\tIY: %04x", indexIY);
+
+		printf("\nI: %02x", regI);
+	        printf("\t\tR: %02x\n", regR);
+	
+		printf("\nEFF 1: %d", IFF2);
+		printf("\tEFF 2: %d\n", IFF1);
+		*/
 	}
 }
 

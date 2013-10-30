@@ -121,7 +121,34 @@ void SBC8BitValFromA( uint8_t val );
 // AND A,(IY+d)
 // Logical AND the value at address of IX plus offset with register A
 // OpCodes: 0xFDA6
-void AND8BitValWithA( uint8_t val ); 	
+void CPU::AND8BitValWithA( int8_t val ){
+	regA &= val;
+
+	//printf("regA is %d", (int)(int8_t)regA);
+
+	// If result negative set S to 1 else 0
+	if( (int)(int8_t)regA < 0 ){	
+		setBitInByte( regA, 8, 1 );
+	}else{
+		setBitInByte( regA, 8, 0 );
+	}
+
+	// Z is set to 1 if result is zero else 0
+	if( (int)(int8_t)regA == 0 ){
+		setBitInByte( regA, 7, 1 );	
+	}else{
+		setBitInByte( regA, 7, 0 );
+	}
+
+	// H is set
+	setBitInByte( regA, 5, 1 );
+
+	// P/V not sure
+	
+	// N and C are reset
+	setBitInByte( regA, 2, 0 );
+	setBitInByte( regA, 1, 0 );
+}	
 
 // OR,s		
 // OR A,s
@@ -197,7 +224,9 @@ void CPU::CP8BitValWithA( uint8_t val ){
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void INC8BitReg( uint8_t &reg );
+void CPU::INC8BitReg( uint8_t &reg ){
+	reg++;
+}
 
 // INC(HL)
 // Increment the contents on address pointed to by HL register
@@ -224,14 +253,44 @@ void CPU::DEC8BitReg( uint8_t &reg ){
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
-void DECAddrsOfHL( uint8_t &reg );
+void CPU::DECAddrsOfHL(){
+
+	// Get address in HL
+	uint16_t addrs = byteToWord( &regH, &regL );
+
+	// Get the byte at address	
+	uint8_t val = readByte( addrs );
+
+	val--;
+
+	// Write the val back to the address
+	writeByte( addrs, val );
+}
 
 // DEC(IX+d)
 // Decrement the contents of address plus offset in IX register
-// OpCodes: 0xDD34
-void DECAddrsOfIXOffset( uint8_t &reg );
+// OpCodes: 0xDD35
+void CPU::DECAddrsOfIXOffset( uint8_t offset ){
+	
+	// Get the byte at address	
+	uint8_t val = readByte( indexIX + offset );
+
+	val--;
+
+	// Write the val back to the address
+	writeByte( indexIX + offset, val );	
+}
 
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
-// OpCodes: 0xFD34
-void DECAddrsOfIYOffset( uint8_t &reg );
+// OpCodes: 0xFD35
+void CPU::DECAddrsOfIYOffset( uint8_t offset ){
+	
+	// Get the byte at address	
+	uint8_t val = readByte( indexIY + offset );
+
+	val--;
+
+	// Write the val back to the address
+	writeByte( indexIY + offset, val );
+}

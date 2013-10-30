@@ -46,7 +46,6 @@ void CPU::LDAddrsOfIXdTo8BitReg( uint8_t &reg, uint8_t disp ){
 // OpCodes: 0xFD46, 0xFD4E, 0xFD56, 0xFD5E, 0xFD66, 0xFD6E, 0xFD7E
 void CPU::LDAddrsOfIYdTo8BitReg( uint8_t &reg, uint8_t disp ){
 	reg = readByte( indexIY+disp );
-	pc++;
 }
 
 // LD (HL), r
@@ -55,7 +54,6 @@ void CPU::LDAddrsOfIYdTo8BitReg( uint8_t &reg, uint8_t disp ){
 void CPU::LD8BitRegToAddrsOfHL( uint8_t &reg ){
 	// Read the value of the PC to determine which operation we are doing
 	writeByte(byteToWord(&regH, &regL), reg);
-
 }
 
 // LD (IX+d),r
@@ -106,7 +104,6 @@ void CPU::LDAddrsOfBCToA(){
 // OpCodes: 0x1A
 void CPU::LDAddrsOfDEToA(){
 	regA = readByte( byteToWord(&regD, &regE) );
-	pc++;
 }
 
 // LD A,(nn)
@@ -114,7 +111,6 @@ void CPU::LDAddrsOfDEToA(){
 // OpCodes: 0x3A
 void CPU::LDAddrsOf16BitIntToA( uint8_t &reg, uint8_t srcConstHO, uint8_t srcConstLO ){
 	reg = readByte( byteToWord(&srcConstHO, &srcConstLO) );
-	pc++;
 }
 
 // LD (BC),A
@@ -122,7 +118,6 @@ void CPU::LDAddrsOf16BitIntToA( uint8_t &reg, uint8_t srcConstHO, uint8_t srcCon
 // OpCodes: 0x02
 void CPU::LDAToAddrsOfBC(){
 	regA = readByte( byteToWord( &regB, &regC )  );
-	pc++;
 }
 
 // LD (DE),A
@@ -130,7 +125,6 @@ void CPU::LDAToAddrsOfBC(){
 // OpCodes: 0x12
 void CPU::LDAToAddrsOfDE(){
 	regA = readByte( byteToWord( &regD, &regE )  );
-	pc++;
 }
 
 // LD (nn),A
@@ -138,7 +132,6 @@ void CPU::LDAToAddrsOfDE(){
 // OpCodes: 0x32
 void CPU::LDAToAddrsOf16BitInt( uint8_t dstIntHO, uint8_t dstIntLO ){
 	writeByte( byteToWord(&dstIntHO, &dstIntLO), regA );
-	pc++;
 }
 
 // LD A,I 
@@ -173,8 +166,6 @@ void CPU::LDIToA(){
 
 	// N is set to 0
 	setBitInByte( regF, 2, 0);
-
-	pc++;
 }
 
 // LD A,R
@@ -208,8 +199,6 @@ void CPU::LDRToA(){
 
 	// N is set to 0
 	setBitInByte( regF, 2, 0);
-
-	pc++;
 }
 
 // LD I,A

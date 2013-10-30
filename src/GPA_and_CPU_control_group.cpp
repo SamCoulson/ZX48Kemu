@@ -46,7 +46,11 @@ void CPU::DI(){
 // EI
 // Enable interupt instruction sets, sets both IFF1 and IFF2.
 // OpCodes: 0xFB
- 
+void CPU::EI(){
+	IFF1 = true;
+	IFF2 = true;
+}	
+
 // IM 0
 // Set interrupt mode 0
 // OpCodes: 0xED46
@@ -54,6 +58,9 @@ void CPU::DI(){
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
+void CPU::IM1(){
+	IFF1 = true;
+}
 
 // IM 2
 // Set interrupt mode 2

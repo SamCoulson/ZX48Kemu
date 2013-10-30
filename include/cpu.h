@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <stdio.h>
 #include "memory.h"
+#include "call_and_return_group.h"
 
 class CPU{
 	public:
@@ -17,7 +19,7 @@ class CPU{
 
 	private:
 
-		Memory* memPtr; 
+		Memory* memPtr;
 
 		// 8-Bit Z80 main general purpose registers
 		uint8_t regA;		// Accumulater
@@ -443,7 +445,7 @@ class CPU{
 		// AND A,(IY+d)
 		// Logical AND the value at address of IX plus offset with register A
 		// OpCodes: 0xFDA6
-		void AND8BitValWithA( uint8_t val ); 	
+		void AND8BitValWithA( int8_t val ); 	
 
 		// OR,s		
 		// OR A,s
@@ -528,17 +530,17 @@ class CPU{
 		// DEC(HL)
 		// Decrement the contents on address pointed to by HL register
 		// OpCodes: 0x35
-		void DECAddrsOfHL( uint8_t &reg );
+		void DECAddrsOfHL();
 	
 		// DEC(IX+d)
 		// Decrement the contents of address plus offset in IX register
 		// OpCodes: 0xDD34
-		void DECAddrsOfIXOffset( uint8_t &reg );
+		void DECAddrsOfIXOffset( uint8_t offset );
 
 		// DEC(IY+d)
 		// Decrement the contents of address plus offset in IX register
 		// OpCodes: 0xFD34
-		void DECAddrsOfIYOffset( uint8_t &reg );
+		void DECAddrsOfIYOffset( uint8_t offset );
 		
 		////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -581,7 +583,8 @@ class CPU{
 		// EI
 		// Enable interupt instruction sets, sets both IFF1 and IFF2.
 		// OpCodes: 0xFB
-		 
+		void EI();
+
 		// IM 0
 		// Set interrupt mode 0
 		// OpCodes: 0xED46
@@ -589,7 +592,8 @@ class CPU{
 		// IM 1
 		// Set interrupt mode 1
 		// opCodes: 0xED56
- 
+ 		void IM1();
+
 		// IM 2
 		// Set interrupt mode 2
 		// OpCodes: 0xED5E
@@ -686,7 +690,7 @@ class CPU{
 		// JR NC,e
 		// Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 		// OpCodes: 0x30
-		void JRNC( uint8_t val );
+		void JRNC( int8_t val );
 	
 		// JR Z, e
 		// Jump relative when z flag is 0
@@ -719,38 +723,6 @@ class CPU{
 		// OpCodes: 0x10
 		void DJNZ( uint8_t val );
 		
-		//////////////////////////////////////////////////////////////////////////
-		
-		// *** Call and Return group ***
-
-		// CALL nn
-		// Save PC to external memory stack and load in nn to PC
-		// OpCodes: 0xCD
-
-		// CALL cc,nn
-		// Save PC to external memory stack and load in nn to PC under a condition
-		// OpCodes: 0xDC, 0xFC, 0xD4, 0xC4, 0xF4, 0xEC, 0xE4, 0xCC
-		
-		// RET
-		// Copy stack pointer address to HO and stack pointer+1 to LO of PC
-		// OpCodes: 0xC9
-		// RET cc
-		// Copy stack pointer address to HO and stack pointer+1 to LO of PC	
-		// OpCodes: 0xD8, 0xF8, 0xD0, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
-
-		// RETI
-		// Return from interrupt
-		// OpCodes: 0xED4D
-
-		// RETN
-		// Return from non-maskable interrupt
-		// OpCodes: 0xED45
-
-		// RST p
-		// Execute page zero routines
-		// OpCodes: 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7, 0xFF 
-
-
 		//////////////////////////////////////////////////////////////////////////
 		
 		// *** Input and Output group ***
