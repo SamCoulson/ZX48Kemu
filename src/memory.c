@@ -40,3 +40,12 @@ void memDump(){
 	}
 	
 }
+
+uint8_t* getByte( uint16_t addrs ){
+	return &totalMem[addrs];
+}
+
+uint16_t* getWord( uint16_t addrs ){
+	// Cast the address of the first byte referenced by addrs to a unint16_t to get addrs+1
+	return (uint16_t*)&totalMem[addrs];
+}

@@ -1,6 +1,7 @@
 #ifndef INC_GPAANDCPUCONTGROP_H
 #define INC_GPAANDCPUCONTGROP_H 
 
+#include <stdint.h>
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 // ***General-Purpose Arithmetic and CPU Control Group***
@@ -37,12 +38,12 @@ void NOP();
 // DI
 // Diable the maskable interupts IFF1 and IFF2 by resetting enable interupt flip-flop
 // OpCodes: 0xF3
-void DI();
+void DI( int* iff1, int* iff2 );
 
 // EI
 // Enable interupt instruction sets, sets both IFF1 and IFF2.
 // OpCodes: 0xFB
-void EI();
+void EI( int* iff1, int* iff2 );
 
 // IM 0
 // Set interrupt mode 0
@@ -51,7 +52,7 @@ void EI();
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void IM1();
+void IM1( uint8_t* iff1 );
 
 // IM 2
 // Set interrupt mode 2

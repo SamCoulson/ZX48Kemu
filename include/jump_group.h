@@ -10,7 +10,7 @@
 // JP nn
 // Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
 // OpCodes: 0xC3
-void JP( uint8_t byte1, uint8_t byte2 );
+void JP( uint16_t*, uint16_t* );
 
 // JP cc, nn
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
@@ -30,7 +30,7 @@ void JRC( uint8_t val );
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 // OpCodes: 0x30
-void JRNC( int8_t val );
+void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 
 // JR Z, e
 // Jump relative when z flag is 0
@@ -41,7 +41,7 @@ void JRZ( uint8_t val );
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
 // Note: has signed int type because value may be + or -
 // OpCodes: 0x20
-void JRNZ( int8_t val );
+void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 
 // JP(HL)
 // Load program counter with contents of address pointed to by HL register

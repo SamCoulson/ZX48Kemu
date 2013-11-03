@@ -1,15 +1,16 @@
 #include "../include/jump_group.h"
 #include "../include/util_bit_operations.h"
-#include "../include/cpu.h"
+
 // *** Jump group ***
 
 // JP nn
 // Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
 // OpCodes: 0xC3
-void JP( uint8_t byte1, uint8_t byte2 ){
-//	pc = byteToWord( &byte1, &byte2  );
+void JP( uint16_t* pc, uint16_t* addrs ){
+	// Set the address the pc points to jump address minus one, to compensate for next incremnet on execution loop
+	*pc = *addrs-1;	
 }
-
+/*
 // JP cc, nn
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
 // OpCodes: 0xC2, 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
@@ -23,7 +24,7 @@ void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 ){
 //		}
 	}
 }
-
+*/
 
 
 // JR e
@@ -39,12 +40,12 @@ void JRC( uint8_t val );
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 // OpCodes: 0x30
-void JRNC( int8_t val ){
+void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// Id C flag is 0 jump relative to val
-//	if( getBit( regF, 0 ) == 0 ){
-//		// Add value to pc
-//		pc += val;
-//	}
+	if( getBit( fReg, 0 ) == 0 ){
+		// Add value to pc
+		*pc += (int8_t)*val;
+	}
 	// Else do nothing	
 }
 
@@ -64,19 +65,18 @@ void JRZ( uint8_t val ){
 // JR NZ, e
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
 // OpCodes: 0x20
-void JRNZ( int8_t val ){
+void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
+
 	// IF Z is 0 jump
-	
-//	if( getBit( regF, 6 ) == 0 ){
+	if( getBit( fReg, 6 ) == 0 ){
 		// jump to val but -2 from the value first,
 		// 1 for because jump happens from the
 		// opcode location and 2 because the loop will autoincrement on
 		// execution of next instruction
 		//val +=2 **Not sure about the above as leaving along works fine for now		
-//		pc += val;	
-//	}
-
-	// If not, do nothing
+		*pc += (int8_t)*val;	
+	}
+	// If not, do nothing and execute next instruction
 }
 
 // JP(HL)

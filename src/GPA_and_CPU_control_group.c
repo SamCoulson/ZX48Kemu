@@ -1,4 +1,4 @@
-#include "../include/cpu.h"
+#include "../include/GPA_and_CPU_control_group.h"
 
 // ***General-Purpose Arithmetic and CPU Control Group***
 	
@@ -25,7 +25,7 @@
 // NOP
 // Perform no operation during the machine cycle
 // OpCodes: 0x00
-void CPU::NOP(){
+void NOP(){
 	// Suposed to wait 6 T-cycles
 }
 
@@ -36,19 +36,18 @@ void CPU::NOP(){
 // DI
 // Disable the maskable interrupts IFF1 and IFF2 by resetting enable interupt flip-flop
 // OpCodes: 0xF3
-void CPU::DI(){
-	// Disable maskable interrupt so that maskable interrupt requests
-	// are ignored` 
-	IFF1 = false;
-	IFF2 = false;	
+void DI( int* iff1, int* iff2 ){
+	// Disable maskable interrupt so that maskable interrupt requests are ignored` 
+	*iff1 = 0;
+	*iff2 = 0;	
 }
 
 // EI
 // Enable interupt instruction sets, sets both IFF1 and IFF2.
 // OpCodes: 0xFB
-void CPU::EI(){
-	IFF1 = true;
-	IFF2 = true;
+void EI( int* iff1, int* iff2 ){
+	*iff1 = 1;
+	*iff2 = 1;
 }	
 
 // IM 0
@@ -58,8 +57,8 @@ void CPU::EI(){
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void CPU::IM1(){
-	IFF1 = true;
+void IM1( uint8_t* iff1 ){
+	*iff1 = 1;
 }
 
 // IM 2

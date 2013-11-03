@@ -12,8 +12,13 @@ SDIR=src
 
 ODIR=obj
 	  
-z80 : src/main.o src/romloader.o src/memory.o src/cpu.o
-	${CC} ${CFLAGS} ${LDFLAGS} ${TARGET} src/main.o src/romloader.o src/memory.o src/cpu.o
+z80 : src/main.o src/romloader.o src/memory.o src/cpu.o src/8-bit_load_group.o src/GPA_and_CPU_control_group.o \
+	src/util_bit_operations.o src/16-bit_load_group.o src/jump_group.o src/8-bit_arithmetic_group.o \
+	src/IO_group.o src/16-bit_arithmetic_group.o
+	${CC} ${CFLAGS} ${LDFLAGS} ${TARGET} src/main.o src/romloader.o src/memory.o src/cpu.o src/8-bit_load_group.o \
+		src/GPA_and_CPU_control_group.o src/util_bit_operations.o src/16-bit_load_group.o src/jump_group.o \
+		src/8-bit_arithmetic_group.o src/IO_group.o src/16-bit_arithmetic_group.o  
+
 
 clean:
 	-del $(SDIR)\*.o

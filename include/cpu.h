@@ -5,12 +5,6 @@
 #include <stdio.h>
 #include "memory.h"
 
-// Start the CPU running
-void start( uint16_t addrs );
-
-// Set program counter to a pointer to a memory address
-void setPC( uint16_t mem );
-
 // 8-Bit Z80 main general purpose registers
 union _AF{
 	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
@@ -127,8 +121,8 @@ typedef struct _REGISTERS{
 
 }Registers;
 
-//static struct _REGISTERS *reg = &registers;
-
+// Start the CPU running
+void run( uint16_t addrs );
 
 int initCPU();
 
@@ -139,8 +133,23 @@ void execute(uint8_t* opcode);
 
 // Memory handling
 
-// Read byte from memory given 16-bit address
-uint8_t readByte( uint16_t romAddrs );
+// Get next byte along in memory, will progress the PC by 1 
+uint8_t* getNextByte();
+
+// Get next word from next two locations in memory, will progress the PC by 2
+uint16_t* getNextWord();
+
+// Read the next byte along, does not progress pc
+uint8_t readNextByte();
+
+// read next word along, does not progress pc
+uint16_t readNextWord();
+
+// Get the byte specified memory location
+uint8_t* getByteAt( uint16_t *addrs );
+
+// Get the word at the specified location
+uint16_t* getWordAt( uint16_t *addrs );
 
 // Write byte to memory given 16-bit address
 void writeByte( uint16_t addrs, uint8_t val );

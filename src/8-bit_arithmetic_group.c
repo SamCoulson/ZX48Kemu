@@ -1,7 +1,7 @@
-#include "../include/cpu.h" 
-
+#include "../include/8-bit_arithmetic_group.h" 
+#include "../include/util_bit_operations.h"
 // *** 8-Bit Arithmetic group*** 
-
+/*
 // ADD A,s
 // Adds an a 8-bit value to the accumulater
 // ADD A,r 
@@ -18,14 +18,14 @@
 // ADD A,(IY+d)
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
-void CPU::ADD8BitValToA( uint8_t val ){
+void ADD( uint8_t *dstReg, uint8_t val ){
 	// Add the value to the register A
-	regA += val;
+	dstReg += val;
 
 	// Alter flags
 	
 	// Is result negative set S flag
-	if( regA < 0 ){
+	if( dstReg < 0 ){
 		setBitInByte( regA, 8, 1 );
 	}else{
 		setBitInByte( regA, 8, 0 );
@@ -104,7 +104,7 @@ void SUB8BitValFromA( uint8_t val );
 // Subtract the value at address of IX plus offset - C Flag from register A
 // OpCodes: 0xFD9E
 void SBC8BitValFromA( uint8_t val );
-
+*/
 // AND A,s
 // Logical AND an a 8-bit value with the accumulater
 // AND A,r 
@@ -121,35 +121,35 @@ void SBC8BitValFromA( uint8_t val );
 // AND A,(IY+d)
 // Logical AND the value at address of IX plus offset with register A
 // OpCodes: 0xFDA6
-void CPU::AND8BitValWithA( int8_t val ){
-	regA &= val;
+void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
+	*reg &= *val;
 
 	//printf("regA is %d", (int)(int8_t)regA);
 
 	// If result negative set S to 1 else 0
-	if( (int)(int8_t)regA < 0 ){	
-		setBitInByte( regA, 8, 1 );
+	if( (int8_t)*reg < 0 ){	
+		setBit( fReg, 7, 1 );
 	}else{
-		setBitInByte( regA, 8, 0 );
+		setBit( fReg, 7, 0 );
 	}
 
 	// Z is set to 1 if result is zero else 0
-	if( (int)(int8_t)regA == 0 ){
-		setBitInByte( regA, 7, 1 );	
+	if( *reg == 0 ){
+		setBit( fReg, 6, 1 );	
 	}else{
-		setBitInByte( regA, 7, 0 );
+		setBit( fReg, 6, 0 );
 	}
 
 	// H is set
-	setBitInByte( regA, 5, 1 );
+	setBit( fReg, 4, 1 );
 
 	// P/V not sure
 	
 	// N and C are reset
-	setBitInByte( regA, 2, 0 );
-	setBitInByte( regA, 1, 0 );
+	setBit( fReg, 1, 0 );
+	setBit( fReg, 0, 0 );
 }	
-
+/*
 // OR,s		
 // OR A,s
 // Logical OR an a 8-bit value with the accumulater
@@ -168,11 +168,11 @@ void CPU::AND8BitValWithA( int8_t val ){
 // Logical OR the value at address of IX plus offset with register A
 // OpCodes: 0xFDB6
 void OR8BitValWithA( uint8_t val ); 	
-
+*/
 // XOR,s		
 // Logical XOR an a 8-bit value with the accumulater
 // XOR A,r 
-// OpCodes: 0xA8, 0xA9,0xAA, 0xAB, 0xAC, 0xAD, 0xAF   
+// OpCodes: 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAF   
 // XOR A,n
 // Logical XOR an 8-bit integer with register A
 // OpCodes: 0xEE
@@ -185,8 +185,34 @@ void OR8BitValWithA( uint8_t val );
 // XOR A,(IY+d)
 // Logical XOR the value at address of IX plus offset with register A
 // OpCodes: 0xFDAE
-void CPU::XOR8BitValWithA( uint8_t val ){
-	regA ^= val;		
+void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
+	// Exclusive-OR the val with register A
+	*dstReg ^= *srcVal;
+
+	// S is one if result is negative
+	if( (int8_t)*dstReg < 0 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+
+	// Z is one if result is zero
+	if( *dstReg == 0 ){
+		setBit( fReg, 6, 1 );	
+	}else{
+		setBit( fReg, 6, 1 );
+	}
+
+	// H is set to zero
+	setBit( fReg, 4, 0 );	
+
+	// P/V is set if parity is even
+	
+	// N is set to zero
+	setBit( fReg, 1, 0 );	
+	
+	// C is set to zero
+	setBit( fReg, 0, 0 );	 
 } 	
 
 // CP,s		
@@ -205,26 +231,26 @@ void CPU::XOR8BitValWithA( uint8_t val ){
 // CP A,(IY+d)
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
-void CPU::CP8BitValWithA( uint8_t val ){
+void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 	// If the values are equal set the Z flag to 1 and S flag to 0
-	if( val == regA ){
-		setBitInByte( regF, 7, 1 );
-		setBitInByte( regF, 8, 0 );
+	if( *val == *reg ){
+		setBit( fReg, 6, 1 ); // Z
+		setBit( fReg, 7, 0 ); // S
 	}else{
-		setBitInByte( regF, 7, 0 );
-		setBitInByte( regF, 8, 1 );
+		setBit( fReg, 6, 0 );
+		setBit( fReg, 7, 1 );
 	}
 
 	// ** Overflow bits need to be set ?? Not sure how yet **
 
 	// N is set
-	setBitInByte( regF, 2, 1 );	
+	setBit( fReg, 1, 1 );	
 }	
-
+/*
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void CPU::INC8BitReg( uint8_t &reg ){
+void INC8BitReg( uint8_t &reg ){
 	reg++;
 }
 
@@ -246,14 +272,14 @@ void INCAddrsOfIYOffset( uint8_t &reg );
 // DEC r
 // Decrement an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void CPU::DEC8BitReg( uint8_t &reg ){
+void DEC8BitReg( uint8_t &reg ){
 	reg--;
 }
 
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
-void CPU::DECAddrsOfHL(){
+void DECAddrsOfHL(){
 
 	// Get address in HL
 	uint16_t addrs = byteToWord( &regH, &regL );
@@ -270,7 +296,7 @@ void CPU::DECAddrsOfHL(){
 // DEC(IX+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xDD35
-void CPU::DECAddrsOfIXOffset( uint8_t offset ){
+void DECAddrsOfIXOffset( uint8_t offset ){
 	
 	// Get the byte at address	
 	uint8_t val = readByte( indexIX + offset );
@@ -284,7 +310,7 @@ void CPU::DECAddrsOfIXOffset( uint8_t offset ){
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD35
-void CPU::DECAddrsOfIYOffset( uint8_t offset ){
+void DECAddrsOfIYOffset( uint8_t offset ){
 	
 	// Get the byte at address	
 	uint8_t val = readByte( indexIY + offset );
@@ -294,3 +320,4 @@ void CPU::DECAddrsOfIYOffset( uint8_t offset ){
 	// Write the val back to the address
 	writeByte( indexIY + offset, val );
 }
+*/

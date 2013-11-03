@@ -1,9 +1,9 @@
 #ifndef INC_8BITARITHMETICGROUP_H
 #define INC_8BITARITHMETICGROUP_H 
 
-
+#include <stdint.h>
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 // *** 8-Bit Arithmetic group*** 
 
 // ADD A,s
@@ -22,7 +22,7 @@
 // ADD A,(IY+d)
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
-void ADD8BitValToA( uint8_t val );
+void ADD( uint8_t* dstReg, uint8_t val );
 
 // ADC A,r
 // Add an 8-bit integer + C Flag to register A  
@@ -75,7 +75,7 @@ void SUB8BitValFromA( uint8_t val );
 // Subtract the value at address of IX plus offset - C Flag from register A
 // OpCodes: 0xFD9E
 void SBC8BitValFromA( uint8_t val );
-
+*/
 // AND A,s
 // Logical AND an a 8-bit value with the accumulater
 // AND A,r 
@@ -92,8 +92,8 @@ void SBC8BitValFromA( uint8_t val );
 // AND A,(IY+d)
 // Logical AND the value at address of IX plus offset with register A
 // OpCodes: 0xFDA6
-void AND8BitValWithA( int8_t val ); 	
-
+void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg );
+/*
 // OR,s		
 // OR A,s
 // Logical OR an a 8-bit value with the accumulater
@@ -112,7 +112,7 @@ void AND8BitValWithA( int8_t val );
 // Logical OR the value at address of IX plus offset with register A
 // OpCodes: 0xFDB6
 void OR8BitValWithA( uint8_t val ); 	
-
+*/
 // XOR,s		
 // Logical XOR an a 8-bit value with the accumulater
 // XOR A,r 
@@ -129,7 +129,7 @@ void OR8BitValWithA( uint8_t val );
 // XOR A,(IY+d)
 // Logical XOR the value at address of IX plus offset with register A
 // OpCodes: 0xFDAE
-void XOR8BitValWithA( uint8_t val ); 	
+void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg );
 
 // CP,s		
 // Logical CP an a 8-bit value with the accumulater
@@ -147,12 +147,12 @@ void XOR8BitValWithA( uint8_t val );
 // CP A,(IY+d)
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
-void CP8BitValWithA( uint8_t val ); 	
-
+void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ); 	
+/*
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void INC8BitReg( uint8_t &reg );
+void INC8BitReg( uint8_t *reg );
 
 // INC(HL)
 // Increment the contents on address pointed to by HL register
@@ -188,5 +188,5 @@ void DECAddrsOfIXOffset( uint8_t offset );
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD34
 void DECAddrsOfIYOffset( uint8_t offset );
-
+*/
 #endif // INC_8BITARITHMETICGROUP_H 

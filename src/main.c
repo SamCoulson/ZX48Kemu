@@ -3,6 +3,7 @@
 #include "../include/romloader.h"
 #include <stdio.h>
 
+
 int main(int argc, char *argv[] ){	
 
 	// Load the spectrum 48K ROM from file
@@ -13,8 +14,9 @@ int main(int argc, char *argv[] ){
 
 	// Start at address 0x00
 	initCPU();
+
 	// Begin executing code from 0x00
-	// start( uint16_t addrs );
+	run( 0x11E2 );
 
 	getchar();
 
