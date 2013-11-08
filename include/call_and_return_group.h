@@ -9,7 +9,7 @@
 // CALL nn
 // Save PC to external memory stack and load in nn to PC
 // OpCodes: 0xCD
-void CALL( uint8_t HObyte, uint8_t LObyte );
+void CALL( uint16_t* addrs, uint16_t* sp, uint16_t* pc );
 
 // CALL cc,nn
 // Save PC to external memory stack and load in nn to PC under a condition

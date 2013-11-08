@@ -16,7 +16,7 @@ int main(int argc, char *argv[] ){
 	initCPU();
 
 	// Begin executing code from 0x00
-	run( 0x11E2 );
+	run( 0x0000 );
 
 	getchar();
 

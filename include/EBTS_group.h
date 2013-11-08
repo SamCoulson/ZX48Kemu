@@ -6,45 +6,44 @@
 // EX DE,HL
 // Swap DE and HL register values
 // OpCodes: 0xEB
-void EXDEHL();
 
 // EX AF,AF'
 // Swap register values between AF and alternative AF 
 // OpCodes: 0x08
-void EXAFAltAF();
-
-// EXX
-// Swap register BC & BC', DE & DE', and HL & HL'
-// OpCodes: 0xD9
-void EXX();
 
 // EX (SP),HL
 // Swap values between two HL register and 2-bytes on stack at SP
 // OpCodes: 0xE3
-void EXHLToAddrsOfSP();
 
 // EX (SP),IX
 // Swap values between two HL register and 2-bytes on stack at SP
 // OpCodes: 0xDDE3
-void EXIXToAddrsOfSP();
 
 // EX (SP),IY
 // Swap values between two IX register and 2-bytes on stack at SP 
 // OpCodes: 0xFDE3
-void EXIYToAddrsOfSP();
+void EX( uint16_t* val1, uint16_t* val2 );
 
+// EXX
+// Swap register BC & BC', DE & DE', and HL & HL'
+// OpCodes: 0xD9
+void EXX( uint16_t* bc, uint16_t* de, uint16_t* hl, uint16_t* altbc, uint16_t* altde, uint16_t* althl );
+
+
+/*
 // LDI *Changes flags*
 // Copy value at adress in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDA0
 void LDI();
-
+*/
 // LDIR *Changes flags*
 // Copy value at adress in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void LDIR();
+void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg );
 
+/*
 // LDD *Changes flags* 
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC, and decrement BC
@@ -79,5 +78,5 @@ void CPD();
 // HL and BC affetced by outcome of comparison 
 // OpCodes: 0xEDB9
 void CPDR();
-
+*/
 #endif // INC_EBTS_H`

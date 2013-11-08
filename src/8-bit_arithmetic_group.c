@@ -69,7 +69,7 @@ void ADD( uint8_t *dstReg, uint8_t val ){
 // Add the value at address of IX plus offset + C Flag to register A
 // OpCodes: 0xFD8E
 void ADC8BitValToA( uint8_t val );
-
+*/
 // SUB A,s
 // Subtract an a 8-bit value from the accumulater
 // SUB A,r 
@@ -86,8 +86,28 @@ void ADC8BitValToA( uint8_t val );
 // SUB A,(IY+d)
 // Subtract the value at address of IX plus offset from register A
 // OpCodes: 0xFD96
-void SUB8BitValFromA( uint8_t val ); 	
-			
+void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg ){
+	*aReg -= *val;
+
+	// S is 1 if result is negative
+	if( *aReg < 0x00 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+	// Z is 1 if result is 0
+        if( *aReg == 0x00 ){
+		setBit( fReg, 6, 1 );
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+	// H is 1 if borrow bit 4
+	// P/V is 1 if overflow
+	// N is set to 1
+	setBit( fReg, 1, 1 );	
+	// C is 1 if borrow	
+}	
+/*			
 // SBC A,r
 // Subtract an 8-bit integer - C Flag from register A  
 // OpCodes: 0x9F, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D 
@@ -246,78 +266,35 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 	// N is set
 	setBit( fReg, 1, 1 );	
 }	
-/*
+
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void INC8BitReg( uint8_t &reg ){
-	reg++;
-}
-
 // INC(HL)
 // Increment the contents on address pointed to by HL register
 // OpCodes: 0x34
-void INCAddrsOfHL( uint8_t &reg );
-
 // INC(IX+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xDD34
-void INCAddrsOfIXOffset( uint8_t &reg );
-
 // INC(IY+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xFD34
-void INCAddrsOfIYOffset( uint8_t &reg );
+void INC( uint8_t* val ){
+	++*val;
+}
 
 // DEC r
 // Decrement an 8-Bit register
-// OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-void DEC8BitReg( uint8_t &reg ){
-	reg--;
-}
-
+// OpCodes: 0x05, 0x15, 0x25, 0x0D, 0x1D, 0x2D, 0x3D  
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
-void DECAddrsOfHL(){
-
-	// Get address in HL
-	uint16_t addrs = byteToWord( &regH, &regL );
-
-	// Get the byte at address	
-	uint8_t val = readByte( addrs );
-
-	val--;
-
-	// Write the val back to the address
-	writeByte( addrs, val );
-}
-
 // DEC(IX+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xDD35
-void DECAddrsOfIXOffset( uint8_t offset ){
-	
-	// Get the byte at address	
-	uint8_t val = readByte( indexIX + offset );
-
-	val--;
-
-	// Write the val back to the address
-	writeByte( indexIX + offset, val );	
-}
-
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD35
-void DECAddrsOfIYOffset( uint8_t offset ){
-	
-	// Get the byte at address	
-	uint8_t val = readByte( indexIY + offset );
-
-	val--;
-
-	// Write the val back to the address
-	writeByte( indexIY + offset, val );
+void DEC( uint8_t* val ){
+	--*val;
 }
-*/

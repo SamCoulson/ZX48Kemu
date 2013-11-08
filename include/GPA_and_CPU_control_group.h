@@ -52,7 +52,7 @@ void EI( int* iff1, int* iff2 );
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void IM1( uint8_t* iff1 );
+void IM1( int* iff1 );
 
 // IM 2
 // Set interrupt mode 2

@@ -7,8 +7,12 @@
 // CALL nn
 // Save PC to external memory stack and load in nn to PC
 // OpCodes: 0xCD
-void CALL( uint8_t HObyte, uint8_t LObyte ){
+void CALL( uint16_t* addrs, uint16_t* sp, uint16_t* pc ){
+	// Save the contents of the PC on the stack pointer
+	*sp = *pc;
 
+	// Set the pc to point to the address -1 to compensate the autoincrment on next loop
+	*pc = *addrs-1;
 }
 
 // CALL cc,nn

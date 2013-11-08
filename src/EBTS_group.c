@@ -6,138 +6,54 @@
 // EX DE,HL
 // Swap DE and HL register values
 // OpCodes: 0xEB
-void CPU::EXDEHL(){
-
-	uint8_t tmp = 0;
-
-	// Swap D with H
-	tmp = regD;
-	regD = regH;
-	regH = tmp;
-
-	// Swap E with L
-	tmp = regE;
-	regE = regL;
-	regL = tmp;
-
-}
 
 // EX AF,AF'
 // Swap register values between AF and alternative AF 
 // OpCodes: 0x08
-void CPU::EXAFAltAF(){
-	uint8_t tmp = 0;
 
-	// Swap A with A'
-	tmp = regA;
-	regA = aregA;
-	aregA = tmp;
+// EX (SP),HL
+// Swap values between two HL register and 2-bytes on stack at SP
+// OpCodes: 0xE3
 
-	// Swap F with F'
-	tmp = regE;
-	regE = regL;
-	regL = tmp;	
+// EX (SP),IX
+// Swap values between two HL register and 2-bytes on stack at SP
+// OpCodes: 0xDDE3
+
+// EX (SP),IY
+// Swap values between two IX register and 2-bytes on stack at SP 
+// OpCodes: 0xFDE3
+void EX( uint16_t* val1, uint16_t* val2 ){
+	uint16_t tmp;
+
+	tmp = *val1;
+	*val1 = *val2;
+	*val2 = tmp;
 }
 
 // EXX
 // Swap register BC & BC', DE & DE', and HL & HL'
 // OpCodes: 0xD9
-void CPU::EXX(){
-	uint8_t tmpBC, tmpDE, tmpHL;
+void EXX( uint16_t* bc, uint16_t* de, uint16_t* hl, uint16_t* altbc, uint16_t* altde, uint16_t* althl ){
+	
+	uint16_t tmp;
 
 	// Swap BC with alt BC
-	tmpBC = regB;
-	regB = aregB;
-	aregB = tmpBC;
-
-	tmpBC = regC;
-	regC = aregC;
-	aregC = tmpBC;
-
+	tmp = *bc;
+	*bc = *altbc;
+	*altbc = tmp;
+	tmp = 0x0000;
 	// Swap DE with alt DE
-	tmpDE = regD;
-	regD = aregD;
-	aregD = tmpDE;
-
-	tmpDE = regE;
-	regE = aregE;
-	aregE = tmpDE;
-
+	tmp = *de;
+	*de = *altde;
+	*altde = tmp;	
+	tmp = 0x0000;
 	// Swap HL with alt HL
-	tmpHL = regH;
-	regH = aregH;
-	aregH = tmpHL;
-
-	tmpHL = regL;
-	regL = aregL;
-	aregL = tmpHL;
+	tmp = *hl;
+	*hl = *althl;
+	*althl = tmp;
 }
 
-// EX (SP),HL
-// Swap values between two HL register and 2-bytes on stack at SP
-// OpCodes: 0xE3
-void CPU::EXHLToAddrsOfSP(){
-	
-	uint8_t tmp = 0;
-	
-	// Exchange LO byte of HL to address in SP
-	tmp = regL;
-	regL = readByte( sp );
-	writeByte( sp, tmp );
-	
-	// Exchange HO byte of HL to address in SP
-	tmp = regH;
-	regH = readByte( sp+1 );
-	writeByte( sp+1, tmp );
-	
-}
-
-// EX (SP),IX
-// Swap values between two HL register and 2-bytes on stack at SP
-// OpCodes: 0xDDE3
-void CPU::EXIXToAddrsOfSP(){
-	
-	// Exchange LO byte of IX to address in SP
-
-	// Store the HO and LO bytes seperately in indexIX
-	uint8_t idxLObyte = getLOByte( &indexIX );
-	uint8_t idxHObyte = getHOByte( &indexIX );
-
-	// Store the 2 bytes as SP address
-	uint8_t spByteLO = readByte( sp );
-	uint8_t spByteHO = readByte( sp+1 );
-
-	// Copy sp bytes to index
-	indexIX = byteToWord( &spByteHO, &spByteLO );
-	
-	// Write the index values to the locations at SP
-	writeByte( sp, idxLObyte );
-	writeByte( sp+1, idxHObyte );
-
-}
-
-// EX (SP),IY
-// Swap values between two IX register and 2-bytes on stack at SP 
-// OpCodes: 0xFDE3
-void CPU::EXIYToAddrsOfSP(){
-	// Exchange LO byte of IY to address in SP
-
-	// Store the HO and LO bytes seperately in indexIX
-	uint8_t idxLObyte = getLOByte( &indexIY );
-	uint8_t idxHObyte = getHOByte( &indexIY );
-
-	// Store the 2 bytes as SP address
-	uint8_t spByteLO = readByte( sp );
-	uint8_t spByteHO = readByte( sp+1 );
-
-	// Copy sp bytes to index
-	indexIX = byteToWord( &spByteHO, &spByteLO );
-	
-	// Write the index values to the locations at SP
-	writeByte( sp, idxLObyte );
-	writeByte( sp+1, idxHObyte );
-}
-
+/*
 // LDI *Changes flags*
 // Copy value at address in HL register to address in DE register
 // Increment both HL and DE, and decrement BC
@@ -180,52 +96,38 @@ void CPU::LDI(){
 	// N flag rest
 	setBit(regF, 4, 0 );
 }
-
+*/
 // LDIR *Changes flags*
-// Copy value at adress in HL register to address in DE register
+// Copy value at address in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void CPU::LDIR(){
-
-	// Transfer byte pointed to by HL to location pointed to by BC
-	uint8_t byte = readByte( byteToWord( &regH, &regL ) );
-	writeByte( byteToWord( &regD, &regE ), byte );
-
+void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg ){
+	
 	// If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-	if( byteToWord(&regB, &regC) == 0x0000){
-		regB = 0xFA;
-		regC = 0x00;
-	}
+	if( *bc == 0x0000){
+		*bc = 0xFA00;
+	}	
+	
 
-	while( ( regB != 0x00 ) && ( regC != 0x00 ) ){
-		// Decrement program counter by two
-		pc-=2;
+	// Keep copying data from one memory loaction to another until BC is 0 
+	while( *bc != 0x0000 ){
+		// Transfer byte pointed to by HL to location pointed to by BC
+		*deVal = *hlVal;			
 
-		// increment HL, DE, and BC until BC is 0
-		uint16_t word = byteToWord(&regD, &regE);
-		word++;
-		regD = getLOByte(&word);
-		regE = getHOByte(&word);
-
-		word = byteToWord(&regH, &regL);
-		word++;
-		regH = (int)getLOByte(&word);
-		regL = (int)getHOByte(&word);
+		// Increment HL and DE
+		++*hl;
+		++*de;	
 
 		// Decrement BC
-		word = byteToWord(&regB, &regC);
-		word--;
-		
-		regB = (int)getLOByte(&word);
-		regC = (int)getHOByte(&word);
+		--*bc;
 	}
 
 	// Reset flags H, P/V, and N
-	setBit( regF, 4, 0 );
-	setBit( regF, 2, 0 );
-	setBit( regF, 1, 0 );
+	setBit( fReg, 4, 0 );
+	setBit( fReg, 2, 0 );
+	setBit( fReg, 1, 0 );
 }
-
+/*
 // LDD *Changes flags* 
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC, and decrement BC
@@ -509,4 +411,4 @@ void CPU::CPDR(){
 
 	setBit( regF, 1, 1 ); // N is set
 }
-
+*/

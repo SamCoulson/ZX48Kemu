@@ -35,7 +35,7 @@ void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 // JR Z, e
 // Jump relative when z flag is 0
 // OpCodes: 0x28 
-void JRZ( uint8_t val );
+void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 
 // JR NZ, e
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
@@ -61,6 +61,6 @@ void JPIY();
 // DJNZ, e
 // Jump on the condition of B reg being non-zero
 // OpCodes: 0x10
-void DJNZ( uint8_t val );
+void DJNZ( uint8_t* disp, uint8_t* bReg, uint16_t* pc );
 
 #endif // INC_JUMPGROUP_H  
