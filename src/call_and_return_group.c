@@ -8,21 +8,16 @@
 // Save PC to external memory stack and load in nn to PC
 // OpCodes: 0xCD
 void CALL( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc ){
-	
-	printf("\nStack  pointer points to %X before and contains %X\n", *sp, *spAddrs );
-	
+		
 	// Make room for the pc address
-	--*spAddrs;
-	--*spAddrs;
-	
+	--spAddrs;
+	*sp-=2;
+
 	// Save the contents of the PC on the stack pointer
 	*spAddrs = *pc;
 
 	// Set the pc to point to the address -1 to compensate the autoincrment on next loop
-	*pc = *addrs-1;
-	
-	printf("\nStack  pointer points to %X after and contains %X\n", *sp, *spAddrs );
-
+	*pc = *addrs-1;	
 }
 
 // CALL cc,nn
@@ -38,8 +33,6 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp ){
 	// Copy addres on stack to PC
 	*pc = *spAddrs;
 	*sp+=2;
-
-	printf("\nSP points to %X Returning to %X\n", *sp, *spAddrs );
 }
 
 // RET cc
@@ -49,18 +42,20 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp ){
 // RET NC 
 // Return on condition that the C flag is non-carry i.e. 0
 // OpCodes: 0xD0
-void RETNC( uint16_t* pc, uint16_t* sp, uint8_t* fReg ){
-	if( getBit( fReg, 0 ) == 0x00 ){
-		*pc = *sp;
+void RETNC( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
+	if( getBit( fReg, 0 ) == 0x00 ){	
+		*pc = *spAddrs;
+		*sp+=2;	
 	}	
 }
 
 // RET Z
 // Return on conditio that the Z flag is 0
 // OpCodes: 0xC8
-void RETZ( uint16_t* pc, uint16_t* sp, uint8_t* fReg ){
+void RETZ( uint16_t* pc, uint16_t* spAddrs, uint16_t *sp, uint8_t* fReg ){
 	if( getBit( fReg, 6 ) == 0x01 ){
-		*pc = *sp;
+		*pc = *spAddrs;
+		*sp+=2;
 	}	
 }
 

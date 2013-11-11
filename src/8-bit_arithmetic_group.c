@@ -317,6 +317,8 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 // OpCodes: 0xFD34
 void INC( uint8_t* val ){
 	++*val;
+
+	// NEED TO SET SOME FLAGS IN HERE
 }
 
 // DEC r
@@ -331,6 +333,37 @@ void INC( uint8_t* val ){
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD35
-void DEC( uint8_t* val ){
+void DEC( uint8_t* val, uint8_t* fReg ){
+	
+	// P/V is 1 if m was 80H before operation 0 otherwise
+	if( *val == 0x80 ){
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );
+	}
+	
+	// Decrement value	
 	--*val;
+
+	// S is one if result is negative
+	if( (int8_t)*val < 0 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+
+	// Z is one if result is zero
+	if( *val == 0 ){
+		setBit( fReg, 6, 1 );	
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+
+	// H is set to 1 if borrow bit 4??
+	//setBit( fReg, 4, 0 );	
+
+		
+	// N is set to 1
+	setBit( fReg, 1, 1 );		
+	
 }

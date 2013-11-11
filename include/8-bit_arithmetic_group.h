@@ -174,6 +174,6 @@ void INC( uint8_t* val );
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD34
-void DEC( uint8_t* val );
+void DEC( uint8_t* val, uint8_t* fReg );
 
 #endif // INC_8BITARITHMETICGROUP_H 

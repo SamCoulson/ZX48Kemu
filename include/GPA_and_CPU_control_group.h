@@ -21,6 +21,7 @@
 // CCF
 // The carry flag in the F register is negated
 // OpCodes: 0x3F
+void CCF( uint8_t* fReg );
 
 // SCF
 // The carry flag in the F register is set

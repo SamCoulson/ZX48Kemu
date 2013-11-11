@@ -1,5 +1,5 @@
 #include "../include/GPA_and_CPU_control_group.h"
-
+#include "../include/util_bit_operations.h"
 // ***General-Purpose Arithmetic and CPU Control Group***
 	
 // DAA
@@ -17,6 +17,13 @@
 // CCF
 // The carry flag in the F register is negated
 // OpCodes: 0x3F
+void CCF( uint8_t* fReg ){
+	if( getBit( fReg, 0 ) == 0 ){
+		setBit( fReg, 0, 1 );
+	}else{
+		setBit( fReg, 0, 0 );
+	}
+}
 
 // SCF
 // The carry flag in the F register is set

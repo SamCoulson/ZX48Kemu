@@ -19,11 +19,12 @@
 // OpCodes: 0xFDCB
 void BIT( uint8_t bit, uint8_t* byte, uint8_t* fReg ){
 	// Z is 1 if bit is 0 else 0 if bit is 1
-	if( getBit( byte, bit ) ){
+	if( getBit( byte, bit ) == 0x00 ){
 		setBit( fReg, 6, 1 );
 	}else{
 		setBit( fReg, 6, 0 );
 	}
+
 	// H is set
 	setBit( fReg, 4, 1 );
 		

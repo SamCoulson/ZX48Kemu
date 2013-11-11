@@ -82,7 +82,7 @@ void PUSH( uint16_t* spAddrs, uint16_t* sp, uint16_t* srcVal ){
 	--*sp;
 
 	// Write the value into the address specified by SP
-	spAddrs = srcVal;
+	*(spAddrs-1) = *srcVal;
 
 	// Decrement stack pointer again
 	--*sp;
@@ -106,7 +106,7 @@ void POP( uint16_t* spAddrs, uint16_t* sp, uint16_t* dstVal ){
 	++*sp;
 
 	// Write the value into the address specified by SP
-	dstVal = spAddrs;
+	*dstVal = *spAddrs;
 
 	// Decrement stack pointer again
 	++*sp;
