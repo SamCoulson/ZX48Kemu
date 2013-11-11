@@ -50,12 +50,14 @@ void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_
 // OpCodes: 0xEDA8
 void LDD();
 
-// LDDR *Changes flags*
+*/
+// LDDR
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC, and decrement BC
 // OpCodes: 0xEDB8
-void LDDR();
+void LDDR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg );
 
+/*
 // CPI *Changes flags*
 // Contents of HL compared with contents of A
 // OpCodes: 0xEDA1

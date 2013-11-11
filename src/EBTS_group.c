@@ -108,7 +108,6 @@ void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_
 		*bc = 0xFA00;
 	}	
 	
-
 	// Keep copying data from one memory loaction to another until BC is 0 
 	while( *bc != 0x0000 ){
 		// Transfer byte pointed to by HL to location pointed to by BC
@@ -170,50 +169,36 @@ void CPU::LDD(){
 	// N flag reset
 	setBit(regF, 4, 0 );
 }
-
-// LDDR *Changes flags*
+*/
+// LDDR
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC, and decrement BC
 // OpCodes: 0xEDB8
-void CPU::LDDR(){
+void LDDR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg ){
 	
-	// Transfer byte pointed to by HL to location pointed to by BC
-	uint8_t byte = readByte( byteToWord( &regH, &regL ) );
-	writeByte( byteToWord( &regD, &regE ), byte );
-
 	// If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-	if( byteToWord(&regB, &regC) == 0x0000){
-		regB = 0xFA;
-		regC = 0x00;
-	}
+	if( *bc == 0x0000){
+		*bc = 0xFA00;
+	}	
+	
+	// Keep copying data from one memory loaction to another until BC is 0 
+	while( *bc != 0x0000 ){
+		// Transfer byte pointed to by HL to location pointed to by BC
+		*deVal = *hlVal;			
 
-	while( ( regB != 0x00 ) && ( regC != 0x00 ) ){
-		// Decrement program counter by two
-		pc-=2;
-
-		// Decrement HL, DE, and BC until BC is 0
-		uint16_t word = byteToWord(&regD, &regE);
-		word--;
-		regD = getLOByte(&word);
-		regE = getHOByte(&word);
-
-		word = byteToWord(&regH, &regL);
-		word--;
-		regH = (int)getLOByte(&word);
-		regL = (int)getHOByte(&word);
+		// Decrement HL and DE
+		--*hl;
+		--*de;	
 
 		// Decrement BC
-		word = byteToWord(&regB, &regC);
-		word--;
-		
-		regB = (int)getLOByte(&word);
-		regC = (int)getHOByte(&word);
+		--*bc;
 	}
 
 	// Reset flags H, P/V, and N
-	setBit( regF, 4, 0 );
-	setBit( regF, 2, 0 );
-	setBit( regF, 1, 0 );}
+	setBit( fReg, 4, 0 );
+	setBit( fReg, 2, 0 );
+	setBit( fReg, 1, 0 );
+}/*
 
 // CPI *Changes flags*
 // Contents of HL compared with contents of A

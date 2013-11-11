@@ -2,8 +2,7 @@
 #define INC_8BITARITHMETICGROUP_H 
 
 #include <stdint.h>
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 // *** 8-Bit Arithmetic group*** 
 
 // ADD A,s
@@ -22,7 +21,7 @@
 // ADD A,(IY+d)
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
-void ADD( uint8_t* dstReg, uint8_t val );
+void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg );
 
 // ADC A,r
 // Add an 8-bit integer + C Flag to register A  
@@ -39,8 +38,8 @@ void ADD( uint8_t* dstReg, uint8_t val );
 // ADC A,(IY+d)
 // Add the value at address of IX plus offset + C Flag to register A
 // OpCodes: 0xFD8E
-void ADC8BitValToA( uint8_t val );
-*/
+void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg );
+
 // SUB A,s
 // Subtract an a 8-bit value from the accumulater
 // SUB A,r 
@@ -93,7 +92,7 @@ void SBC8BitValFromA( uint8_t val );
 // Logical AND the value at address of IX plus offset with register A
 // OpCodes: 0xFDA6
 void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg );
-/*
+
 // OR,s		
 // OR A,s
 // Logical OR an a 8-bit value with the accumulater
@@ -111,8 +110,8 @@ void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg );
 // OR A,(IY+d)
 // Logical OR the value at address of IX plus offset with register A
 // OpCodes: 0xFDB6
-void OR8BitValWithA( uint8_t val ); 	
-*/
+void OR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ); 	
+
 // XOR,s		
 // Logical XOR an a 8-bit value with the accumulater
 // XOR A,r 
@@ -152,15 +151,12 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg );
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-
 // INC(HL)
 // Increment the contents on address pointed to by HL register
 // OpCodes: 0x34
-
 // INC(IX+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xDD34
-
 // INC(IY+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xFD34
@@ -169,15 +165,12 @@ void INC( uint8_t* val );
 // DEC r
 // Decrement an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,  
-
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
-
 // DEC(IX+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xDD34
-
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD34

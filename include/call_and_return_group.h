@@ -9,7 +9,7 @@
 // CALL nn
 // Save PC to external memory stack and load in nn to PC
 // OpCodes: 0xCD
-void CALL( uint16_t* addrs, uint16_t* sp, uint16_t* pc );
+void CALL( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc );
 
 // CALL cc,nn
 // Save PC to external memory stack and load in nn to PC under a condition
@@ -19,12 +19,21 @@ void CALLCond( uint8_t HObyte, uint8_t LObyte );
 // RET
 // Copy stack pointer address to HO and stack pointer+1 to LO of PC
 // OpCodes: 0xC9
-void RET();
+void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp );
 
 // RET cc
 // Copy stack pointer address to HO and stack pointer+1 to LO of PC	
-// OpCodes: 0xD8, 0xF8, 0xD0, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
-void RETCond();
+// OpCodes: 0xD8, 0xF8, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
+
+// RET NC 
+// Return on condition that the C flag is non-carry i.e. 0
+// OpCodes: 0xD0
+void RETNC( uint16_t* pc, uint16_t* sp, uint8_t* fReg );
+
+// RET Z
+// Return on conditio that the Z flag is 0
+// OpCodes: 0xC8
+void RETZ( uint16_t* pc, uint16_t* sp, uint8_t* fReg );
 
 // RETI
 // Return from interrupt
@@ -39,6 +48,6 @@ void RETN();
 // RST p
 // Execute page zero routines
 // OpCodes: 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7, 0xFF 
-void RST( uint8_t routine );
+void RST( uint8_t addrs, uint16_t* sp, uint16_t* pc );
 
 #endif // INC_CALLANDRETUNGROUP_H 

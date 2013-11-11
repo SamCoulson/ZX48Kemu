@@ -121,6 +121,7 @@ typedef struct _REGISTERS{
 
 }Registers;
 
+uint8_t ports[256];
 // Start the CPU running
 void run( uint16_t addrs );
 
@@ -150,6 +151,12 @@ uint8_t* getByteAt( uint16_t *addrs );
 
 // Get the word at the specified location
 uint16_t* getWordAt( uint16_t *addrs );
+
+// Read word at memory location
+uint16_t readWordAt( uint16_t *addrs );
+
+// Read byte at memory location
+uint16_t readByteAt( uint16_t *addrs );
 
 // Write byte to memory given 16-bit address
 void writeByte( uint16_t addrs, uint8_t val );

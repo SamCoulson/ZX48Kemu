@@ -1,7 +1,7 @@
 #include "../include/8-bit_arithmetic_group.h" 
 #include "../include/util_bit_operations.h"
 // *** 8-Bit Arithmetic group*** 
-/*
+
 // ADD A,s
 // Adds an a 8-bit value to the accumulater
 // ADD A,r 
@@ -18,39 +18,26 @@
 // ADD A,(IY+d)
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
-void ADD( uint8_t *dstReg, uint8_t val ){
-	// Add the value to the register A
-	dstReg += val;
+void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
+	*aReg += *val;
 
-	// Alter flags
-	
-	// Is result negative set S flag
-	if( dstReg < 0 ){
-		setBitInByte( regA, 8, 1 );
+	// S is 1 if result is negative
+	if( *aReg < 0x00 ){
+		setBit( fReg, 7, 1 );
 	}else{
-		setBitInByte( regA, 8, 0 );
+		setBit( fReg, 7, 0 );
 	}
-
-	// If zero set z flag
-	if( regA == 0 ){
-		setBitInByte( regA, 7, 1 );
+	// Z is 1 if result is 0
+        if( *aReg == 0x00 ){
+		setBit( fReg, 6, 1 );
 	}else{
-		setBitInByte( regA, 7, 0 );	
+		setBit( fReg, 6, 0 );
 	}
-
-
-	// Supposed to set the H bit?? Not sure here
-	//
-	
-        // P/V is set if overflow
-        
-	// N is reset
-	setBitInByte( regA, 2, 0 );
-
-	// C is set if carry from bit 7
-	
-
-	pc++;
+	// H is 1 if borrow bit 4
+	// P/V is 1 if overflow
+	// N is set to 1
+	setBit( fReg, 1, 1 );	
+	// C is 1 if borrow	
 }
 
 // ADC A,r
@@ -68,8 +55,29 @@ void ADD( uint8_t *dstReg, uint8_t val ){
 // ADC A,(IY+d)
 // Add the value at address of IX plus offset + C Flag to register A
 // OpCodes: 0xFD8E
-void ADC8BitValToA( uint8_t val );
-*/
+void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
+	
+	*aReg += ( *val + getBit( fReg, 0 ) );
+
+	// S is 1 if result is negative
+	if( *aReg < 0x00 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+	// Z is 1 if result is 0
+        if( *aReg == 0x00 ){
+		setBit( fReg, 6, 1 );
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+	// H is 1 if borrow bit 4
+	// P/V is 1 if overflow
+	// N is set to 1
+	setBit( fReg, 1, 1 );	
+	// C is 1 if borrow		
+}
+
 // SUB A,s
 // Subtract an a 8-bit value from the accumulater
 // SUB A,r 
@@ -169,7 +177,7 @@ void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 	setBit( fReg, 1, 0 );
 	setBit( fReg, 0, 0 );
 }	
-/*
+
 // OR,s		
 // OR A,s
 // Logical OR an a 8-bit value with the accumulater
@@ -187,8 +195,36 @@ void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 // OR A,(IY+d)
 // Logical OR the value at address of IX plus offset with register A
 // OpCodes: 0xFDB6
-void OR8BitValWithA( uint8_t val ); 	
-*/
+void OR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
+	// OR the val with register A
+	*dstReg |= *srcVal;
+
+	// S is one if result is negative
+	if( (int8_t)*dstReg < 0 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+
+	// Z is one if result is zero
+	if( *dstReg == 0 ){
+		setBit( fReg, 6, 1 );	
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+
+	// H is set to zero
+	setBit( fReg, 4, 0 );	
+
+	// P/V is set if parity is even
+	
+	// N is set to zero
+	setBit( fReg, 1, 0 );	
+	
+	// C is set to zero
+	setBit( fReg, 0, 0 );	
+}	
+
 // XOR,s		
 // Logical XOR an a 8-bit value with the accumulater
 // XOR A,r 
@@ -220,7 +256,7 @@ void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	if( *dstReg == 0 ){
 		setBit( fReg, 6, 1 );	
 	}else{
-		setBit( fReg, 6, 1 );
+		setBit( fReg, 6, 0 );
 	}
 
 	// H is set to zero

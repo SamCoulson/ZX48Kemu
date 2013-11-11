@@ -47,7 +47,8 @@ void INDR();
 // register A, the byte in register A is copied to the address
 // OpCodes: 0xD3
 void OUTA( uint8_t *port, uint8_t* val ){
-	// Will call a function with val as param to write extenal "port"	
+	// Write value to the 0xFE "port"
+	*port = *val;	
 } 
 
 // OUT (C),r

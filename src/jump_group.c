@@ -5,10 +5,10 @@
 
 // JP nn
 // Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
-// OpCodes: 0xC3
+// OpCodes: 0xC3, 0xE9
 void JP( uint16_t* pc, uint16_t* addrs ){
 	// Set the address the pc points to jump address minus one, to compensate for next incremnet on execution loop
-	*pc = *addrs-1;	
+	*pc = (*addrs)-1;	
 }
 /*
 // JP cc, nn
@@ -30,13 +30,21 @@ void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 ){
 // JR e
 // Jump relative given 8-bit value
 // OpCodes: 0x18
-void JR( uint8_t val );
+void JR( uint8_t* val, uint16_t* pc ){
+	*pc += (int8_t)*val;
+}
 
 // JR C,e
 // Jump relative on according to state of the carry flag
 // OpCodes: 0x38
-void JRC( uint8_t val );
-
+void JRC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
+	// Id C flag is 0 jump relative to val
+	if( getBit( fReg, 0 ) == 1 ){
+		// Add value to pc
+		*pc += (int8_t)*val;
+	}
+	// Else do nothing	
+}
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 // OpCodes: 0x30
@@ -54,7 +62,7 @@ void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 // OpCodes: 0x28 
 void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If Z flag is 0 jump relative to val
-	if( getBit( fReg, 6 ) == 0 ){
+	if( getBit( fReg, 6 ) == 0x01  ){
 		// Add value to pc
 		*pc += (int8_t)*val;
 	}
@@ -68,12 +76,7 @@ void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 
 	// IF Z is 0 jump
-	if( getBit( fReg, 6 ) == 0 ){
-		// jump to val but -2 from the value first,
-		// 1 for because jump happens from the
-		// opcode location and 2 because the loop will autoincrement on
-		// execution of next instruction
-		//val +=2 **Not sure about the above as leaving along works fine for now		
+	if( getBit( fReg, 6 ) == 0x00 ){
 		*pc += (int8_t)*val;	
 	}
 	// If not, do nothing and execute next instruction

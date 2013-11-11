@@ -20,12 +20,12 @@ void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 );
 // JR e
 // Jump relative given 8-bit value
 // OpCodes: 0x18
-void JR( uint8_t val );
+void JR( uint8_t* val, uint16_t* pc );
 
 // JR C,e
 // Jump relative on according to state of the carry flag
 // OpCodes: 0x38
-void JRC( uint8_t val );
+void JRC( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
