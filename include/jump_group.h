@@ -14,8 +14,12 @@ void JP( uint16_t*, uint16_t* );
 
 // JP cc, nn
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
-// OpCodes: 0xC2, 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
-void JPCondition( const char* flag, uint8_t byte1, uint8_t byte2 );
+// OpCodes: 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
+
+// JPNZ,nn
+// Jump to address when Z flag is non-zero
+// OpCodes: 0xC2 
+void JPNZ( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
 // JR e
 // Jump relative given 8-bit value

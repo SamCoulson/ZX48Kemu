@@ -105,7 +105,7 @@ void POP( uint16_t* spAddrs, uint16_t* sp, uint16_t* dstVal ){
 	// Decrement the stack pointer
 	++*sp;
 
-	// Write the value into the address specified by SP
+	// Write the value into the address specified by dst value either a register or ix or iy
 	*dstVal = *spAddrs;
 
 	// Decrement stack pointer again

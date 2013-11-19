@@ -126,14 +126,14 @@ void run( uint16_t addrs ){
 
 		printf( "\n\n*** Stack ***\n" );
 
-		for( int i = 0xFFFF; i > 0xFFF0; i-- ){
+		for( int i = 0xFFFF; i > 0xFFEA; i-- ){
 			printf("\n%X %X", i, totalMem[i] );
 			if( *reg->sp == i ){
 				printf( "\t<" );
 			}
 			
 		}
-		printf( "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+		printf( "\n\n\n\n\n\n\n\n\n\n\n\n" );
 	}
 }
 
@@ -427,7 +427,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x48:
 			printf( "LD C,B");
-			LD( reg->b, reg->b );
+			LD( reg->c, reg->b );
 			break;
 		case 0x49:
 			printf( "LD C,C" );
@@ -483,10 +483,10 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x56:
 			printf( "LD D,(%02X)", readByteAt( reg->hl ));
-			LD( reg->b, getByteAt( reg->hl ) );
+			LD( reg->d, getByteAt( reg->hl ) );
 			break;
 		case 0x57:
-			printf( "LD E,A" );
+			printf( "LD D,A" );
 			LD( reg->d, reg->a );
 			break;
 		case 0x58:
@@ -499,7 +499,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x5A:
 			printf( "LD E,D" );
-			LD(reg->e, reg->d );
+			LD( reg->e, reg->d );
 			break;
 		case 0x5B:
 			printf( "LD E,E" );
@@ -518,8 +518,8 @@ void execute( uint8_t* opcode ){
 			LD( reg->e, getByteAt( reg->hl ) );
 			break;
 		case 0x5F:
-			printf( "LD D,A" );
-			LD( reg->d, reg->a );
+			printf( "LD E,A" );
+			LD( reg->e, reg->a );
 			break;
 		case 0x60:
 			printf( "LD H,B" );
@@ -896,8 +896,8 @@ void execute( uint8_t* opcode ){
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->bc );
 			break;
 		case 0xC2:
-			//printf( "JP NZ %d%d",(int)readByte( pc+2 ), (int)readByte( pc+1 ) );
-			//JPCondition( "NZ", readByte( ++pc ), readByte( ++pc ) );
+			printf( "JP NZ %X", readNextWord() );
+			JPNZ( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xC3:
 			printf( "JP %X", readNextWord() );
@@ -915,7 +915,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xC7:
 			printf( "RST 00H" );
-			RST( 0x00, getWordAt( reg->sp ), reg->pc );
+			RST( 0x00, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xC8:
 			printf( "RET Z" );
@@ -1042,9 +1042,11 @@ void execute( uint8_t* opcode ){
 				default:
 					break;
 			}
-			break;/*
+			break;
 		case 0xCC:
-			break;*/
+			printf( "CALL Z, %X", readNextWord() );
+			CALLZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
+			break;
 		case 0xCD:
 			printf( "CALL %X", readNextWord() );
 			CALL( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc );
@@ -1055,7 +1057,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xCF:
 			printf( "RST 08H" );
-			RST( 0x08, getWordAt( reg->sp ), reg->pc );
+			RST( 0x08, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xD0:
 			printf( "RET NC" );
@@ -1084,11 +1086,12 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xD7:
 			printf( "RST 10" );
-			RST( 0x10, reg->sp, reg->pc );
-			break;/*
+			RST( 0x10, getWordAt( reg->sp ), reg->sp, reg->pc );
+			break;
 		case 0xD8:
-			//printf( "RET C");
-			break;*/
+			printf( "RET C" );
+			RETC( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
+			break;
 		case 0xD9:
 			printf( "EXX" );
 			EXX( reg->bc, reg->de, reg->hl, reg->altbc, reg->altde, reg->althl );
@@ -1130,7 +1133,7 @@ void execute( uint8_t* opcode ){
 				DEC( getByteAt( reg->ix + *( getNextByte() ) ), reg->f );
 				break;
 			case 0x36:
-				printf( "LD (IX+%d)", readNextByte() );
+				printf( "LD (IX+%d),+%d", readNextByte(), readNextByte() + 1 ); // BROKEN second param is incorrect
 				LD( getByteAt( reg->ix + *( getNextByte() ) ), getNextByte() );
 				break;
 			case 0x46:
@@ -1346,6 +1349,10 @@ void execute( uint8_t* opcode ){
 				printf( "PUSH IX" );
 				PUSH( getWordAt( reg->sp ), reg->sp, reg->ix );
 				break;
+			case 0xE9:
+				printf( "JP(IX)" );
+				JP( reg->pc, getWordAt( reg->ix ) );
+				break;
 			case 0xF9:
 				printf( "LD SP,IX" );
 				LD16( reg->sp, reg->ix );
@@ -1358,7 +1365,7 @@ void execute( uint8_t* opcode ){
 			break;*/
 		case 0xDF:
 			printf( "RST 18H" );
-			RST( 0x18, reg->sp, reg->pc );
+			RST( 0x18, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;/*
 		case 0xE0:
 			break;*/
@@ -1384,14 +1391,13 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xE7:
 			printf( "RST 20H" );
-			RST( 0x20, reg->sp, reg->pc );
+			RST( 0x20, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;/*
 		case 0xE8:
 			//printf("");
 			break;*/
 		case 0xE9:
 			printf( "JP (HL)");
-			printf( "\n%X %X\n", *reg->hl, readWordAt( reg->hl ) );
 			JP( reg->pc, getWordAt( reg->hl ) );
 			break;/*
 		case 0xEA:
@@ -1500,7 +1506,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xEF:
 			printf( "RST 28H" );
-			RST( 0x28, reg->sp, reg->pc );
+			RST( 0x28, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;/*
 		case 0xF0:
 			break;*/
@@ -1521,12 +1527,12 @@ void execute( uint8_t* opcode ){
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->af );
 			break;
 		case 0xF6:
-			printf( "OR %d", readNextByte() );
+			printf( "OR %X", readNextByte() );
 			OR( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xF7:
 			printf( "RST 30H" );
-			RST( 0x30, reg->sp, reg->pc );
+			RST( 0x30, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;/*
 		case 0xF8:
 			break;*/
@@ -1573,7 +1579,7 @@ void execute( uint8_t* opcode ){
 				DEC( getByteAt( reg->iy + *( getNextByte() ) ), reg->f );
 				break;
 			case 0x36:
-				printf( "LD (IX+%d)", readNextByte() );
+				printf( "LD (IX+%d),%X", readNextByte(), readNextByte() + 1 );
 				LD( getByteAt( reg->iy + *( getNextByte() ) ), getNextByte() );				
 				break;
 			case 0x46:
@@ -1790,6 +1796,10 @@ void execute( uint8_t* opcode ){
 				printf( "PUSH IY" );
 				PUSH( getWordAt( reg->sp ), reg->sp, reg->iy );
 				break;
+			case 0xE9:
+				printf( "JP(IY)" );
+				JP( reg->pc, getWordAt( reg->iy ) );
+				break;
 			case 0xF9:
 				printf( "LD SP,IY");
 				LD16( reg->sp, reg->iy );
@@ -1804,7 +1814,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xFF:
 			printf( "RST 38H");
-			RST( 0x38, reg->sp, reg->pc );
+			RST( 0x38, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		default:
 			break;
