@@ -51,7 +51,7 @@ static uint8_t* IOport = ports;
 
 // Static structure for registers
 int initCPU(){
-	
+	// initialise registers to starting values, this can be used for testing	
 	return 0;
 }
 //  Set the PC to point to a location in memory
@@ -929,35 +929,205 @@ void execute( uint8_t* opcode ){
 			break;*/
 		case 0xCB:
 			switch( *( getNextByte() ) ){
+				case 0x00:
+					break;
+				case 0x01:
+					break;
+				case 0x02:
+					break;
+				case 0x03:
+					break;
+				case 0x04:
+					break;
+				case 0x05:
+					break;
 				case 0x06:
+					break;
+				case 0x07:
+					break;
+				case 0x08:
+					break;
+				case 0x09:
+					break;
+				case 0x0A:
 					break;	
+				case 0x0B:
+					break;
+				case 0x0C:
+					break;
+				case 0x0D:
+					break;
 				case 0x0E:
+					break;
+				case 0x0F:
+					break;
+				case 0x10:
+					break;
+				case 0x11:
+					break;
+				case 0x12:
+					break;
+				case 0x13:
+					break;
+				case 0x14:
+					break;
+				case 0x15:
 					break;
 				case 0x16:
 					break;
+				case 0x17:
+					break;
+				case 0x18:
+					break;
+				case 0x19:
+					break;
+				case 0x1A:
+					break;	
+				case 0x1B:
+					break;
+				case 0x1C:
+					break;
+				case 0x1D:
+					break;
 				case 0x1E:
+					break;
+				case 0x1F:
+					break;
+				case 0x20:
+					break;
+				case 0x21:
+					break;
+				case 0x22:
+					break;
+				case 0x23:
+					break;
+				case 0x24:
+					break;
+				case 0x25:
 					break;
 				case 0x26:
 					break;
+				case 0x27:
+					break;
+				case 0x28:
+					break;
+				case 0x29:
+					break;
+				case 0x2A:
+					break;	
+				case 0x2B:
+					break;
+				case 0x2C:
+					break;
+				case 0x2D:
+					break;
 				case 0x2E:
 					break;
-				case 0x3E:	
+				case 0x2F:
+					break;
+				case 0x30:
+					break;
+				case 0x31:
+					break;
+				case 0x32:
+					break;
+				case 0x33:
+					break;
+				case 0x34:
+					break;
+				case 0x35:
+					break;
+				case 0x36:
+					break;
+				case 0x37:
+					break;
+				case 0x38:
+					break;
+				case 0x39:
+					break;
+				case 0x3A:
+					break;	
+				case 0x3B:
+					break;
+				case 0x3C:
+					break;
+				case 0x3D:
+					break;
+				case 0x3E:
+					break;
+				case 0x3F:
+					break;
+				case 0x40:
+					break;
+				case 0x41:
+					break;
+				case 0x42:
+					break;
+				case 0x43:
+					break;
+				case 0x44:
+					break;
+				case 0x45:
 					break;
 				case 0x46:
 					printf( "BIT 0" );
 					BIT( 0, getByteAt( reg->hl ), reg->f );
 					break;	
+				case 0x47:
+					break;
+				case 0x48:
+					break;
+				case 0x49:
+					break;
+				case 0x4A:
+					break;	
+				case 0x4B:
+					break;
+				case 0x4C:
+					break;
+				case 0x4D:
+					break;
 				case 0x4E:
 					printf( "BIT 1" );
 					BIT( 1, getByteAt( reg->hl ), reg->f );
+					break;
+				case 0x4F:
+					break;
+				case 0x50:
+					break;
+				case 0x51:
+					break;
+				case 0x52:
+					break;
+				case 0x53:
+					break;
+				case 0x54:
+					break;
+				case 0x55:
 					break;
 				case 0x56:
 					printf( "BIT 2" );
 					BIT( 2, getByteAt( reg->hl ), reg->f );
 					break;
+				case 0x57:
+					break;
+				case 0x58:
+					break;
+				case 0x59:
+					break;
+				case 0x5A:
+					break;	
+				case 0x5B:
+					break;
+				case 0x5C:
+					break;
+				case 0x5D:
+					break;
 				case 0x5E:
 					printf( "BIT 3" );
 					BIT( 3, getByteAt( reg->hl ), reg->f );
+					break;
+				case 0x5F:
 					break;
 				case 0x66:
 					printf( "BIT 4" );

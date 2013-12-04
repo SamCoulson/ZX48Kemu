@@ -19,10 +19,13 @@
 // Add the value at address of IX plus offset to register A
 // OpCodes: 0xFD86 	
 void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
+
+	uint8_t areg = *aReg; //save the original areg to check for overflow
+
 	*aReg += *val;
 
 	// S is 1 if result is negative
-	if( *aReg < 0x00 ){
+	if( getBit( aReg, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
@@ -33,11 +36,30 @@ void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	}else{
 		setBit( fReg, 6, 0 );
 	}
-	// H is 1 if borrow bit 4
+
+	// H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
+	if( getBit( &areg, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( aReg, 4 ) == 0x00 ){
+		// half carry occured
+		setBit( fReg, 4, 1 );
+	}else{
+		setBit( fReg, 4, 0 );	
+	}
+
 	// P/V is 1 if overflow
-	// N is set to 1
-	setBit( fReg, 1, 1 );	
-	// C is 1 if borrow	
+	if( getBit( &areg, 7 ) == 0x00 && getBit( val, 7 ) == 0x00 && getBit( aReg, 7 ) == 0x01 ){
+		setBit( fReg, 2, 1 );
+	}
+	if( getBit( &areg, 7 ) == 0x01 && getBit( val, 7 ) == 0x01 && getBit( aReg, 7 ) == 0x00  ){
+		setBit( fReg, 2, 1 );	
+	}
+
+	// N is set to 0 becasue we are not subtracting
+	setBit( fReg, 1, 0 );	
+
+	// C is 1 if carry from bit 7
+	if( (getBit( aReg, 7 ) == 0x01 ) && ( getBit( val, 7 ) == 0x01 ) ){
+		setBit( fReg, 0, 1 );
+	}	
 }
 
 // ADC A,r
@@ -60,7 +82,7 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	*aReg += ( *val + getBit( fReg, 0 ) );
 
 	// S is 1 if result is negative
-	if( *aReg < 0x00 ){
+	if( getBit( aReg, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
@@ -72,10 +94,16 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 		setBit( fReg, 6, 0 );
 	}
 	// H is 1 if borrow bit 4
+	
 	// P/V is 1 if overflow
-	// N is set to 1
-	setBit( fReg, 1, 1 );	
-	// C is 1 if borrow		
+	
+	// N is set to 0 as there is no subtraction
+	setBit( fReg, 1, 0 );	
+	
+	// C is 1 carry from bit 7
+	if( (getBit( aReg, 7 ) == 0x01 ) && ( getBit( val, 7 ) == 0x01 ) ){
+		setBit( fReg, 0, 1 );
+	}			
 }
 
 // SUB A,s
@@ -103,16 +131,22 @@ void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg ){
 	}else{
 		setBit( fReg, 7, 0 );
 	}
+	
 	// Z is 1 if result is 0
         if( *aReg == 0x00 ){
 		setBit( fReg, 6, 1 );
 	}else{
 		setBit( fReg, 6, 0 );
 	}
+	
 	// H is 1 if borrow bit 4
+	
 	// P/V is 1 if overflow
-	// N is set to 1
+	// NOTE: this is the reverse of ADD operands with unlike signs cause the overflow
+	
+	// N is set to 1 as a subtract happend
 	setBit( fReg, 1, 1 );	
+
 	// C is 1 if borrow	
 }	
 /*			

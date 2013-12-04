@@ -15,10 +15,10 @@ void ADD16( uint16_t* dstReg, uint16_t* srcReg, uint8_t* fReg ){
 	
 	// H not sure 
 	
-	// N is set
+	// N is reset
 	setBit( fReg, 1, 0 );
 
-	// C not sure 
+	// C is set to 1 if bit 15 carry out 
 }
 /*
 // ADC HL,ss
