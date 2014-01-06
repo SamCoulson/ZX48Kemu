@@ -20,25 +20,18 @@
 // OpCodes: 0xFD86 	
 void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 
-	uint8_t areg = *aReg; //save the original areg to check for overflow
+	uint8_t result = *aReg + *val; // Save the result will copy to A register at end
 
-	*aReg += *val;
+	// S (Signed) is 1 if result is negative
+	getBit( &result, 7 ) ? setBit( fReg, 7, 1 ) : setBit( fReg, 7, 0);
 
-	// S is 1 if result is negative
-	if( getBit( aReg, 7 ) == 0x01 ){
-		setBit( fReg, 7, 1 );
-	}else{
-		setBit( fReg, 7, 0 );
-	}
-	// Z is 1 if result is 0
-        if( *aReg == 0x00 ){
-		setBit( fReg, 6, 1 );
-	}else{
-		setBit( fReg, 6, 0 );
-	}
+	// Z (Zero) is 1 if result is 0
+        result == 0x00 ? setBit( fReg, 6, 1 ) : setBit( fReg, 6, 0 );
+
 
 	// H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
-	if( getBit( &areg, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( aReg, 4 ) == 0x00 ){
+	// NOTE: might not have to worry about this only for BCD instructions
+	if( getBit( &result, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( aReg, 4 ) == 0x00 ){
 		// half carry occured
 		setBit( fReg, 4, 1 );
 	}else{
@@ -46,20 +39,24 @@ void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	}
 
 	// P/V is 1 if overflow
-	if( getBit( &areg, 7 ) == 0x00 && getBit( val, 7 ) == 0x00 && getBit( aReg, 7 ) == 0x01 ){
-		setBit( fReg, 2, 1 );
+	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) ){
+	       	if( getBit( &result, 7 ) != *val ){
+			//Set to 1 overflow
+			setBit( fReg, 2, 1 );
+		}else{
+			setBit( fReg, 2, 0 );	
+		}
 	}
-	if( getBit( &areg, 7 ) == 0x01 && getBit( val, 7 ) == 0x01 && getBit( aReg, 7 ) == 0x00  ){
-		setBit( fReg, 2, 1 );	
-	}
+	
 
-	// N is set to 0 becasue we are not subtracting
+	// N is set to 0 because we are not subtracting
 	setBit( fReg, 1, 0 );	
 
 	// C is 1 if carry from bit 7
-	if( (getBit( aReg, 7 ) == 0x01 ) && ( getBit( val, 7 ) == 0x01 ) ){
-		setBit( fReg, 0, 1 );
-	}	
+	( getBit( aReg, 7 ) && getBit( val, 7 ) ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
+	
+
+	*aReg = result;	
 }
 
 // ADC A,r

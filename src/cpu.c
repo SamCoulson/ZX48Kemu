@@ -50,10 +50,8 @@ uint8_t ports[256] = {0};
 static uint8_t* IOport = ports; 
 
 // Static structure for registers
-int initCPU(){
-	// initialise registers to starting values, this can be used for testing	
-	return 0;
-}
+
+
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
 	

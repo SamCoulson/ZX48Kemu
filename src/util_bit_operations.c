@@ -17,7 +17,7 @@ void setBit(uint8_t *byte, uint8_t pos, uint8_t bitval){
 		*byte &= ~( 1 << ( pos ) ); 
 		// Set to 0, 00000001 shifted to the position of pos, 
 		// AND i.e. both need to be true to set to 1, 
-		// then inverse the result with ~
+		// then inverse the result with NOT~
 	else
 		*byte |= ( 1 << ( pos ) ); 
 		// Set to 1, 00000001 shifted to the position of pos, 
