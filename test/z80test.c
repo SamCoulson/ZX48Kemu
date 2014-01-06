@@ -89,8 +89,8 @@ static void test_8bit_add(){
 
 	// Test P/V flag (parity / overflow)
 	resetCPU();
-	*reg->a = 64;
-	*reg->b = 64;
+	*reg->a = 64; // 0100 0000
+	*reg->b = 64; // 0100 0000
 	ADD( reg->a, reg->b, reg->f );
 	assert( *reg->a == 128 && getBit( reg->f, 2 ) == 0x01  && "test_8bit_add() - P/V Flag" );
 	
@@ -126,6 +126,62 @@ static void test_8bit_add(){
 	}
 }
 
+static void test_8bit_sub(){
+	// Test Carry flag
+	resetCPU();
+	*reg->a = 0;
+	*reg->b = 2;
+	SUB( reg->a, reg->b, reg->f );
+	assert( (int8_t)*reg->a < 0 && getBit( reg->f, 0) == 0x01  && "test_8bit_sub() - Carry Flag" );
+
+	// Test N(Addition/Subtraction) flag
+	resetCPU();
+	*reg->a = 1;
+	*reg->b = 1;
+	SUB( reg->a, reg->b, reg->f );
+	assert( *reg->a == 0 && getBit( reg->f, 1 ) == 0x01  && "test_8bit_sub() - N Flag" );
+
+	// Test P/V flag (parity / overflow)
+	resetCPU();
+	*reg->a = 128; // 0100 0000
+	*reg->b = 128; // 0100 0000
+	SUB( reg->a, reg->b, reg->f );
+	assert( *reg->a == 0 && getBit( reg->f, 2 ) == 0x01  && "test_8bit_sub() - P/V Flag" );
+	
+	// Test H (Half carry) flag
+	//resetCPU();
+	//*reg->a = 4;
+	//*reg->b = 4;
+	//ADD( reg->a, reg->b, reg->f );
+	//assert( *reg->a == 8 && getBit( reg->f, 4 ) == 0x01  && "test_8bit_add() - H Flag" );
+	
+	const uint8_t values[6] = { 0, 1, 127, 128, 129, 255 };
+
+	resetCPU();
+	for( int i = 0; i < sizeof( values ); i++){
+
+		*reg->a = values[i]; 
+		printf("Uint Sint  Uint Sint\n");	
+
+		for( int j = 0; j < sizeof( values ); j++ ){
+			
+			*reg->b = values[j];
+			
+			printf("%3d(%4d) - %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b, (int8_t)*reg->b ); 
+			
+			SUB( reg->a, reg->b, reg->f );
+		
+			printf(" %3d(%4d) C = %d V = %d\n", *reg->a, (int8_t)*reg->a, getBit( reg->f, 0 ),
+			     getBit( reg->f, 2 ) );
+			// Reset a
+			*reg->a = values[i];
+		}
+
+	}
+	
+
+}
+
 int main( int argc, char* argv[] ){
 
 	printf("Testing started!\n");
@@ -134,6 +190,10 @@ int main( int argc, char* argv[] ){
 	printf("Testing 8Bit ADD\n");
 	test_8bit_add();
 	printf("Testing 8Bit ADD successful\n");
+	
+	printf("Testing 8Bit SUB\n");
+	test_8bit_sub();
+	printf("Testing 8Bit SUB successful\n");
 
 	printf( "Testing successful" );
 

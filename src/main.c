@@ -29,7 +29,7 @@ int main(int argc, char *argv[] ){
 	loadROM( romMemPtr, romFileSize );	
 
 	// Start at address 0x00
-	initCPU();
+	//initCPU();
 
 	// Begin executing code from 0x00
 	run( 0x0000 );

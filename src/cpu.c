@@ -162,7 +162,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x04:
 			printf( "INC B" );
-			INC( reg->b );
+			INC( reg->b, reg->f );
 			break;
 		case 0x05:
 			printf( "DEC B" );
@@ -192,7 +192,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x0C:
 			printf( "INC C" );
-			INC( reg->c );
+			INC( reg->c, reg->f );
 			break;
 		case 0x0D:
 			printf( "DEC C" );
@@ -224,7 +224,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x14:
 			printf( "INC D" );
-			INC( reg->d );
+			INC( reg->d, reg->f );
 			break;
 		case 0x15:
 			printf( "DEC D" );
@@ -254,7 +254,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x1C:
 			printf( "INC E" );
-			INC( reg->e );
+			INC( reg->e, reg->f );
 			break;
 		case 0x1D:
 			printf( "DEC E" );
@@ -286,7 +286,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x24:
 			printf( "INC H" );
-			INC( reg->h );
+			INC( reg->h, reg->f );
 			break;
 		case 0x25:
 			printf( "DEC H" );
@@ -316,7 +316,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x2C:
 			printf( "INC L" );
-			INC( reg->l );
+			INC( reg->l, reg->f );
 			break;
 		case 0x2D:
 			printf( "DEC L" );
@@ -346,7 +346,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x34:
 			printf( "INC (HL)" );
-			INC( getByteAt( reg->hl ) );
+			INC( getByteAt( reg->hl ), reg->f );
 			break;
 		case 0x35:
 			printf("DEC (HL)" );
@@ -377,7 +377,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x3C:
 			printf( "INC A" );
-			INC( reg->a );
+			INC( reg->a, reg->f );
 			break;
 		case 0x3D:
 			printf( "DEC A" );
@@ -1294,7 +1294,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x34:
 				printf( "INC IX+%X", readNextByte() );
-				INC( getByteAt( reg->ix + *( getNextByte() ) ) );
+				INC( getByteAt( reg->ix + *( getNextByte() ) ), reg->f );
 				break;
 			case 0x35:
 				printf( "DEC IX +%d", readNextByte() );
@@ -1740,7 +1740,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x34:
 				printf( "INC IY+%d", readNextByte() );
-				INC( getByteAt( reg->iy + *( getNextByte() ) ) );
+				INC( getByteAt( reg->iy + *( getNextByte() ) ), reg->f );
 				break;
 			case 0x35:
 				printf( "DEC IY+%d", readNextByte() );

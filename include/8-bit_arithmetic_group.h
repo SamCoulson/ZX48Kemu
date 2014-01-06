@@ -160,7 +160,7 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg );
 // INC(IY+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xFD34
-void INC( uint8_t* val );
+void INC( uint8_t* val, uint8_t* fReg );
 
 // DEC r
 // Decrement an 8-Bit register

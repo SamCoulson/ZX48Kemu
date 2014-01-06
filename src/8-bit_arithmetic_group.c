@@ -39,23 +39,20 @@ void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	}
 
 	// P/V is 1 if overflow
-	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) ){
-	       	if( getBit( &result, 7 ) != *val ){
-			//Set to 1 overflow
-			setBit( fReg, 2, 1 );
-		}else{
-			setBit( fReg, 2, 0 );	
-		}
+	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( aReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
 	}
 	
-
 	// N is set to 0 because we are not subtracting
 	setBit( fReg, 1, 0 );	
 
 	// C is 1 if carry from bit 7
 	( getBit( aReg, 7 ) && getBit( val, 7 ) ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
 	
-
+	// Copy the result to the A register
 	*aReg = result;	
 }
 
@@ -120,31 +117,41 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 // Subtract the value at address of IX plus offset from register A
 // OpCodes: 0xFD96
 void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg ){
-	*aReg -= *val;
+	
+	
+	uint8_t result = *aReg + (~(*val))+1 ;
 
-	// S is 1 if result is negative
-	if( *aReg < 0x00 ){
-		setBit( fReg, 7, 1 );
+	// S (Signed) is 1 if result is negative
+	getBit( &result, 7 ) ? setBit( fReg, 7, 1 ) : setBit( fReg, 7, 0);
+
+	// Z (Zero) is 1 if result is 0
+        result == 0x00 ? setBit( fReg, 6, 1 ) : setBit( fReg, 6, 0 );
+
+	// H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
+	// NOTE: might not have to worry about this only for BCD instructions
+	if( getBit( &result, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( aReg, 4 ) == 0x00 ){
+		// half carry occured
+		setBit( fReg, 4, 1 );
 	}else{
-		setBit( fReg, 7, 0 );
+		setBit( fReg, 4, 0 );	
 	}
-	
-	// Z is 1 if result is 0
-        if( *aReg == 0x00 ){
-		setBit( fReg, 6, 1 );
-	}else{
-		setBit( fReg, 6, 0 );
-	}
-	
-	// H is 1 if borrow bit 4
-	
+
 	// P/V is 1 if overflow
-	// NOTE: this is the reverse of ADD operands with unlike signs cause the overflow
+	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( aReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
 	
-	// N is set to 1 as a subtract happend
+	// N is set to 1 because we are subtracting
 	setBit( fReg, 1, 1 );	
 
-	// C is 1 if borrow	
+	// C is 1 if result is less than 0
+	( (int8_t)result < 0 ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
+	
+	// Copy the result to the A register
+	*aReg = result;		
 }	
 /*			
 // SBC A,r
@@ -181,32 +188,43 @@ void SBC8BitValFromA( uint8_t val );
 // Logical AND the value at address of IX plus offset with register A
 // OpCodes: 0xFDA6
 void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
-	*reg &= *val;
 
-	//printf("regA is %d", (int)(int8_t)regA);
+	uint8_t result = *reg & *val;
 
-	// If result negative set S to 1 else 0
-	if( (int8_t)*reg < 0 ){	
+	// S is one if result is signed
+	if( getBit( &result, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
 	}
 
-	// Z is set to 1 if result is zero else 0
-	if( *reg == 0 ){
+	// Z is one if result is zero
+	if( result == 0x0 ){
 		setBit( fReg, 6, 1 );	
 	}else{
 		setBit( fReg, 6, 0 );
 	}
 
-	// H is set
-	setBit( fReg, 4, 1 );
+	// H is set to zero
+	setBit( fReg, 4, 0 );	
 
-	// P/V not sure
+	// P/V is set if parity is even
+	if( ( getBit( reg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( reg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
+ 
+ 
+	// N is set to zero
+	setBit( fReg, 1, 0 );	
 	
-	// N and C are reset
-	setBit( fReg, 1, 0 );
-	setBit( fReg, 0, 0 );
+	// C is set to zero
+	setBit( fReg, 0, 0 );	
+
+	*reg = result;
+
 }	
 
 // OR,s		
@@ -228,17 +246,17 @@ void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 // OpCodes: 0xFDB6
 void OR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	// OR the val with register A
-	*dstReg |= *srcVal;
+	uint8_t result = *dstReg | *srcVal;
 
-	// S is one if result is negative
-	if( (int8_t)*dstReg < 0 ){
+	// S is one if result is signed
+	if( getBit( &result, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
 	}
 
 	// Z is one if result is zero
-	if( *dstReg == 0 ){
+	if( result == 0x0 ){
 		setBit( fReg, 6, 1 );	
 	}else{
 		setBit( fReg, 6, 0 );
@@ -248,12 +266,21 @@ void OR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	setBit( fReg, 4, 0 );	
 
 	// P/V is set if parity is even
-	
+	if( ( getBit( dstReg, 7 ) == getBit( srcVal, 7 ) ) && ( getBit( &result, 7 ) != getBit( dstReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
+ 
+ 
 	// N is set to zero
 	setBit( fReg, 1, 0 );	
 	
 	// C is set to zero
 	setBit( fReg, 0, 0 );	
+
+	*dstReg = result;
 }	
 
 // XOR,s		
@@ -274,17 +301,17 @@ void OR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 // OpCodes: 0xFDAE
 void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	// Exclusive-OR the val with register A
-	*dstReg ^= *srcVal;
+	uint8_t result = *dstReg ^ *srcVal;
 
-	// S is one if result is negative
-	if( (int8_t)*dstReg < 0 ){
+	// S is one if result is signed
+	if( getBit( &result, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
 	}
 
 	// Z is one if result is zero
-	if( *dstReg == 0 ){
+	if( result == 0x0 ){
 		setBit( fReg, 6, 1 );	
 	}else{
 		setBit( fReg, 6, 0 );
@@ -294,12 +321,20 @@ void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	setBit( fReg, 4, 0 );	
 
 	// P/V is set if parity is even
-	
+	if( ( getBit( dstReg, 7 ) == getBit( srcVal, 7 ) ) && ( getBit( &result, 7 ) != getBit( dstReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
+  
 	// N is set to zero
 	setBit( fReg, 1, 0 );	
 	
 	// C is set to zero
-	setBit( fReg, 0, 0 );	 
+	setBit( fReg, 0, 0 );	
+
+	*dstReg = result;	 
 } 	
 
 // CP,s		
@@ -319,19 +354,41 @@ void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
 void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
-	// If the values are equal set the Z flag to 1 and S flag to 0
-	if( *val == *reg ){
-		setBit( fReg, 6, 1 ); // Z
-		setBit( fReg, 7, 0 ); // S
+
+	// This is supposed to be a subtraction without updating the register
+	// only the flags are altered.
+
+	uint8_t result = *reg + (~(*val))+1 ;
+
+	// S (Signed) is 1 if result is negative
+	getBit( &result, 7 ) ? setBit( fReg, 7, 1 ) : setBit( fReg, 7, 0);
+
+	// Z (Zero) is 1 if result is 0
+        result == 0x00 ? setBit( fReg, 6, 1 ) : setBit( fReg, 6, 0 );
+
+	// H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
+	// NOTE: might not have to worry about this only for BCD instructions
+	if( getBit( &result, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( reg, 4 ) == 0x00 ){
+		// half carry occured
+		setBit( fReg, 4, 1 );
 	}else{
-		setBit( fReg, 6, 0 );
-		setBit( fReg, 7, 1 );
+		setBit( fReg, 4, 0 );	
 	}
 
-	// ** Overflow bits need to be set ?? Not sure how yet **
-
-	// N is set
+	// P/V is 1 if overflow
+	if( ( getBit( reg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( reg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
+	
+	// N is set to 1 because we are subtracting
 	setBit( fReg, 1, 1 );	
+
+	// C is 1 if result is less than 0
+	( (int8_t)result < 0 ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
+		
 }	
 
 // INC r
@@ -346,10 +403,36 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 // INC(IY+d)
 // Increment the contents of address plus offset in IX register
 // OpCodes: 0xFD34
-void INC( uint8_t* val ){
+void INC( uint8_t* val, uint8_t* fReg ){
+	// P/V is 1 if m( the operand) was 7FH(127) before operation 0 otherwise
+	if( *val == 0x7F ){
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );
+	}
+	
+	// Decrement value	
 	++*val;
 
-	// NEED TO SET SOME FLAGS IN HERE
+	// S is one if result is negative
+	if( getBit( val, 7 ) == 0x01 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+
+	// Z is one if result is zero
+	if( *val == 0 ){
+		setBit( fReg, 6, 1 );	
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+
+	// H is set to 1 if borrow bit 4??
+	//setBit( fReg, 4, 0 );	
+	
+	// N is set to 1
+	setBit( fReg, 1, 1 );	
 }
 
 // DEC r
@@ -366,7 +449,7 @@ void INC( uint8_t* val ){
 // OpCodes: 0xFD35
 void DEC( uint8_t* val, uint8_t* fReg ){
 	
-	// P/V is 1 if m was 80H before operation 0 otherwise
+	// P/V is 1 if m( the operand) was 80H before operation 0 otherwise
 	if( *val == 0x80 ){
 		setBit( fReg, 2, 1 );
 	}else{
@@ -377,7 +460,7 @@ void DEC( uint8_t* val, uint8_t* fReg ){
 	--*val;
 
 	// S is one if result is negative
-	if( (int8_t)*val < 0 ){
+	if( getBit( val, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
