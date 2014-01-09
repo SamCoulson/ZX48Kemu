@@ -57,7 +57,7 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg );
 // Subtract the value at address of IX plus offset from register A
 // OpCodes: 0xFD96
 void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg );
-/*
+
 // SBC A,r
 // Subtract an 8-bit integer - C Flag from register A  
 // OpCodes: 0x9F, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D 
@@ -73,8 +73,8 @@ void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg );
 // ADD A,(IY-d)
 // Subtract the value at address of IX plus offset - C Flag from register A
 // OpCodes: 0xFD9E
-void SBC8BitValFromA( uint8_t val );
-*/
+void SBC( uint8_t *aReg, uint8_t *val, uint8_t *fReg  );
+
 // AND A,s
 // Logical AND an a 8-bit value with the accumulater
 // AND A,r 

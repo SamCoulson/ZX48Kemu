@@ -101,7 +101,7 @@ void CPU::LDI(){
 // Copy value at address in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg ){
+void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint16_t* pc, uint8_t* fReg ){
 	
 	// If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
 	if( *bc == 0x0000){
@@ -109,9 +109,9 @@ void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_
 	}	
 	
 	// Keep copying data from one memory loaction to another until BC is 0 
-	while( *bc != 0x0000 ){
+	if( *bc != 0x0000 ){
 		// Transfer byte pointed to by HL to location pointed to by BC
-		*deVal = *hlVal;			
+		*deVal = *hlVal;		
 
 		// Increment HL and DE
 		++*hl;
@@ -119,6 +119,12 @@ void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_
 
 		// Decrement BC
 		--*bc;
+
+		// Reset PC back
+		if( *bc != 0x0000 ){
+			--*pc;
+			--*pc;
+		}
 	}
 
 	// Reset flags H, P/V, and N
@@ -172,7 +178,7 @@ void CPU::LDD(){
 */
 // LDDR
 // Copy value at adress in HL register to address in DE register
-// Decrement both HL and BC, and decrement BC
+// Decrement both HL and BC.
 // OpCodes: 0xEDB8
 void LDDR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg ){
 	

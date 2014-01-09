@@ -85,7 +85,7 @@ void PUSH( uint16_t* spAddrs, uint16_t* sp, uint16_t* srcVal ){
 	*(spAddrs-1) = *srcVal;
 
 	// Decrement stack pointer again
-	--*sp;
+	--*sp;	
 }
 
 // POP qq

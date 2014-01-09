@@ -5,7 +5,7 @@ SDL_Surface* screen = NULL;
 int initSDL(){
 
 	//Start SDL
-	int result = SDL_Init( SDL_INIT_EVERYTHING );
+	int result = SDL_Init( SDL_INIT_VIDEO );
 
 	if(result != 0)
 	{

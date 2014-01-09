@@ -73,7 +73,7 @@ void ADD( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 // OpCodes: 0xFD8E
 void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	
-	*aReg += ( *val + getBit( fReg, 0 ) );
+	uint8_t result = *aReg + ( *val + getBit( fReg, 0 ) );
 
 	// S is 1 if result is negative
 	if( getBit( aReg, 7 ) == 0x01 ){
@@ -90,6 +90,12 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	// H is 1 if borrow bit 4
 	
 	// P/V is 1 if overflow
+	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( aReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
 	
 	// N is set to 0 as there is no subtraction
 	setBit( fReg, 1, 0 );	
@@ -98,6 +104,8 @@ void ADC( uint8_t *aReg, uint8_t* val, uint8_t* fReg ){
 	if( (getBit( aReg, 7 ) == 0x01 ) && ( getBit( val, 7 ) == 0x01 ) ){
 		setBit( fReg, 0, 1 );
 	}			
+
+	*aReg = result;
 }
 
 // SUB A,s
@@ -153,7 +161,7 @@ void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg ){
 	// Copy the result to the A register
 	*aReg = result;		
 }	
-/*			
+			
 // SBC A,r
 // Subtract an 8-bit integer - C Flag from register A  
 // OpCodes: 0x9F, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D 
@@ -169,8 +177,42 @@ void SUB( uint8_t* aReg, uint8_t* val, uint8_t* fReg ){
 // ADD A,(IY-d)
 // Subtract the value at address of IX plus offset - C Flag from register A
 // OpCodes: 0xFD9E
-void SBC8BitValFromA( uint8_t val );
-*/
+void SBC( uint8_t *aReg, uint8_t *val, uint8_t *fReg  ){
+	uint8_t result = *aReg + ( ( (~(*val))+1 ) - getBit( fReg, 7 ) );
+
+	// S (Signed) is 1 if result is negative
+	getBit( &result, 7 ) ? setBit( fReg, 7, 1 ) : setBit( fReg, 7, 0);
+
+	// Z (Zero) is 1 if result is 0
+        result == 0x00 ? setBit( fReg, 6, 1 ) : setBit( fReg, 6, 0 );
+
+	// H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
+	// NOTE: might not have to worry about this only for BCD instructions
+	if( getBit( &result, 3 ) == 0x01 && getBit( val, 3 ) == 0x01 && getBit( aReg, 4 ) == 0x00 ){
+		// half carry occured
+		setBit( fReg, 4, 1 );
+	}else{
+		setBit( fReg, 4, 0 );	
+	}
+
+	// P/V is 1 if overflow
+	if( ( getBit( aReg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( aReg, 7 ) )  ){ 
+	//Set to 1 overflow
+		setBit( fReg, 2, 1 );
+	}else{
+		setBit( fReg, 2, 0 );	
+	}
+	
+	// N is set to 1 because we are subtracting
+	setBit( fReg, 1, 1 );	
+
+	// C is 1 if result is less than 0
+	( (int8_t)result < 0 ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
+	
+	// Copy the result to the A register
+	*aReg = result;	
+}
+
 // AND A,s
 // Logical AND an a 8-bit value with the accumulater
 // AND A,r 
@@ -411,7 +453,7 @@ void INC( uint8_t* val, uint8_t* fReg ){
 		setBit( fReg, 2, 0 );
 	}
 	
-	// Decrement value	
+	// increment value	
 	++*val;
 
 	// S is one if result is negative
@@ -422,8 +464,8 @@ void INC( uint8_t* val, uint8_t* fReg ){
 	}
 
 	// Z is one if result is zero
-	if( *val == 0 ){
-		setBit( fReg, 6, 1 );	
+	if( *val == 0x0 ){
+		setBit( fReg, 6, 1 );  // HAVE BEEN CHAGED FOR EXPERIMENT	
 	}else{
 		setBit( fReg, 6, 0 );
 	}
@@ -475,7 +517,6 @@ void DEC( uint8_t* val, uint8_t* fReg ){
 
 	// H is set to 1 if borrow bit 4??
 	//setBit( fReg, 4, 0 );	
-
 		
 	// N is set to 1
 	setBit( fReg, 1, 1 );		

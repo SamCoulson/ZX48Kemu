@@ -7,6 +7,7 @@
 #include "../include/cpu.h"
 #include "../include/util_bit_operations.h"
 #include "../include/8-bit_arithmetic_group.h"
+#include "../include/16-bit_arithmetic_group.h"
 
 // Declare and initialise a register set for testing
 static Registers registers = {
@@ -182,6 +183,30 @@ static void test_8bit_sub(){
 
 }
 
+static void test_16bit_add(){
+	// Test carry flag
+	resetCPU();
+	*reg->bc = 32768;
+	*reg->de = 32768;
+	printf("%d + %d", *reg->bc, *reg->de);
+	ADD16( reg->bc, reg->de, reg->f );
+	printf(" = %d\n", *reg->bc );	
+	printf("Carry flag = %d\n", getBit( reg->f, 0 ) );
+	assert( *reg->bc == 0x00 && getBit( reg->f, 0) == 0x01  && "test_16bit_sub() - Carry Flag" );
+	
+	// test half carry
+	resetCPU();
+	*reg->bc = 128;
+	*reg->de = 128;
+	printf("%d + %d", *reg->bc, *reg->de);
+	ADD16( reg->bc, reg->de, reg->f );
+	printf(" = %d\n", *reg->bc );	
+	printf("Half Carry flag = %d\n", getBit( reg->f, 4 ) );
+	assert( *reg->bc == 256 && getBit( reg->f, 4) == 0x01  && "test_16bit_sub() - Carry Flag" );
+	
+	
+}
+
 int main( int argc, char* argv[] ){
 
 	printf("Testing started!\n");
@@ -193,6 +218,10 @@ int main( int argc, char* argv[] ){
 	
 	printf("Testing 8Bit SUB\n");
 	test_8bit_sub();
+	printf("Testing 8Bit SUB successful\n");
+
+	printf("Testing 16Bit ADD16\n");
+	test_16bit_add();
 	printf("Testing 8Bit SUB successful\n");
 
 	printf( "Testing successful" );

@@ -9,8 +9,14 @@ void RRCA( uint8_t* aReg, uint8_t* fReg){
 	setBit( fReg, 0, getBit( aReg, 0 ) );
 	// Bit shift right 1 place
 	*aReg >>= 1;
-	// Copy carry flag into 7 of register
+	// Copy carry flag into 7 of A register
 	setBit( aReg, 7, getBit( fReg, 0 ) );
+
+	// Reset H
+	setBit( fReg, 4, 0 );
+	// Reset N
+	setBit( fReg, 1, 0 );
+	
 }
 
 // RRA

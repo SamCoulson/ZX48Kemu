@@ -7,7 +7,7 @@
 // Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
 // OpCodes: 0xC3, 0xE9
 void JP( uint16_t* pc, uint16_t* addrs ){
-	// Set the address the pc points to jump address minus one, to compensate for next incremnet on execution loop
+	// Set the address the pc points to jump address in the minus one, to compensate for next incremnet on execution loop
 	*pc = (*addrs)-1;	
 }
 
@@ -39,7 +39,7 @@ void JR( uint8_t* val, uint16_t* pc ){
 // OpCodes: 0x38
 void JRC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If C flag is 0 jump relative to val
-	if( getBit( fReg, 0 ) == 1 ){
+	if( getBit( fReg, 0 ) == 0x01 ){
 		// Add value to pc
 		*pc += (int8_t)*val;
 	}
@@ -50,7 +50,7 @@ void JRC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 // OpCodes: 0x30
 void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If C flag is 0 jump relative to val
-	if( getBit( fReg, 0 ) == 0 ){
+	if( getBit( fReg, 0 ) == 0x00 ){
 		// Add value to pc
 		*pc += (int8_t)*val;
 	}

@@ -3,16 +3,6 @@
 // Set the given bit in a byte to either 1 or 0
 void setBit(uint8_t *byte, uint8_t pos, uint8_t bitval){
 	
-	if( (pos < 0 ) && ( pos > 7 ) ){
-		printf( "invalid bit range passed to setBit" );
-		return;
-	}
-
-	if( bitval < 0 || bitval > 1 ){
-		printf( "invalid bit value passed to setBit" );
-		return;
-	}
-
 	if( bitval == 0 )
 		*byte &= ~( 1 << ( pos ) ); 
 		// Set to 0, 00000001 shifted to the position of pos, 
@@ -26,11 +16,6 @@ void setBit(uint8_t *byte, uint8_t pos, uint8_t bitval){
 
 // Find the status of a specific bit **TEST THIS**
 int getBit( uint8_t *byte, uint8_t pos ){
-
-	if( (pos < 0 ) && (pos > 7) ){
-		printf( "invalid bit range passed to setBit\n" );
-		return 0;
-	}
 
 	// AND with a 1 at corresponding position along the bit string
 	if( *byte & ( 1 << ( pos ) ) ){

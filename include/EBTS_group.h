@@ -41,7 +41,7 @@ void LDI();
 // Copy value at adress in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint8_t* fReg );
+void LDIR( uint16_t* hlVal, uint16_t* deVal, uint16_t* hl, uint16_t* de, uint16_t* bc, uint16_t* pc, uint8_t* fReg );
 
 /*
 // LDD *Changes flags* 

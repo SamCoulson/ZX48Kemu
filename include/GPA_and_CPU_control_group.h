@@ -26,6 +26,7 @@ void CCF( uint8_t* fReg );
 // SCF
 // The carry flag in the F register is set
 // OpCodes: 0x37
+void SCF( uint8_t* fReg );
 
 // NOP
 // Perform no operation during the machine cycle

@@ -18,7 +18,7 @@
 // Test bit b in memory location specifed by IX plus 2's complement offset d
 // OpCodes: 0xFDCB
 void BIT( uint8_t bit, uint8_t* byte, uint8_t* fReg ){
-	// Z is 1 if bit is 0 else 0 if bit is 1
+	// Z is 1 if specified bit is 0
 	if( getBit( byte, bit ) == 0x00 ){
 		setBit( fReg, 6, 1 );
 	}else{
@@ -27,7 +27,9 @@ void BIT( uint8_t bit, uint8_t* byte, uint8_t* fReg ){
 
 	// H is set
 	setBit( fReg, 4, 1 );
-		
+
+	// N is reset
+	setBit( fReg, 1, 0 );	
 }
 
 // SET b,r

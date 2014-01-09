@@ -15,7 +15,7 @@ uint8_t* getByte( uint16_t addrs );
 
 uint16_t* getWord( uint16_t addrs );
 
-// Writes an 8-bit value to the 16-bit location in memory
+// Writes an 8-bit value to the 16-bit address location in memory
 void setByte(uint16_t loc, uint8_t val);
 
 // Total 64K Spectrum memory

@@ -28,6 +28,16 @@ void CCF( uint8_t* fReg ){
 // SCF
 // The carry flag in the F register is set
 // OpCodes: 0x37
+void SCF( uint8_t* fReg ){
+	// H Reset
+	setBit( fReg, 4, 0 );
+
+	// N Reset
+	setBit( fReg, 1, 0 );
+	
+	// C is Set
+	setBit( fReg, 0, 1 );
+}
 
 // NOP
 // Perform no operation during the machine cycle
