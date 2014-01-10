@@ -2,6 +2,7 @@
 #include "../include/CPU.h"
 #include "../include/Memory.h"
 #include "../include/romloader.h"
+#include "../include/screen.h"
 #include <stdio.h>
 
 int main(int argc, char *argv[] ){	
@@ -9,18 +10,9 @@ int main(int argc, char *argv[] ){
 	// Re-direct output to console as SDL will disable it	
 	freopen( "CON" ,"w", stdout);
 
-	printf( "Output to console enabled\n" );
-	
-	/*
-	//Apply image to screen
-	SDL_BlitSurface( hello, NULL, screen, NULL );
+	printf( "Output to console enabled\n");
 
-	//Update Screen
-	SDL_Flip( screen );
-	
-	//Pause
-	SDL_Delay( 5000 );
-	*/
+	initSDL();
 
 	// Load the spectrum 48K ROM from file
 	loadROMFile( "48.rom" );
