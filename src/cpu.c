@@ -61,12 +61,19 @@ void run( uint16_t addrs ){
 
 	// DEBUG
 	*reg->pc = 0x0000;
-
 	
 	uint8_t timeToInterrupt = 50;
 
+	// Test 8x8 block for screen
+	totalMem[ 0x4000 ] = 0xFF;
+	totalMem[ 0x4020 ] = 0xFF;
+	totalMem[ 0x4040 ] = 0xFF;
+	totalMem[ 0x4060 ] = 0xFF;
+	totalMem[ 0x4080 ] = 0xFF;
+	totalMem[ 0x40A0 ] = 0xFF;
+	totalMem[ 0x40C0 ] = 0xFF;
+	totalMem[ 0x40E0 ] = 0xFF;
 
-	totalMem[0x4004] = 0xFF;
 
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
@@ -107,7 +114,7 @@ void console(){
 	
 	//system("cls");
 	
-	if( *reg->pc == 0x0E80 )
+	if( *reg->pc == 0x0D96 || *reg->pc == 0x0E88 || totalMem[0x5CB6] == 0x0000 )
 		stepMode = 1;
 
 	if( mode == 0 ){
@@ -204,27 +211,30 @@ void console(){
 			printf("%X %02X %02X\n", i, totalMem[i], totalMem[i+1] );
 		}
 	}
-	
-	if( stepMode ){
+
+
+	if( kbhit() || stepMode ){	
 		key = getch();
 		
-		//printf("key press = %d\n", key);
+		// printf("key press = %d\n", key);
 
 		if( key == 113 ){
 			exit(1); // key q
 		}else if( key == 115 ){
 			mode = 0; // key s
+		}else if( key == 108 ) {
+			mode = 4; // l key
 		}else if( key == 109 ){
 			mode = 1; // key m
 		}else if( key == 114 ){
-			stepMode = 0; // r
+			stepMode = stepMode ? 0 : 1; // r
 		}else if( key == 118 ){
 			mode = 2;
 		}else if( key == 107 ){
 			mode = 3;
 		}	
+		
 	}
-
 	
 
 }
@@ -1885,7 +1895,7 @@ void execute( uint8_t* opcode ){
 				DEC( getByteAt( reg->iy + *( getNextByte() ) ), reg->f );
 				break;
 			case 0x36:
-				printf( "LD (IX+%X),%d", readNextByte(), readNextByte() + 1 );
+				printf( "LD (IX+%X),%d", readNextByte(), readNextByte() + 1 ); // Is incorrect +1 does not work
 				LD( getByteAt( reg->iy + *( getNextByte() ) ), getNextByte() );				
 				break;
 			case 0x46:
