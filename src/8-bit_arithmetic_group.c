@@ -490,7 +490,7 @@ void INC( uint8_t* val, uint8_t* fReg ){
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD35
 void DEC( uint8_t* val, uint8_t* fReg ){
-	
+
 	// P/V is 1 if m( the operand) was 80H before operation 0 otherwise
 	if( *val == 0x80 ){
 		setBit( fReg, 2, 1 );

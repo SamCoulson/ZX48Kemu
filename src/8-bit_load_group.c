@@ -85,7 +85,7 @@
 // OpCodes: 0xED4F
 
 void LD( uint8_t* dst, uint8_t* src ){
-	*dst = *src;
+	*dst = *src;	
 }
 
 

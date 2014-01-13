@@ -147,7 +147,7 @@ uint8_t readNextByte();
 uint16_t readNextWord();
 
 // Get the byte specified memory location
-uint8_t* getByteAt( uint16_t *addrs );
+uint8_t* getByteAt( uint16_t addrs );
 
 // Get the word at the specified location
 uint16_t* getWordAt( uint16_t *addrs );
