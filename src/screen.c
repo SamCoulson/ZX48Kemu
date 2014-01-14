@@ -2,6 +2,7 @@
 #include "../include/memory.h"
 
 SDL_Surface* screen = NULL;
+SDL_Event event;
 
 int initSDL(){
 
@@ -30,6 +31,8 @@ int initSDL(){
 
 void updateScreen(){
 
+	SDL_PollEvent( &event );
+
 	// Row counter
 	uint8_t column = 0, row = 0;
 	
@@ -45,16 +48,16 @@ void updateScreen(){
 	int bit = 0;
 		
 	// Determine picel colors
-	Uint32 foreground = SDL_MapRGB( screen->format, 255, 255, 255 ); 
-	Uint32 background = SDL_MapRGB( screen->format, 0, 0, 0 );
+	Uint32 foreground = SDL_MapRGB( screen->format, 0, 0, 0 ); 
+	Uint32 background = SDL_MapRGB( screen->format, 255, 255, 255 );
 
 	// Update 256 x 192 pixels  
-	for( y = 0; y < 192; ){
+	for( y = 0; y < 192; y++ ){
 		for( x = 0; x < 256; ){
 			// Read spec video mem buffer and get pixel status + determine color
 			uint8_t pixel = totalMem[vidBufLoc];
 
-			for( bit = 0; bit < 8; bit++ ){
+			for( bit = 7; bit > -1; bit-- ){
 				// Set on pixel to forground color
 				if( pixel & (1 << (bit) ) ){
 					putColor( screen, x, y, foreground );
@@ -65,14 +68,13 @@ void updateScreen(){
 			}
 			vidBufLoc++;	
 		}	
-		y++; //  Progress 1 pixel down
 		// If y < current 8x8 block reset 
 		if( y < column ){
 			// Reset the attribute location pointer to beginning of line to retain 
 			// PAPER and INK attiributes.	
 			//vidBufLoc = 0x4000;
 		}else{
-			column += 8; // Set the next y pos to 8 pixel down, end of next 8x8 block
+			column += 1; // Set the next y pos to 8 pixel down, end of next 8x8 block
 			// Move Attribute buffer pointer to next line
 			// Will need to multipy row number by 32 to determine the location. 	
 		}

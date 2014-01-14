@@ -15,11 +15,32 @@ void JP( uint16_t* pc, uint16_t* addrs ){
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
 // OpCodes: 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
 
+// 0xD2
+void JPNC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
+	// If C flag is non-carry i.e. C == 0
+	if( getBit( fReg, 0 ) == 0x00 ){
+		// Add value to pc
+		*pc = (*addrs)-1;
+	}
+	// Else do nothing	
+}
+
+// 0xDA
+void JPC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
+	// If C flag is carry i.e. C == 1
+	if( getBit( fReg, 0 ) == 0x01 ){
+		// Add value to pc
+		*pc = (*addrs)-1;
+	}
+	// Else do nothing	
+}
+
+
 // JPNZ,nn
 // Jump to address when Z flag is non-zero
 // OpCodes: 0xC2 
 void JPNZ( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
-	// If Z flag is non-zero jump to address
+	// If Z flag is non-zero i.e z != 0
 	if( getBit( fReg, 6 ) != 0x00 ){
 		// Add value to pc
 		*pc = (*addrs)-1;
@@ -46,7 +67,7 @@ void JRC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// Else do nothing	
 }
 // JR NC,e
-// Jump relative when C not 0 - Jump by val if c flag is non-zero *check this*
+// Jump relative when C is 0 
 // OpCodes: 0x30
 void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If C flag is 0 jump relative to val

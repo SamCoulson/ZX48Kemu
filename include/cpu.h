@@ -156,7 +156,7 @@ uint16_t* getWordAt( uint16_t *addrs );
 uint16_t readWordAt( uint16_t *addrs );
 
 // Read byte at memory location
-uint16_t readByteAt( uint16_t *addrs );
+uint16_t readByteAt( uint16_t addrs );
 
 // Write byte to memory given 16-bit address
 void writeByte( uint16_t addrs, uint8_t val );

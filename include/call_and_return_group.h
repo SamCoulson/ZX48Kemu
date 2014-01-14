@@ -29,6 +29,9 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp );
 // Copy stack pointer address to HO and stack pointer+1 to LO of PC	
 // OpCodes: 0xF8, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
 
+// 0xC0
+void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
 // RET C
 // Return if C is set
 // OpCodes: 0xD8

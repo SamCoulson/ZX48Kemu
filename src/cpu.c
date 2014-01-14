@@ -59,7 +59,7 @@ void console();
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
 	
-	freopen( "CON" ,"w", stdout);
+	//freopen( "CON" ,"w", stdout);
 	// Begin executing from 0x0000
 	*reg->pc = addrs;
 
@@ -69,16 +69,106 @@ void run( uint16_t addrs ){
 	uint8_t timeToInterrupt = 50;
 
 	// Test 8x8 block for screen
-	totalMem[ 0x4000 ] = 0xFF;
-	totalMem[ 0x4020 ] = 0xFF;
-	totalMem[ 0x4040 ] = 0xFF;
-	totalMem[ 0x4060 ] = 0xFF;
-	totalMem[ 0x4080 ] = 0xFF;
-	totalMem[ 0x40A0 ] = 0xFF;
-	totalMem[ 0x40C0 ] = 0xFF;
-	totalMem[ 0x40E0 ] = 0xFF;
+	totalMem[ 0x4000 ] = 0x00;
+	totalMem[ 0x4020 ] = 0x3C;
+	totalMem[ 0x4040 ] = 0x42;
+	totalMem[ 0x4060 ] = 0x04;
+	totalMem[ 0x4080 ] = 0x08;
+	totalMem[ 0x40A0 ] = 0x00;
+	totalMem[ 0x40C0 ] = 0x08;
+	totalMem[ 0x40E0 ] = 0x00;
 
-	//totalMem[ 0x5C6B ] = 0x02;
+	totalMem[ 0x4800 ] = 0xFF;
+	totalMem[ 0x4820 ] = 0xFF;
+	totalMem[ 0x4840 ] = 0xFF;
+	totalMem[ 0x4860 ] = 0xFF;
+	totalMem[ 0x4880 ] = 0xFF;
+	totalMem[ 0x48A0 ] = 0xFF;
+	totalMem[ 0x48C0 ] = 0xFF;
+	totalMem[ 0x48E0 ] = 0xFF;
+// Lower third
+	totalMem[ 0x5000 ] = 0xFF;
+	totalMem[ 0x5020 ] = 0xFF;
+	totalMem[ 0x5040 ] = 0xFF;
+	totalMem[ 0x5060 ] = 0xFF;
+	totalMem[ 0x5080 ] = 0xFF;
+	totalMem[ 0x50A0 ] = 0xFF;
+	totalMem[ 0x50C0 ] = 0xFF;
+	totalMem[ 0x50E0 ] = 0xFF;
+	
+	totalMem[ 0x5100 ] = 0xFF;
+	totalMem[ 0x5120 ] = 0xFF;
+	totalMem[ 0x5140 ] = 0xFF;
+	totalMem[ 0x5160 ] = 0xFF;
+	totalMem[ 0x5180 ] = 0xFF;
+	totalMem[ 0x51A0 ] = 0xFF;
+	totalMem[ 0x51C0 ] = 0xFF;
+	totalMem[ 0x51E0 ] = 0xFF;
+
+	totalMem[ 0x5200 ] = 0xFF;
+	totalMem[ 0x5220 ] = 0xFF;
+	totalMem[ 0x5240 ] = 0xFF;
+	totalMem[ 0x5260 ] = 0xFF;
+	totalMem[ 0x5280 ] = 0xFF;
+	totalMem[ 0x52A0 ] = 0xFF;
+	totalMem[ 0x52C0 ] = 0xFF;
+	totalMem[ 0x52E0 ] = 0xFF;
+
+	totalMem[ 0x5300 ] = 0xFF;
+	totalMem[ 0x5320 ] = 0xFF;
+	totalMem[ 0x5340 ] = 0xFF;
+	totalMem[ 0x5360 ] = 0xFF;
+	totalMem[ 0x5380 ] = 0xFF;
+	totalMem[ 0x53A0 ] = 0xFF;
+	totalMem[ 0x53C0 ] = 0xFF;
+	totalMem[ 0x53E0 ] = 0xFF;
+
+	totalMem[ 0x5400 ] = 0xFF;
+	totalMem[ 0x5420 ] = 0xFF;
+	totalMem[ 0x5440 ] = 0xFF;
+	totalMem[ 0x5460 ] = 0xFF;
+	totalMem[ 0x5480 ] = 0xFF;
+	totalMem[ 0x54A0 ] = 0xFF;
+	totalMem[ 0x54C0 ] = 0xFF;
+	totalMem[ 0x54E0 ] = 0xFF;
+
+	totalMem[ 0x5500 ] = 0xFF;
+	totalMem[ 0x5520 ] = 0xFF;
+	totalMem[ 0x5540 ] = 0xFF;
+	totalMem[ 0x5560 ] = 0xFF;
+	totalMem[ 0x5580 ] = 0xFF;
+	totalMem[ 0x55A0 ] = 0xFF;
+	totalMem[ 0x55C0 ] = 0xFF;
+	totalMem[ 0x55E0 ] = 0xFF;
+
+
+	totalMem[ 0x5600 ] = 0xFF;
+	totalMem[ 0x5620 ] = 0xFF;
+	totalMem[ 0x5640 ] = 0xFF;
+	totalMem[ 0x5660 ] = 0xFF;
+	totalMem[ 0x5680 ] = 0xFF;
+	totalMem[ 0x56A0 ] = 0xFF;
+	totalMem[ 0x56C0 ] = 0xFF;
+	totalMem[ 0x56E0 ] = 0xFF;
+
+	totalMem[ 0x5700 ] = 0xFF;
+	totalMem[ 0x5720 ] = 0xFF;
+	totalMem[ 0x5740 ] = 0xFF;
+	totalMem[ 0x5760 ] = 0xFF;
+	totalMem[ 0x5780 ] = 0xFF;
+	totalMem[ 0x57A0 ] = 0xFF;
+	totalMem[ 0x57C0 ] = 0xFF;
+	totalMem[ 0x57E0 ] = 0xFF;
+
+	totalMem[ 0x5800 ] = 0xFF;
+	totalMem[ 0x5820 ] = 0xFF;
+	totalMem[ 0x5840 ] = 0xFF;
+	totalMem[ 0x5860 ] = 0xFF;
+	totalMem[ 0x5880 ] = 0xFF;
+	totalMem[ 0x58A0 ] = 0xFF;
+	totalMem[ 0x58C0 ] = 0xFF;
+	totalMem[ 0x58E0 ] = 0xFF;
+	
 
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
@@ -88,7 +178,7 @@ void run( uint16_t addrs ){
 		// Execute the instruction pointed to by pc
 		execute( &totalMem[*reg->pc]  );
 
-		// Execute the opcode pointed to by program counter
+		// Progess the PC by 1
 		getNextByte();
 	
 		// Do interrupts
@@ -106,8 +196,6 @@ void run( uint16_t addrs ){
 			// Set HL to +FFFF fro RAM-TOP
 			*reg->hl = 0xFFFF;	
 		}
-
-		
 	}
 }
 
@@ -119,7 +207,7 @@ void console(){
 	
 	//system("cls");
 	
-	if( *reg->pc == 0x0D6E || *reg->pc == 0x128E )
+	if( *reg->pc == 0x0C0A )
 		stepMode = 1;
 
 	if( mode == 0 ){
@@ -182,9 +270,15 @@ void console(){
 		uint8_t column = 0;
 
 		// Read the video memory
-		for( int i = 0x4000; i < 0x57FF; i+=8 ){
-			printf( "%X", totalMem[i] );
+		for( int i = 0x4000; i < 0x57FF; i++ ){
+			printf( "%02X", totalMem[i] );
 			column++;
+			if( i == 0x4800 ){
+				printf("\nSecond third\n");
+			}else if( i == 0x5000 ){
+				printf("\nThird third\n");
+			}
+
 			if( column == 32 ){
 				printf("\n");
 				column = 0;
@@ -192,8 +286,9 @@ void console(){
 		}	
 	}
 
+
 	if( mode == 2 ){
-		for( int i = 0x5C00; i < 0x5CB5; i++ ){
+		for(int i = 0x5C00; i < 0x5CB5; i++ ){
 			switch( i ){
 				case 0x5C00 :
 					printf( "KSTATE\t:\n" );
@@ -219,7 +314,7 @@ void console(){
 					printf( "CHANS\t: %02X %02X\n", totalMem[i], totalMem[i++] );
 					break;
 				case 0x5C51 :
-					printf( "CURCHL\t: %02X %02X", totalMem[i], totalMem[i++] );
+					printf( "CURCHL\t: %02X %02X\n", totalMem[i], totalMem[i++] );
 					break;
 				case 0x5C53 :
 					printf( "PROG\t: %02X %02X\n", totalMem[i], totalMem[i++] );
@@ -267,7 +362,7 @@ void console(){
 		}else if( key == 118 ){
 			mode = 2;
 		}else if( key == 107 ){
-			mode = 3;
+			mode = 3; // k key
 		}	
 		
 	}
@@ -314,7 +409,7 @@ void execute( uint8_t* opcode ){
 		case 0x07:
 			break;*/
 		case 0x08:
-			printf( "EX AF,AF" );
+			printf( "EX AF,AF'" );
 			EX( reg->af, reg->altaf );
 			break;
 		case 0x09:
@@ -355,7 +450,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x12:
 			printf( "LD(DE),A");
-			LD( getByteAt( *reg->bc ) ,reg->a );
+			LD( getByteAt( *reg->de ) ,reg->a );
 			break;
 		case 0x13:
 			printf( "INC DE" );
@@ -438,7 +533,7 @@ void execute( uint8_t* opcode ){
 		case 0x27:
 			break;*/
 		case 0x28:
-			printf( "JR Z,%d", (int8_t)readNextByte() );
+			printf( "JR Z,%X", readNextByte() );
 			JRZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x29:
@@ -620,7 +715,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->d, reg->l );
 			break;
 		case 0x56:
-			printf( "LD D,(%02X)", readByteAt( reg->hl ));
+			printf( "LD D,(%02X)", readByteAt( *reg->hl ));
 			LD( reg->d, getByteAt( *reg->hl ) );
 			break;
 		case 0x57:
@@ -652,7 +747,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->e, reg->l );
 			break;
 		case 0x5E:
-			printf( "LD E,(%02X)", readByteAt( reg->hl ) );
+			printf( "LD E,(%02X)", readByteAt( *reg->hl ) );
 			LD( reg->e, getByteAt( *reg->hl ) );
 			break;
 		case 0x5F:
@@ -684,7 +779,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->h, reg->l );
 			break;
 		case 0x66:
-			printf( "LD H,((%02X)", readByteAt( reg->hl ) );
+			printf( "LD H,(%02X)", readByteAt( *reg->hl ) );
 			LD( reg->h, getByteAt( *reg->hl ) );
 			break; 
 		case 0x67:
@@ -716,7 +811,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->l, reg->l );
 			break;
 		case 0x6E:
-			printf( "LD L,(%X)", readByteAt( reg->hl ) );
+			printf( "LD L,(%X)", readByteAt( *reg->hl ) );
 			LD( reg->l, getByteAt( *reg->hl ) );
 			break;
 		case 0x6F:
@@ -779,7 +874,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->a, reg->l );
 			break;
 		case 0x7E:
-			printf( "LD A,(%02X)", readByteAt( reg->hl ) );
+			printf( "LD A,(%02X)", readByteAt( *reg->hl ) );
 			LD( reg->a, getByteAt( *reg->hl ) );
 			break;
 		case 0x7F:
@@ -1041,16 +1136,17 @@ void execute( uint8_t* opcode ){
 		case 0xBF:
 			printf( "CP A" );
 			CP( reg->a, reg->a, reg->f );
-			break;/*
+			break;
 		case 0xC0:
-			//printf( "RET NZ";
-		break;*/
+			printf( "RET NZ" );
+			RETNZ( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
+			break;
 		case 0xC1:
 			printf( "POP BC");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->bc );
 			break;
 		case 0xC2:
-			printf( "JP NZ %X", readNextWord() );
+			printf( "JP NZ, %X", readNextWord() );
 			JPNZ( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xC3:
@@ -1316,15 +1412,15 @@ void execute( uint8_t* opcode ){
 					BIT( 4, reg->a, reg->f );
 					break;
 				case 0x6E:
-					printf( "BIT 5" );
+					printf( "BIT 5, (HL)" );
 					BIT( 5, getByteAt( *reg->hl ), reg->f );
 					break;
 				case 0x76:
-					printf( "BIT 6" );
+					printf( "BIT 6, (HL)" );
 					BIT( 6, getByteAt( *reg->hl ), reg->f );
 					break;
 				case 0x7E:
-					printf( "BIT 7" );
+					printf( "BIT 7, (HL)" );
 					BIT( 7, getByteAt( *reg->hl ), reg->f );
 					break;
 				case 0x86:
@@ -1418,9 +1514,11 @@ void execute( uint8_t* opcode ){
 		case 0xD1:
 			printf( "POP DE");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->de );
-			break;/*
+			break;
 		case 0xD2:
-			break;*/
+			printf( "JP NC, %04X", readNextWord() );
+			JPNC( reg->pc, getNextWord(), reg->f );
+			break;
 		case 0xD3:
 			printf("OUT (+%X),A", readNextByte() );
 			OUTA( &IOport[ *( getNextByte() ) ], reg->a );
@@ -1447,13 +1545,15 @@ void execute( uint8_t* opcode ){
 		case 0xD9:
 			printf( "EXX" );
 			EXX( reg->bc, reg->de, reg->hl, reg->altbc, reg->altde, reg->althl );
-			break;/*
+			break;
 		case 0xDA:
+			printf( "JP C, %X", readNextWord() );
+			JPC( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xDB:
 			break;
 		case 0xDC:
-			break;*/
+			break;
 		case 0xDD: /* IX registers */
 			switch( *( getNextByte() ) ){
 			case 0x21:
@@ -1726,6 +1826,7 @@ void execute( uint8_t* opcode ){
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->hl );
 			break;/*
 		case 0xE2:
+			printf( "" );
 			break;*/
 		case 0xE3:
 			printf( "EX (SP),HL" );
@@ -1777,7 +1878,7 @@ void execute( uint8_t* opcode ){
 				LD( reg->i, reg->a );
 				break;
 			case 0x4B:
-				printf( "LD BC(%X)", readNextWord() );
+				printf( "LD BC,(%X)", readNextWord() );
 				LD16( reg->bc, getWordAt( getNextWord() ) );
 				break;
 			case 0x4F:
@@ -1799,6 +1900,10 @@ void execute( uint8_t* opcode ){
 			case 0x57:
 				printf( "LD A,I");
 				LDAIR( reg->a, reg->i, reg->f, reg->iff2 );
+				break;
+			case 0x5B:
+				printf( "LD DE,(%X)", readNextWord() );
+				LD16( reg->de, getWordAt( getNextWord() ) );
 				break;
 			case 0x5F:
 				printf( "LD A,R");
@@ -1923,16 +2028,15 @@ void execute( uint8_t* opcode ){
 				DEC16( reg->iy );
 				break;
 			case 0x34:
-				printf( "INC IY+%X", (int8_t)readNextByte() );
+				printf( "INC IY+%X", readNextByte() );
 				INC( getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ), reg->f );
 				break;
 			case 0x35:
-				printf( "DEC IY+%X", (int8_t)readNextByte() );
+				printf( "DEC IY+%X", readNextByte() );
 				DEC( getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ), reg->f );
 				break;
 			case 0x36:
-				temppc = *reg->pc+2;
-				printf( "LD (IY+%X),%02X*************", (int8_t)readNextByte(), readByteAt( &temppc ) );
+				printf( "LD (IY+%X),%02X**", (int8_t)readNextByte(), readByteAt( *reg->pc+2 ) );
 				LD( getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ), getByteAt( *reg->pc+2 ) );
 				getNextByte();				
 				break;
@@ -2243,8 +2347,8 @@ uint16_t* getWordAt( uint16_t* addrs ){
 uint16_t readWordAt( uint16_t *addrs ){
 	return *( getWord( *addrs ) );
 }
-uint16_t readByteAt( uint16_t *addrs ){
-	return *( getByte( *addrs ) );
+uint16_t readByteAt( uint16_t addrs ){
+	return *( getByte( addrs ) );
 }
 // Write byte to memory given 16-bit address
 void writeByte( uint16_t addrs, uint8_t val ){
