@@ -126,9 +126,11 @@ void execute( uint8_t* opcode ){
 		case 0x06:
 			printf( "LD B,+%X", readNextByte() );
 			LD( reg->b, getNextByte() );
-			break;/*
+			break;
 		case 0x07:
-			break;*/
+			printf( "RLCA" );
+			RLCA( reg->a, reg->f );
+			break;
 		case 0x08:
 			printf( "EX AF,AF'" );
 			EX( reg->af, reg->altaf );
@@ -142,7 +144,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->a, getByteAt( *reg->bc ) );
 			break;
 		case 0x0B:
-			printf("DEC BC");
+			printf( "DEC BC" );
 			DEC16( reg->bc );
 			break;
 		case 0x0C:
@@ -188,11 +190,13 @@ void execute( uint8_t* opcode ){
 		case 0x16:
 			printf( "LD D,+%X", readNextByte() );
 			LD( reg->d, getNextByte() );
-			break;/*
+			break;
 		case 0x17:
-			break;*/
+			printf( "RLA" );
+			RLA( reg->a, reg->f );
+			break;
 		case 0x18:
-			printf( "JR %d", readNextByte() );
+			printf( "JR %X", readNextByte() );
 			JR( getNextByte(), reg->pc );
 			break;
 		case 0x19:
@@ -282,6 +286,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->l, getNextByte() );
 			break;/*
 		case 0x2F:
+			printf( "DAA" );
 			break;*/
 		case 0x30:
 			printf("JR NC,%d", readNextByte() );
@@ -404,7 +409,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->c, reg->l );
 			break;
 		case 0x4E:
-			printf( "LD C,(HL)");
+			printf( "LD C,(HL)" );
 			LD( reg->c, getByteAt( *reg->hl ) );
 			break;
 		case 0x4F:
@@ -436,7 +441,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->d, reg->l );
 			break;
 		case 0x56:
-			printf( "LD D,(%02X)", readByteAt( *reg->hl ));
+			printf( "LD D,(HL)" );
 			LD( reg->d, getByteAt( *reg->hl ) );
 			break;
 		case 0x57:
@@ -468,7 +473,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->e, reg->l );
 			break;
 		case 0x5E:
-			printf( "LD E,(%02X)", readByteAt( *reg->hl ) );
+			printf( "LD E,(HL)" );
 			LD( reg->e, getByteAt( *reg->hl ) );
 			break;
 		case 0x5F:
@@ -500,7 +505,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->h, reg->l );
 			break;
 		case 0x66:
-			printf( "LD H,(%02X)", readByteAt( *reg->hl ) );
+			printf( "LD H,(HL)" );
 			LD( reg->h, getByteAt( *reg->hl ) );
 			break; 
 		case 0x67:
@@ -532,7 +537,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->l, reg->l );
 			break;
 		case 0x6E:
-			printf( "LD L,(%X)", readByteAt( *reg->hl ) );
+			printf( "LD L,(HL)" );
 			LD( reg->l, getByteAt( *reg->hl ) );
 			break;
 		case 0x6F:
@@ -564,8 +569,8 @@ void execute( uint8_t* opcode ){
 			LD( getByteAt( *reg->hl ), reg->l );
 			break;/*
 		case 0x76:
-			cout << "HALT");
-		break;*/
+			printf( "HALT" );
+			break;*/
 		case 0x77:
 			printf( "LD (HL),A");
 			LD( getByteAt( *reg->hl ) ,reg->a );
@@ -595,7 +600,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->a, reg->l );
 			break;
 		case 0x7E:
-			printf( "LD A,(%02X)", readByteAt( *reg->hl ) );
+			printf( "LD A,(HL)" );
 			LD( reg->a, getByteAt( *reg->hl ) );
 			break;
 		case 0x7F:
@@ -873,9 +878,11 @@ void execute( uint8_t* opcode ){
 		case 0xC3:
 			printf( "JP %X", readNextWord() );
 			JP( reg->pc, getNextWord() );
-			break;/*
+			break;
 		case 0xC4:
-			break;*/
+			printf( "CALLNZ %X", readNextWord() );
+			CALLNZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
+			break;
 		case 0xC5:
 			printf( "PUSH BC");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->bc );
@@ -895,9 +902,11 @@ void execute( uint8_t* opcode ){
 		case 0xC9:
 			printf( "RET");
 			RET( reg->pc, getWordAt( reg->sp ), reg->sp );
-			break;/*
+			break;
 		case 0xCA:
-			break;*/
+			printf( "JP Z,%X", readNextWord() );
+			JPZ( reg->pc, getNextWord(), reg->f );
+			break;
 		case 0xCB:
 			switch( *( getNextByte() ) ){
 				case 0x00:
@@ -1213,7 +1222,7 @@ void execute( uint8_t* opcode ){
 			}
 			break;
 		case 0xCC:
-			printf( "CALL Z, %X", readNextWord() );
+			printf( "CALL Z,%X", readNextWord() );
 			CALLZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xCD:
@@ -1237,16 +1246,17 @@ void execute( uint8_t* opcode ){
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->de );
 			break;
 		case 0xD2:
-			printf( "JP NC, %04X", readNextWord() );
+			printf( "JP NC,%X", readNextWord() );
 			JPNC( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xD3:
 			printf("OUT (+%X),A", readNextByte() );
 			OUTA( &IOport[ *( getNextByte() ) ], reg->a );
-			break;/*
+			break;
 		case 0xD4:
-			//printf( "CALL NC,%X%X");
-			break;*/
+			printf( "CALL NC,%X", readNextWord() );
+			CALLNC( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
+			break;
 		case 0xD5:
 			printf( "PUSH DE");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->de );
@@ -1268,12 +1278,15 @@ void execute( uint8_t* opcode ){
 			EXX( reg->bc, reg->de, reg->hl, reg->altbc, reg->altde, reg->althl );
 			break;
 		case 0xDA:
-			printf( "JP C, %X", readNextWord() );
+			printf( "JP C,%X", readNextWord() );
 			JPC( reg->pc, getNextWord(), reg->f );
-			break;
+			break;/*
 		case 0xDB:
-			break;
+			printf( "IN A(%X)" );
+			break;*/
 		case 0xDC:
+			printf( "CALL C,%X", readNextWord() );
+			CALLC( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xDD: /* IX registers */
 			switch( *( getNextByte() ) ){
@@ -1533,28 +1546,35 @@ void execute( uint8_t* opcode ){
 			default:
 				break;
 			}
-			break;/*
+			break;
 		case 0xDE:
-			break;*/
+			printf( "SBC A,%X", readNextByte() );
+			SBC( reg->a, getNextByte(), reg->f );
+			break;
 		case 0xDF:
 			printf( "RST 18H" );
 			RST( 0x18, getWordAt( reg->sp ), reg->sp, reg->pc );
-			break;/*
+			break;
 		case 0xE0:
-			break;*/
+			printf( "RET PO,%X***MUST BE CHECKED", readNextWord() );
+			RETPO( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
+			break;
 		case 0xE1:
 			printf( "POP HL");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->hl );
-			break;/*
+			break;
 		case 0xE2:
-			printf( "" );
-			break;*/
+			printf( "JP PO,%X ****MUST BE CHECKED", readNextWord() );
+			JPPO( reg->pc, getNextWord(), reg->f );
+			break;
 		case 0xE3:
 			printf( "EX (SP),HL" );
 			EX( getWordAt( reg->sp ), reg->hl );
-			break;/*
+			break;
 		case 0xE4:
-			break;*/
+			printf( "CALL PO,%X***MUST BE CHECKED", readNextWord() );
+			CALLPO( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
+			break;
 		case 0xE5:
 			printf( "PUSH HL");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->hl );

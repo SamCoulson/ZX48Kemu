@@ -14,12 +14,25 @@ void CALL( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc );
 // CALL cc,nn
 // Save PC to external memory stack and load in nn to PC under a condition
 // OpCodes: 0xDC, 0xFC, 0xD4, 0xC4, 0xF4, 0xEC, 0xE4, 0xCC
+
+// 0xDC
+void CALLC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
+// 0xC4
 void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
+// CALL NC,nn
+// 0xD4
+void CALLNC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
 
 // CALL Z,nn
 // CAll the address if Z flag is set
-// OpCodes: 0xCC
+// 0xCC
 void CALLZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
+// CALL PO
+// 0xF4
+void CALLPO( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
 
 // RET
 // Copy stack pointer address to HO and stack pointer+1 to LO of PC
@@ -33,6 +46,9 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp );
 // 0xC0
 void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
 
+// 0xE0 ***Check this***
+void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
 // RET C
 // Return if C is set
 // OpCodes: 0xD8
@@ -42,6 +58,7 @@ void RETC( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
 // Return on condition that the C flag is non-carry i.e. 0
 // OpCodes: 0xD0
 void RETNC( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
 
 // RET Z
 // Return on conditio that the Z flag is 0

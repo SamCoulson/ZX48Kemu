@@ -18,6 +18,12 @@ void JP( uint16_t*, uint16_t* );
 // 0xD2
 void JPNC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
+// 0xE2
+void JPPO( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
+
+// 0xCA
+void JPZ( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
+
 // 0xDA
 void JPC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
