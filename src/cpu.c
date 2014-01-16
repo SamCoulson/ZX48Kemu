@@ -924,6 +924,8 @@ void execute( uint8_t* opcode ){
 				case 0x06:
 					break;
 				case 0x07:
+					printf( "RLC A" );
+					RLC( reg->a, reg->f );
 					break;
 				case 0x08:
 					break;
@@ -1181,6 +1183,10 @@ void execute( uint8_t* opcode ){
 					printf( "RES 6, (HL)" );
 					RES( 6, getByteAt( *reg->hl ) );
 					break;
+				case 0xBC:	
+					printf( "RES 7, H" );
+					RES( 7, reg->h );
+					break;	
 				case 0xBE:
 					printf( "RES 7, (HL)" );
 					RES( 7, getByteAt( *reg->hl ) );
@@ -1212,6 +1218,10 @@ void execute( uint8_t* opcode ){
 				case 0xF6:
 					printf( "SET 6, (HL)" );
 					SET( 6, getByteAt( *reg->hl ) );
+					break;
+				case 0xFD:
+					printf( "SET 7, L" );
+					SET( 7, reg->l );
 					break;
 				case 0xFE:
 					printf( "SET 7, (HL)" );
@@ -1409,11 +1419,59 @@ void execute( uint8_t* opcode ){
 			case 0xCB:
 				offset = *( getNextByte() );
 				switch( *( getNextByte() ) ){
+					case 0x01:
+						break;
+					case 0x02:
+						break;
+					case 0x03:
+						break;
+					case 0x04:
+						break;
+					case 0x05:
+						break;	
 					case 0x06:
+						break;
+					case 0x07:
+						printf( "RLC" );
+						RLC( reg->a, reg->f );
+						break;
+					case 0x08:
+						break;
+					case 0x09:
+						break;
+					case 0x0A:
+						break;
+					case 0x0B:
+						break;
+					case 0x0C:
+						break;
+					case 0x0D:
 						break;	
 					case 0x0E:
 						break;
+					case 0x0F:
+						break;
+					case 0x10:
+						break;
+					case 0x11:
+						break;
+					case 0x12:
+						break;
+					case 0x13:
+						break;
+					case 0x14:
+						break;
+					case 0x15:
+						break;	
 					case 0x16:
+						break;
+					case 0x17:
+						break;
+					case 0x18:
+						break;
+					case 0x19:
+						break;
+					case 0x1A:
 						break;
 					case 0x1E:
 						break;
@@ -1482,7 +1540,7 @@ void execute( uint8_t* opcode ){
 					case 0xB6:
 						printf( "RES 6, (IX+%X)", (int8_t)offset );
 						RES( 6, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;
+						break;	
 					case 0xBE:
 						printf( "RES 7, (IX+%X)", (int8_t)offset );
 						RES( 7, getByteAt( *reg->ix + (int8_t)offset ) );
@@ -1514,7 +1572,7 @@ void execute( uint8_t* opcode ){
 					case 0xF6:
 						printf( "SET 6, (IX+%X)", (int8_t)offset );
 						SET( 6, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;
+						break;	
 					case 0xFE:
 						printf( "SET 7, (IX+%X)", (int8_t)offset );
 						SET( 7, getByteAt( *reg->ix + (int8_t)offset ) );
@@ -1657,6 +1715,10 @@ void execute( uint8_t* opcode ){
 			case 0x72:
 				printf( "SBC HL,SP" );
 				SBC16( reg->hl, reg->sp, reg->f );
+				break;
+			case 0x73:
+				printf( "LD(%X),SP", readNextWord() );
+				LD16( getNextWord(), reg->sp );
 				break;
 			case 0x7B:
 				printf( "LD SP,(%X)", readNextWord() );
