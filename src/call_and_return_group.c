@@ -73,6 +73,7 @@ void CALLNC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uin
 // CALL PO
 // 0xE4
 void CALLPO( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
+	/*
 	if( getBit( fReg, 0 ) != 0x00 ){
 		// Make room for the pc address
 		--spAddrs;
@@ -83,7 +84,18 @@ void CALLPO( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uin
 
 		// Set the pc to point to the address -1 to compensate the autoincrment on next loop
 		*pc = *addrs-1;
-	}	
+	}*/	
+}
+
+// 0xEC
+void CALLPE( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
+// Parity even	
+}
+
+// 0xF4
+void CALLP( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
+// Sign positive
+
 }
 
 // CALL Z,nn
@@ -104,6 +116,12 @@ void CALLZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 	}	
 }	
 
+// 0xFC
+void CALLM( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
+	// Sign Negative
+
+}
+
 // RET
 // Copy stack pointer address to PC
 // OpCodes: 0xC9
@@ -121,11 +139,32 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp ){
 // 0xE0
 // When parity is ODD ***Check this***
 void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
-	if( getBit( fReg, 2 ) != 0x00 ){	
-		*pc = *spAddrs;
-		*sp+=2;	
-	}
+	///if( getBit( fReg, 2 ) != 0x00 ){	
+	//	*pc = *spAddrs;
+	//	*sp+=2;	
+	//}
 }
+
+// 0xE8 ***Check this***
+void RETPE( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
+	//if( getBit( fReg, 2 ) != 0x00 ){	
+	//	*pc = *spAddrs;
+	//	*sp+=2;	
+	//}
+}
+
+// 0xF0 ***Check this***
+void RETP( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
+
+
+}
+
+// 0xF8 ***Check this***
+void RETM( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
+	// Sign negative
+
+}
+
 // 0xC0
 void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	if( getBit( fReg, 6 ) != 0x00 ){	

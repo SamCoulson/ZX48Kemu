@@ -47,13 +47,29 @@ void JPC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
 // 0xE2 ***Check this***
 void JPPO( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
 	// If parity is odd
-	if( getBit( fReg, 0 ) == 0x01 ){
-		// Add value to pc
-		*pc = (*addrs)-1;
-	}
+	//if( getBit( fReg, 0 ) == 0x01 ){
+	//	// Add value to pc
+	//	*pc = (*addrs)-1;
+	//}
 	// Else do nothing	
 }
 
+// 0xEA ***Check this***
+void JPPE( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
+	// If parity bit is even
+
+}
+
+// 0xF2
+void JPP( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
+	
+
+}
+
+// 0xFA
+void JPM( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
+	// Sign Negative
+}
 
 // JPNZ,nn
 // Jump to address when Z flag is non-zero

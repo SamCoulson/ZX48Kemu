@@ -34,6 +34,18 @@ void CALLZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 // 0xF4
 void CALLPO( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
 
+// CALL PE
+// 0xEC
+void CALLPE( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
+// CALL P
+// 0xF4
+void CALLP( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
+// CALL M
+// 0xFC
+void CALLM( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
+
 // RET
 // Copy stack pointer address to HO and stack pointer+1 to LO of PC
 // OpCodes: 0xC9
@@ -48,6 +60,15 @@ void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
 
 // 0xE0 ***Check this***
 void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
+// 0xE8 ***Check this***
+void RETPE( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
+// 0xF0 ***Check this***
+void RETP( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
+
+// 0xF8 ***Check this***
+void RETM( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg );
 
 // RET C
 // Return if C is set

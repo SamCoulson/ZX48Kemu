@@ -14,7 +14,8 @@ void JP( uint16_t*, uint16_t* );
 
 // JP cc, nn
 // Jump according to the condition (cc) of the F-register to a 16-bit address 
-// OpCodes: 0xD2, 0xE2, 0xF3 0xCA, 0xDA, 0xEA, 0xFA
+// OpCodes: 0xCA, 0xD2, 0xDA, 0xE2, 0xEA, 0xF3, 0xFA
+
 // 0xD2
 void JPNC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
@@ -27,7 +28,14 @@ void JPZ( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 // 0xDA
 void JPC( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
+// 0xEA
+void JPPE( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
+// 0xF2
+void JPP( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
+
+// 0xFA
+void JPM( uint16_t* pc, uint16_t* addrs, uint8_t* fReg );
 
 // JPNZ,nn
 // Jump to address when Z flag is non-zero
