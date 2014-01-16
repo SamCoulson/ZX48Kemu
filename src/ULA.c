@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 void read( uint8_t* port ){
-	printf("Read %X at port\n", *port);	
+//	printf("Read %X at port\n", *port);	
 }
 
 void readVideoRAM( unsigned char* mem ){

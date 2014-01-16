@@ -24,6 +24,22 @@ void CALL( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc ){
 // Save PC to external memory stack and load in nn to PC under a condition
 // OpCodes: 0xDC, 0xFC, 0xD4, 0xC4, 0xF4, 0xEC, 0xE4
 
+// 0xC4
+void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
+	if( getBit( fReg, 6 ) != 0x00 ){
+		// Make room for the pc address
+		--spAddrs;
+		*sp-=2;
+
+		// Save the contents of the PC on the stack pointer
+		*spAddrs = *pc;
+
+		// Set the pc to point to the address -1 to compensate the autoincrment on next loop
+		*pc = *addrs-1;
+	}
+}
+
+
 // CALL Z,nn
 // CAll the address if Z flag is set
 // OpCodes: 0xCC

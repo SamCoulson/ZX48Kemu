@@ -13,6 +13,7 @@
 // CPL
 // Contents of accumulator A are inverted to the complement
 // OpCodes: 0x2F 
+void CPL( uint8_t* aReg, uint8_t* fReg );
 
 // NEG
 // The contentsof the accumulator is negated (subtracted from 0)

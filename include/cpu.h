@@ -121,7 +121,8 @@ typedef struct _REGISTERS{
 
 }Registers;
 
-uint8_t ports[256];
+//uint8_t ports[256];
+
 // Start the CPU running
 void run( uint16_t addrs );
 

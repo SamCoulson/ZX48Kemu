@@ -14,6 +14,7 @@ void CALL( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc );
 // CALL cc,nn
 // Save PC to external memory stack and load in nn to PC under a condition
 // OpCodes: 0xDC, 0xFC, 0xD4, 0xC4, 0xF4, 0xEC, 0xE4, 0xCC
+void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg );
 
 // CALL Z,nn
 // CAll the address if Z flag is set

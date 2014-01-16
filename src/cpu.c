@@ -1,8 +1,9 @@
-#include "../include/cpu.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include "../include/cpu.h"
 #include "../include/8-bit_load_group.h"
 #include "../include/16-bit_load_group.h"
 #include "../include/GPA_and_CPU_control_group.h"
@@ -16,6 +17,7 @@
 #include "../include/EBTS_group.h"
 #include "../include/util_bit_operations.h"
 #include "../include/ULA.h"
+#include "../include/console.h"
 
 #define BUF_SIZE 5
 
@@ -49,17 +51,9 @@ Registers* reg = &registers;
 uint8_t ports[256] = {0};
 static uint8_t* IOport = ports; 
 
-// Used to test 
-uint16_t temppc;
-uint8_t *tempAddrs;
-
-// Static structure for registers
-void console();
-
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
 	
-	//freopen( "CON" ,"w", stdout);
 	// Begin executing from 0x0000
 	*reg->pc = addrs;
 
@@ -67,108 +61,6 @@ void run( uint16_t addrs ){
 	*reg->pc = 0x0000;
 	
 	uint8_t timeToInterrupt = 50;
-
-	// Test 8x8 block for screen
-	totalMem[ 0x4000 ] = 0x00;
-	totalMem[ 0x4020 ] = 0x3C;
-	totalMem[ 0x4040 ] = 0x42;
-	totalMem[ 0x4060 ] = 0x04;
-	totalMem[ 0x4080 ] = 0x08;
-	totalMem[ 0x40A0 ] = 0x00;
-	totalMem[ 0x40C0 ] = 0x08;
-	totalMem[ 0x40E0 ] = 0x00;
-
-	totalMem[ 0x4800 ] = 0xFF;
-	totalMem[ 0x4820 ] = 0xFF;
-	totalMem[ 0x4840 ] = 0xFF;
-	totalMem[ 0x4860 ] = 0xFF;
-	totalMem[ 0x4880 ] = 0xFF;
-	totalMem[ 0x48A0 ] = 0xFF;
-	totalMem[ 0x48C0 ] = 0xFF;
-	totalMem[ 0x48E0 ] = 0xFF;
-// Lower third
-	totalMem[ 0x5000 ] = 0xFF;
-	totalMem[ 0x5020 ] = 0xFF;
-	totalMem[ 0x5040 ] = 0xFF;
-	totalMem[ 0x5060 ] = 0xFF;
-	totalMem[ 0x5080 ] = 0xFF;
-	totalMem[ 0x50A0 ] = 0xFF;
-	totalMem[ 0x50C0 ] = 0xFF;
-	totalMem[ 0x50E0 ] = 0xFF;
-	
-	totalMem[ 0x5100 ] = 0xFF;
-	totalMem[ 0x5120 ] = 0xFF;
-	totalMem[ 0x5140 ] = 0xFF;
-	totalMem[ 0x5160 ] = 0xFF;
-	totalMem[ 0x5180 ] = 0xFF;
-	totalMem[ 0x51A0 ] = 0xFF;
-	totalMem[ 0x51C0 ] = 0xFF;
-	totalMem[ 0x51E0 ] = 0xFF;
-
-	totalMem[ 0x5200 ] = 0xFF;
-	totalMem[ 0x5220 ] = 0xFF;
-	totalMem[ 0x5240 ] = 0xFF;
-	totalMem[ 0x5260 ] = 0xFF;
-	totalMem[ 0x5280 ] = 0xFF;
-	totalMem[ 0x52A0 ] = 0xFF;
-	totalMem[ 0x52C0 ] = 0xFF;
-	totalMem[ 0x52E0 ] = 0xFF;
-
-	totalMem[ 0x5300 ] = 0xFF;
-	totalMem[ 0x5320 ] = 0xFF;
-	totalMem[ 0x5340 ] = 0xFF;
-	totalMem[ 0x5360 ] = 0xFF;
-	totalMem[ 0x5380 ] = 0xFF;
-	totalMem[ 0x53A0 ] = 0xFF;
-	totalMem[ 0x53C0 ] = 0xFF;
-	totalMem[ 0x53E0 ] = 0xFF;
-
-	totalMem[ 0x5400 ] = 0xFF;
-	totalMem[ 0x5420 ] = 0xFF;
-	totalMem[ 0x5440 ] = 0xFF;
-	totalMem[ 0x5460 ] = 0xFF;
-	totalMem[ 0x5480 ] = 0xFF;
-	totalMem[ 0x54A0 ] = 0xFF;
-	totalMem[ 0x54C0 ] = 0xFF;
-	totalMem[ 0x54E0 ] = 0xFF;
-
-	totalMem[ 0x5500 ] = 0xFF;
-	totalMem[ 0x5520 ] = 0xFF;
-	totalMem[ 0x5540 ] = 0xFF;
-	totalMem[ 0x5560 ] = 0xFF;
-	totalMem[ 0x5580 ] = 0xFF;
-	totalMem[ 0x55A0 ] = 0xFF;
-	totalMem[ 0x55C0 ] = 0xFF;
-	totalMem[ 0x55E0 ] = 0xFF;
-
-
-	totalMem[ 0x5600 ] = 0xFF;
-	totalMem[ 0x5620 ] = 0xFF;
-	totalMem[ 0x5640 ] = 0xFF;
-	totalMem[ 0x5660 ] = 0xFF;
-	totalMem[ 0x5680 ] = 0xFF;
-	totalMem[ 0x56A0 ] = 0xFF;
-	totalMem[ 0x56C0 ] = 0xFF;
-	totalMem[ 0x56E0 ] = 0xFF;
-
-	totalMem[ 0x5700 ] = 0xFF;
-	totalMem[ 0x5720 ] = 0xFF;
-	totalMem[ 0x5740 ] = 0xFF;
-	totalMem[ 0x5760 ] = 0xFF;
-	totalMem[ 0x5780 ] = 0xFF;
-	totalMem[ 0x57A0 ] = 0xFF;
-	totalMem[ 0x57C0 ] = 0xFF;
-	totalMem[ 0x57E0 ] = 0xFF;
-
-	totalMem[ 0x5800 ] = 0xFF;
-	totalMem[ 0x5820 ] = 0xFF;
-	totalMem[ 0x5840 ] = 0xFF;
-	totalMem[ 0x5860 ] = 0xFF;
-	totalMem[ 0x5880 ] = 0xFF;
-	totalMem[ 0x58A0 ] = 0xFF;
-	totalMem[ 0x58C0 ] = 0xFF;
-	totalMem[ 0x58E0 ] = 0xFF;
-	
 
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
@@ -183,12 +75,12 @@ void run( uint16_t addrs ){
 	
 		// Do interrupts
 		// read( &IOport[0xfe] );
-		//if( timeToInterrupt == 0x00 ){
+		if( timeToInterrupt == 0x00 ){
 			readVideoRAM( totalMem );
-		//	timeToInterrupt = 50;
-		//}else{
-		//	timeToInterrupt--;	
-		//}	
+			timeToInterrupt = 50;
+		}else{
+			timeToInterrupt--;	
+		}	
 
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
 		if( *reg->pc == 0x11DC ){
@@ -197,177 +89,6 @@ void run( uint16_t addrs ){
 			*reg->hl = 0xFFFF;	
 		}
 	}
-}
-
-void console(){
-	static uint8_t stepMode = 1;
-
-	static int key = 0;
-	static int mode = 0;
-	
-	//system("cls");
-	
-	if( *reg->pc == 0x0C0A )
-		stepMode = 1;
-
-	if( mode == 0 ){
-		printf("\nMain registers\tAlternate registers\n");
-		printf("AF: %02x %02x", *reg->a, *reg->f );  
-		printf("\tAF': %02x %02x\n",*reg->alta, *reg->altf );
-		printf("BC: %02x %02x", *reg->b, *reg->c );  
-		printf("\tBC': %02x %02x\n", *reg->altb, *reg->altc );
-		printf("DE: %02x %02x", *reg->d, *reg->e );  
-		printf("\tDE': %02x %02x\n", *reg->altd, *reg->alte );
-
-		printf("HL: %02x %02x", *reg->h, *reg->l );  
-		printf("\tHL': %02x %02x\n", *reg->alth, *reg->altl );
-
-		printf("\nSP: %04x", *reg->sp );
-		printf( "\nPC: %04x\n", *reg->pc );	
-
-		printf("\nIX: %04x", *reg->ix );
-		printf("\tIY: %04x", *reg->iy );
-
-		printf("\nI: %02x", *reg->i );
-		printf("\t\tR: %02x\n", *reg->r );
-
-		printf("\nEFF 1: %d", *reg->iff2 );
-		printf("\tEFF 2: %d\n", *reg->iff1 );
-
-		printf("\n*** Flags ***\n");
-		printf("S:%d Z:%d -:%d H:%d -:%d P/V:%d N:%d C:%d",
-				getBit( reg->f, 7 ),
-				getBit( reg->f, 6 ),
-				getBit( reg->f, 5 ),
-				getBit( reg->f, 4 ),
-				getBit( reg->f, 3 ),
-				getBit( reg->f, 2 ),
-				getBit( reg->f, 1 ),
-				getBit( reg->f, 0 ) );
-
-		printf( "\n\n*** Stack ***\n" );
-
-		for( int i = 0xFF56; i > 0xFF43; i-- ){
-			printf("\n%X %X", i, totalMem[i] );
-			if( *reg->sp == i ){
-				printf( "\t<" );
-			}
-			
-		}
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
-	}
-
-	// Prints the channels 
-	if( mode == 1 ){
-		for( int i = 0x5CB6; i < 0x5CD7; i+=2 ){
-			printf("\n%X %02X %02X", i, totalMem[i], totalMem[i+1] );
-		}
-	}
-
-	// Print content of video memory
-	if( mode == 3 ){
-		// Row counter
-		uint8_t column = 0;
-
-		// Read the video memory
-		for( int i = 0x4000; i < 0x57FF; i++ ){
-			printf( "%02X", totalMem[i] );
-			column++;
-			if( i == 0x4800 ){
-				printf("\nSecond third\n");
-			}else if( i == 0x5000 ){
-				printf("\nThird third\n");
-			}
-
-			if( column == 32 ){
-				printf("\n");
-				column = 0;
-			}
-		}	
-	}
-
-
-	if( mode == 2 ){
-		for(int i = 0x5C00; i < 0x5CB5; i++ ){
-			switch( i ){
-				case 0x5C00 :
-					printf( "KSTATE\t:\n" );
-					for( int j = 0; j < 8; j++ ){
-						printf( "\t%X %d: %02X\n",i ,j ,totalMem[i] );
-						i++;
-					}
-					break;
-				case 0x5C10 :
-					printf( "STRMS\t:\n" );
-					for( int j = 0; j < 38; j++ ){
-						printf( "\t%X : %02X\n",i ,totalMem[i] );
-						i++;
-					}
-					break;	
-				case 0x5C3C :
-					printf( "TVFLAGS\t: %02X\n", totalMem[i] );
-					break;
-				case 0x5C3D :
-					printf( "ERR-SP\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5C4F :
-					printf( "CHANS\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5C51 :
-					printf( "CURCHL\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5C53 :
-					printf( "PROG\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5C57:
-					printf( "DATADD\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5C6A :
-					printf( "FLAGS2\t: %02X\n", totalMem[i] );
-					break;
-				case 0x5C6B :
-					printf( "DF-SZ\t: %02X\n", totalMem[i] );
-					break;
-				case 0x5C7F :
-					printf( "P-POSN\t: %02X\n", totalMem[i] );	
-					break;	
-				case 0x5CB2 :
-					printf( "RAM-TOP\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;
-				case 0x5CB4 :
-					printf( "P-RAMT\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;	
-				default:
-				break;
-			}
-		}
-	}
-
-
-	if( kbhit() || stepMode ){	
-		key = getch();
-		
-		// printf("key press = %d\n", key);
-
-		if( key == 113 ){
-			exit(1); // key q
-		}else if( key == 115 ){
-			mode = 0; // key s
-		}else if( key == 108 ) {
-			mode = 4; // l key
-		}else if( key == 109 ){
-			mode = 1; // key m
-		}else if( key == 114 ){
-			stepMode = stepMode ? 0 : 1; // r
-		}else if( key == 118 ){
-			mode = 2;
-		}else if( key == 107 ){
-			mode = 3; // k key
-		}	
-		
-	}
-	
-
 }
 
 
