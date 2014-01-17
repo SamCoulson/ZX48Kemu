@@ -41,7 +41,7 @@ void CALLC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 
 // 0xC4
 void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
-	if( getBit( fReg, 6 ) != 0x00 ){
+	if( getBit( fReg, 1 ) != 0x00 ){
 		// Make room for the pc address
 		--spAddrs;
 		*sp-=2;

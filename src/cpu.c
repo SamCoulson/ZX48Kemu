@@ -60,7 +60,7 @@ void run( uint16_t addrs ){
 	// DEBUG
 	*reg->pc = 0x0000;
 	
-	uint8_t timeToInterrupt = 50;
+	uint8_t timeToInterrupt = 100;
 
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
@@ -76,8 +76,11 @@ void run( uint16_t addrs ){
 		// Do interrupts
 		// read( &IOport[0xfe] );
 		if( timeToInterrupt == 0x00 ){
+			// Emulate ULA interuprintg and reading video memory
 			readVideoRAM( totalMem );
-			timeToInterrupt = 50;
+			// Emulate keyboard interuupt (Maskable interupt RST38)
+			*reg->pc = 0x0038;
+			timeToInterrupt = 25;
 		}else{
 			timeToInterrupt--;	
 		}	
@@ -910,18 +913,32 @@ void execute( uint8_t* opcode ){
 		case 0xCB:
 			switch( *( getNextByte() ) ){
 				case 0x00:
+					printf( "RLC B" );
+					RLC( reg->b, reg->f );
 					break;
 				case 0x01:
+					printf( "RLC C" );
+					RLC( reg->c, reg->f );
 					break;
 				case 0x02:
+					printf( "RLC D" );
+					RLC( reg->d, reg->f );
 					break;
 				case 0x03:
+					printf( "RLC E" );
+					RLC( reg->e, reg->f );
 					break;
 				case 0x04:
+					printf( "RLC H" );
+					RLC( reg->h, reg->f );
 					break;
 				case 0x05:
+					printf( "RLC L" );
+					RLC( reg->l, reg->f );
 					break;
 				case 0x06:
+					printf( "RLC (HL)" );
+					RLC( getByteAt( *reg->hl ), reg->f );
 					break;
 				case 0x07:
 					printf( "RLC A" );
@@ -1418,23 +1435,11 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0xCB:
 				offset = *( getNextByte() );
-				switch( *( getNextByte() ) ){
-					case 0x01:
-						break;
-					case 0x02:
-						break;
-					case 0x03:
-						break;
-					case 0x04:
-						break;
-					case 0x05:
-						break;	
+				switch( *( getNextByte() ) ){	
 					case 0x06:
-						break;
-					case 0x07:
-						printf( "RLC" );
-						RLC( reg->a, reg->f );
-						break;
+						printf( "RLC(IX+%X)", offset );
+						RLC( getByteAt( *reg->ix + (int8_t) *( getNextByte() ) ), reg->f );
+						break;	
 					case 0x08:
 						break;
 					case 0x09:
@@ -1646,7 +1651,7 @@ void execute( uint8_t* opcode ){
 			RST( 0x20, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xE8:
-			printf( "RET PE,%X" );
+			printf( "RET PE,%X", readNextWord() );
 			RETPE( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f  );
 			break;
 		case 0xE9:
@@ -1788,7 +1793,7 @@ void execute( uint8_t* opcode ){
 			DI( reg->iff1, reg->iff2 );
 			break;
 		case 0xF4:
-			printf( "CALL P,%X" );
+			printf( "CALL P,%X", readNextWord() );
 			CALLP( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xF5:
@@ -1804,7 +1809,7 @@ void execute( uint8_t* opcode ){
 			RST( 0x30, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xF8:
-			printf( "RET M,%X***CHECK THIS" );
+			printf( "RET M,%X***CHECK THIS", readNextWord() );
 			RETM( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xF9:
@@ -1946,6 +1951,8 @@ void execute( uint8_t* opcode ){
 				offset = *( getNextByte() );
 				switch( *( getNextByte() ) ){
 					case 0x06:
+						printf( "RLC(IY+%X)", offset );
+						RLC( getByteAt( *reg->iy + (int8_t) *( getNextByte() ) ), reg->f );
 						break;	
 					case 0x0E:
 						break;

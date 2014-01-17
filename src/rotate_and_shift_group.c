@@ -64,7 +64,7 @@ void RRA( uint8_t* aReg, uint8_t* fReg){
 // RLC
 // Contents of register are rotated left one position, the content of bit 7 is copied to the
 // carry flag and to bit 0.
-// OpCodes: 0xCB01
+// OpCodes: 0xCB01 - 07
 void RLC( uint8_t* reg, uint8_t* fReg ){
 	// Copy contents of bit 7 to carry flag
 	setBit( fReg, 0, getBit( reg, 7 ) ); 
