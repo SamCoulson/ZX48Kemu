@@ -55,14 +55,14 @@ void console(){
 
 		printf( "\n\n*** Stack ***\n" );
 
-		for( int i = 0xFF56; i > 0xFF43; i-- ){
+		for( int i = 0xFF56; i > 0xFF40; i-- ){
 			printf("\n%X %X", i, totalMem[i] );
 			if( *reg->sp == i ){
 				printf( "\t<" );
 			}
 			
 		}
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n" );
 	}
 
 	// Prints the channels 

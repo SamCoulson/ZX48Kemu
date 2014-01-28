@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,14 +32,16 @@ static Registers registers = {
 	.altb = &altbc._bc[1], .altc = &altbc._bc[0], .altbc = &altbc.bc,
 	.altd = &altde._de[1], .alte = &altde._de[0], .altde = &altde.de,
 	.alth = &althl._hl[1], .altl = &althl._hl[0], .althl = &althl.hl,
-	// 8-bit Special registers - interrupt vector
+	// 8-bit Special registers - interrupt vector and refresh register
 	.i = &ir._ir[1], .r = &ir._ir[0], .ir = &ir.ir,
 	// 16-bit index registers
 	.ix = &ix, .iy = &iy,
       	// 16-bit stack pointer and program pointer
 	.sp = &sp, .pc = &pc,
 	// IFF (Interrupt enabled flip-flop)
-	.iff1 = &iff1, .iff2 = &iff2 	
+	.iff1 = &iff1, .iff2 = &iff2,
+	// CPU Mode
+	.mode = &mode	
 };
 
 // Pointer to the register structure
@@ -48,7 +49,7 @@ Registers* reg = &registers;
 
 // IO ports *** The CPU has 256 addressable ports *** 
 // This might be excessive for emualtion but all IO will park data at these location for read/write by external modules
-uint8_t ports[256] = {0};
+// uint8_t ports[256] = {0};
 static uint8_t* IOport = ports; 
 
 //  Set the PC to point to a location in memory
@@ -73,17 +74,64 @@ void run( uint16_t addrs ){
 		// Progess the PC by 1
 		getNextByte();
 	
-		// Do interrupts
+		
 		// read( &IOport[0xfe] );
+		
+		// Do interrupts ( Peripheral service routines )	
 		if( timeToInterrupt == 0x00 ){
-			// Emulate ULA interuprintg and reading video memory
-			readVideoRAM( totalMem );
-			// Emulate keyboard interuupt (Maskable interupt RST38)
+
+			// Automatically save the current PC location on stack
+			PUSH( getWordAt( reg->sp ), reg->sp, reg->pc );	
+
+			// INT - Software maskable interrupt
+			// Responds depening on CPU Mode. ( See IM 0,1,2 in GPA )
+			// 0 - As normal can execute instructions
+			// 1 - Resets to 0038h instead of 0066h
+			// 2 - Rediection can be made to anwhere in memory
+			// When the IFF is reset the CPU cannot accpet the interrupt.
+			// IFF1 actually hold the state and IFF2 is used as a temporary storage space
+			// for IFF1 state.
+			// EI enables ( Sets IFF1 to enabled )
+			// DI disables ( Sets IFF2 to disabled )    
+
+			// Emulate ULA interrupting and reading video memory only if INT enabled
+			//if( *reg->iff1 != 0 ){
+				readKeys();
+			//}
+			IOport[0xFE] = 0xFF;
+			// Emulate keyboard interrupt (Maskable interupt RST38)
 			*reg->pc = 0x0038;
-			timeToInterrupt = 25;
+
+			// Emulate an NMI( Non-maskable interrupt ), is always honered 
+			// independent of IFF (interrupt enable flip-flop) status.  Always resets to 0066h
+			// After an NMI on IFF1 is reset, IFF2 preserves the state as part of being able to restore
+			// the CPU state before execution of NMI routine.
+			// when LD A,I or LD A,R or RETN occurs the state of IFF2 is copied to
+			// parut flag and can then be tested 
+			
+			// Read video RAM
+			readVideoRAM( totalMem );
+
+			// Reset for next interrupt period
+			timeToInterrupt = 100;
+
+			// After accepting a maskable interrupt both IFFs are reset
+			*reg->iff1 = 0;
+			*reg->iff2 = 0;
+
 		}else{
+			//printf( "\nTime to interrupt = %d\n", timeToInterrupt );
 			timeToInterrupt--;	
-		}	
+		}
+
+		// RESET - Set IFF1 and IIF2 to 0.
+
+		// HALT - May also need to be implemented as it can be software generated, it issues some NOP's
+		// while waiting for a NMI or interrupt request ( only is IIF is enabled )
+
+		// R Register should be implemented, 7-bits are incremetend after each instrutrion fetch
+		// and the 8-bit is programmed according to LD R,A (0xED4f).  Refresh refers to refreshing
+		// computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed	
 
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
 		if( *reg->pc == 0x11DC ){
@@ -259,6 +307,7 @@ void execute( uint8_t* opcode ){
 			LD( reg->h, getNextByte() );
 			break;/*
 		case 0x27:
+			printf( "DAA" );
 			break;*/
 		case 0x28:
 			printf( "JR Z,%X", readNextByte() );
@@ -287,10 +336,11 @@ void execute( uint8_t* opcode ){
 		case 0x2E:
 			printf( "LD L+,%X", readNextByte() );
 			LD( reg->l, getNextByte() );
-			break;/*
+			break;
 		case 0x2F:
-			printf( "DAA" );
-			break;*/
+			printf( "CPL" );
+			CPL( reg->a, reg->f );
+			break;
 		case 0x30:
 			printf("JR NC,%d", readNextByte() );
 			JRNC( reg->pc, getNextByte(), reg->f );
@@ -312,7 +362,7 @@ void execute( uint8_t* opcode ){
 			INC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x35:
-			printf("DEC (HL)" );
+			printf( "DEC (HL)" );
 			DEC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x36:
@@ -1307,10 +1357,11 @@ void execute( uint8_t* opcode ){
 		case 0xDA:
 			printf( "JP C,%X", readNextWord() );
 			JPC( reg->pc, getNextWord(), reg->f );
-			break;/*
+			break;
 		case 0xDB:
-			printf( "IN A(%X)" );
-			break;*/
+			printf( "IN A,(C)" );
+			INA( reg->a, IOport[0xFE] );
+			break;
 		case 0xDC:
 			printf( "CALL C,%X", readNextWord() );
 			CALLC( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
@@ -1680,6 +1731,10 @@ void execute( uint8_t* opcode ){
 				printf( "LD (%X),BC", readNextWord() );
 				LD16( getWordAt( getNextWord() ) ,reg->bc );				
 				break;
+			case 0x46:
+				printf( "IM 0" );
+				IM0( reg->mode );
+				break;
 			case 0x47:
 				printf( "LD I,A");
 				LD( reg->i, reg->a );
@@ -1701,8 +1756,8 @@ void execute( uint8_t* opcode ){
 				LD16( getWordAt( getNextWord() ) ,reg->de );				
 				break;
 			case 0x56:
-				printf( "IM1" ); 
-				IM1( reg->iff1 );
+				printf( "IM 1" ); 
+				IM1( reg->mode );
 				break;
 			case 0x57:
 				printf( "LD A,I");
@@ -1711,6 +1766,10 @@ void execute( uint8_t* opcode ){
 			case 0x5B:
 				printf( "LD DE,(%X)", readNextWord() );
 				LD16( reg->de, getWordAt( getNextWord() ) );
+				break;
+			case 0x5E:
+				printf( "IM 2" );
+				IM2( reg->mode );
 				break;
 			case 0x5F:
 				printf( "LD A,R");
@@ -1727,6 +1786,10 @@ void execute( uint8_t* opcode ){
 			case 0x73:
 				printf( "LD(%X),SP", readNextWord() );
 				LD16( getNextWord(), reg->sp );
+				break;
+			case 0x78:
+				printf( "IN A,(C)" );
+				INA( reg->a, IOport[0xFE] );
 				break;
 			case 0x7B:
 				printf( "LD SP,(%X)", readNextWord() );
@@ -1822,7 +1885,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xFB:
 			printf( "EI" );
-			//EI( reg->iff2 );
+			EI( reg->iff1, reg->iff2 );
 			break;
 		case 0xFC:
 			printf( "CALL M,%X***Check this", readNextWord() );

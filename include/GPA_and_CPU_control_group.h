@@ -51,14 +51,15 @@ void EI( int* iff1, int* iff2 );
 // IM 0
 // Set interrupt mode 0
 // OpCodes: 0xED46
+void IM0( int* mode );
 
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void IM1( int* iff1 );
+void IM1( int* mode );
 
 // IM 2
 // Set interrupt mode 2
 // OpCodes: 0xED5E
-
+void IM2( int* mode );
 #endif // INC_GPAANDCPUCONTGROP_H  

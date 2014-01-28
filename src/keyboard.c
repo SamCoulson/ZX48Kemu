@@ -3,14 +3,21 @@
 
 extern SDL_Event event;
 
-void readKeyboard(){
+// For now just returns single chars back to ULA
+
+uint8_t readKeyboard(){
+
+	uint8_t key = 0;
+
 	if( event.type == SDL_KEYDOWN  ){
 		switch( event.key.keysym.sym ){
 			case SDLK_a:
+				key = 0x41; 	
 				break;
 			default:
 				break;
 		}
 	}
+	return key;
 
 }

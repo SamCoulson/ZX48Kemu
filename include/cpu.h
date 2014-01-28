@@ -65,6 +65,9 @@ uint16_t pc; // AKA Instruction pointer
 int iff1;
 int iff2;
 
+// Mode ( CPU mode )
+int mode;
+
 // Structure to hold pointers to all register union
 typedef struct _REGISTERS{
 
@@ -119,9 +122,12 @@ typedef struct _REGISTERS{
 	int* const iff1;
 	int* const iff2;
 
+	// CPU Mode
+	int* const mode;
+
 }Registers;
 
-//uint8_t ports[256];
+uint8_t ports[256];
 
 // Start the CPU running
 void run( uint16_t addrs );

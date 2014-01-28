@@ -1,6 +1,8 @@
 #ifndef INC_KEYBOARD_H 
 #define INC_KEYBOARD_H
 
-void readKeyboard();
+#include <stdint.h>
+
+uint8_t readKeyboard();
 
 #endif // INC_KEYABORD_H

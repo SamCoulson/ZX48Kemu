@@ -10,7 +10,7 @@
 // IN A,(n)
 // Read in one byte from IO mapped port (n) into register A 
 // OpCodes: 0xDB
-void INA( uint8_t val );
+void INA( uint8_t *aReg, uint8_t port );
 
 // IN r,(C)
 // IO ported is slected through contents of register C and one 

@@ -76,20 +76,30 @@ void DI( int* iff1, int* iff2 ){
 void EI( int* iff1, int* iff2 ){
 	*iff1 = 1;
 	*iff2 = 1;
+
+	// May need to set interrupt count down back one as the next instruction after an EI needs to be allowed
+	// to execute because it might be a return instruction.
 }	
 
 // IM 0
 // Set interrupt mode 0
 // OpCodes: 0xED46
+void IM0( int* mode ){
+	*mode = 0;
+}
 
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void IM1( int* iff1 ){
-	*iff1 = 1;
+void IM1( int* mode ){
+	// responds to an interrupt by execuing restart to 0038h
+	*mode = 1;
 }
 
 // IM 2
 // Set interrupt mode 2
 // OpCodes: 0xED5E
+void IM2( int* mode ){
+	*mode = 2;
+}
 

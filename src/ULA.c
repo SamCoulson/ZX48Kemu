@@ -1,10 +1,14 @@
 #include "../include/ULA.h"
 #include "../include/memory.h"
 #include "../include/screen.h"
+#include "../include/keyboard.h"
 #include <stdio.h>
 
-void read( uint8_t* port ){
-//	printf("Read %X at port\n", *port);	
+extern uint8_t ports[256];
+
+void readKeys(){
+	// Copy any pressed key values to input port
+	ports[0xFE] = readKeyboard();	
 }
 
 void readVideoRAM( unsigned char* mem ){
