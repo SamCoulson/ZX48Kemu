@@ -17,7 +17,10 @@ uint8_t readKeyboard(){
 			default:
 				break;
 		}
+	}else{
+		key = 0x45;	
 	}
+
 	return key;
 
 }

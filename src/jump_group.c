@@ -114,7 +114,7 @@ void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 }
 
 // JR Z, e
-// Jump relative when z flag is 0
+// Jump relative when z flag is 1
 // OpCodes: 0x28 
 void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If Z flag is 0 jump relative to val

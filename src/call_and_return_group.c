@@ -167,7 +167,7 @@ void RETM( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 
 // 0xC0
 void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
-	if( getBit( fReg, 6 ) != 0x00 ){	
+	if( getBit( fReg, 6 ) == 0x01 ){	
 		*pc = *spAddrs;
 		*sp+=2;	
 	}	

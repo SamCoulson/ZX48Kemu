@@ -247,8 +247,8 @@ void AND( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 		setBit( fReg, 6, 0 );
 	}
 
-	// H is set to zero
-	setBit( fReg, 4, 0 );	
+	// H is set
+	setBit( fReg, 4, 1 );	
 
 	// P/V is set if parity is even
 	if( ( getBit( reg, 7 ) == getBit( val, 7 ) ) && ( getBit( &result, 7 ) != getBit( reg, 7 ) )  ){ 

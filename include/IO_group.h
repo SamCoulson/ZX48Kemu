@@ -10,13 +10,13 @@
 // IN A,(n)
 // Read in one byte from IO mapped port (n) into register A 
 // OpCodes: 0xDB
-void INA( uint8_t *aReg, uint8_t port );
+void INA( uint8_t *reg, uint8_t port );
 
 // IN r,(C)
 // IO ported is slected through contents of register C and one 
 // byte copied in to register r
 // OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
-void INAddrsOfRegCTo8BitReg( uint8_t *reg );
+void IN( uint8_t *reg, uint8_t port, uint8_t *fReg );
 
 // INI
 // IO port is selected by the contents of register C, the byte is 

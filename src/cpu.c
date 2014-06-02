@@ -49,7 +49,8 @@ Registers* reg = &registers;
 
 // IO ports *** The CPU has 256 addressable ports *** 
 // This might be excessive for emualtion but all IO will park data at these location for read/write by external modules
-// uint8_t ports[256] = {0};
+
+uint8_t ports[256] = {0};
 static uint8_t* IOport = ports; 
 
 //  Set the PC to point to a location in memory
@@ -61,7 +62,7 @@ void run( uint16_t addrs ){
 	// DEBUG
 	*reg->pc = 0x0000;
 	
-	uint8_t timeToInterrupt = 100;
+	uint8_t timeToInterrupt = 200;
 
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
@@ -73,14 +74,13 @@ void run( uint16_t addrs ){
 
 		// Progess the PC by 1
 		getNextByte();
-	
-		
-		// read( &IOport[0xfe] );
-		
+			
 		// Do interrupts ( Peripheral service routines )	
 		if( timeToInterrupt == 0x00 ){
 
 			// Automatically save the current PC location on stack
+			// Need to accomodate autoincrement of PC on return 
+			--*reg->pc;	
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->pc );	
 
 			// INT - Software maskable interrupt
@@ -98,7 +98,7 @@ void run( uint16_t addrs ){
 			//if( *reg->iff1 != 0 ){
 				readKeys();
 			//}
-			IOport[0xFE] = 0xFF;
+		
 			// Emulate keyboard interrupt (Maskable interupt RST38)
 			*reg->pc = 0x0038;
 
@@ -113,7 +113,7 @@ void run( uint16_t addrs ){
 			readVideoRAM( totalMem );
 
 			// Reset for next interrupt period
-			timeToInterrupt = 100;
+			timeToInterrupt = 200;
 
 			// After accepting a maskable interrupt both IFFs are reset
 			*reg->iff1 = 0;
@@ -130,7 +130,7 @@ void run( uint16_t addrs ){
 		// while waiting for a NMI or interrupt request ( only is IIF is enabled )
 
 		// R Register should be implemented, 7-bits are incremetend after each instrutrion fetch
-		// and the 8-bit is programmed according to LD R,A (0xED4f).  Refresh refers to refreshing
+	
 		// computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed	
 
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
@@ -310,7 +310,7 @@ void execute( uint8_t* opcode ){
 			printf( "DAA" );
 			break;*/
 		case 0x28:
-			printf( "JR Z,%X", readNextByte() );
+			printf( "JR Z,+%X", readNextByte() );
 			JRZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x29:
@@ -334,7 +334,7 @@ void execute( uint8_t* opcode ){
 			DEC( reg->l, reg->f );
 			break;
 		case 0x2E:
-			printf( "LD L+,%X", readNextByte() );
+			printf( "LD L,+%X", readNextByte() );
 			LD( reg->l, getNextByte() );
 			break;
 		case 0x2F:
@@ -1789,7 +1789,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x78:
 				printf( "IN A,(C)" );
-				INA( reg->a, IOport[0xFE] );
+				IN( reg->a, IOport[0xFE], reg->f );
 				break;
 			case 0x7B:
 				printf( "LD SP,(%X)", readNextWord() );
@@ -1810,7 +1810,7 @@ void execute( uint8_t* opcode ){
 			case 0xEDA9:
 				//printf( "CPD");
 				CPD();
-				break;*/
+			break;*/
 			case 0xB0:
 				printf( "LDIR");
 				LDIR( getWordAt( reg->hl ), getWordAt( reg->de ), reg->hl, reg->de, reg->bc, reg->pc, reg->f );

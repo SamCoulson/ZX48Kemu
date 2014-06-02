@@ -1,21 +1,49 @@
 #include "../include/IO_group.h"
+#include "../include/util_bit_operations.h"
 #include <stdio.h>
 
 // *** Input and Output group ***
 
-// IN A,(n)
+// IN r,(C)
 // Read in one byte from IO mapped port (n) into register A 
 // OpCodes: 0xDB
-void INA( uint8_t *aReg, uint8_t port ){
+void INA( uint8_t *reg, uint8_t port ){
 	printf( "INA sees %X at port 0xFE", port );
-	*aReg = port; 
+	*reg = port; 
 }
 
 // IN r,(C)
 // IO ported is slected through contents of register C and one 
 // byte copied in to register r
 // OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
-void INAddrsOfRegCTo8BitReg( uint8_t *reg );
+void IN( uint8_t *reg, uint8_t port, uint8_t *fReg ){
+	printf( "INA sees %X at port 0xFE", port );
+	*reg = port;
+
+	// S is set if input data is negative
+	if( getBit( &port, 7 ) == 0x01 ){
+		setBit( fReg, 7, 1 );
+	}else{
+		setBit( fReg, 7, 0 );
+	}
+
+	// Z is set if input data is 0 otherwise reset
+	if( port == 0x00 ){
+		setBit( fReg, 6, 1 );
+	}else{
+		setBit( fReg, 6, 0 );
+	}
+
+	// H is reset
+	setBit( fReg, 4, 0 );
+
+	// P/V is set if parity is even
+	
+	// N is reset
+	setBit( fReg, 1, 0 );
+
+}
+
 
 // INI
 // IO port is selected by the contents of register C, the byte is 
