@@ -16,7 +16,7 @@ void INA( uint8_t *reg, uint8_t port );
 // IO ported is slected through contents of register C and one 
 // byte copied in to register r
 // OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
-void IN( uint8_t *reg, uint8_t port, uint8_t *fReg );
+void IN( uint8_t *reg, uint8_t *bReg, uint8_t portVal, uint8_t *fReg );
 
 // INI
 // IO port is selected by the contents of register C, the byte is 

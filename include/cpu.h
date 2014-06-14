@@ -177,4 +177,6 @@ uint8_t getLOByte(uint16_t *word);
 // Return the Ho from a word
 uint8_t getHOByte(uint16_t *word);
 
+uint8_t readPort(uint16_t portAddrs);
+
 #endif // INC_CPU_H

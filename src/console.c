@@ -15,8 +15,8 @@ void console(){
 	
 	//system("cls");
 	
-	if( *reg->pc == 0x0038 )
-		stepMode = 1;
+	//if( *reg->pc == 0x0038 )
+	//	stepMode = 1;
 
 	if( mode == 0 ){
 		printf("\nMain registers\tAlternate registers\n");
@@ -55,14 +55,14 @@ void console(){
 
 		printf( "\n\n*** Stack ***\n" );
 
-		for( int i = 0xFF56; i > 0xFF40; i-- ){
+		for( int i = 0xFF56; i > 0xFF35; i-- ){
 			printf("\n%X %X", i, totalMem[i] );
 			if( *reg->sp == i ){
 				printf( "\t<" );
 			}
 			
 		}
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n" );
+	printf("\n" );
 	}
 
 	// Prints the channels 

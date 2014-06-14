@@ -1,4 +1,5 @@
 #include "../include/IO_group.h"
+#include "../include/ULA.h"
 #include "../include/util_bit_operations.h"
 #include <stdio.h>
 
@@ -13,22 +14,26 @@ void INA( uint8_t *reg, uint8_t port ){
 }
 
 // IN r,(C)
-// IO ported is slected through contents of register C and one 
-// byte copied in to register r
+// IO ported is selected through contents of register C which selects one of 256 ports, register B forms the 
+// second part a byte copied from that IO device address in to register r
 // OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
-void IN( uint8_t *reg, uint8_t port, uint8_t *fReg ){
-	printf( "INA sees %X at port 0xFE", port );
-	*reg = port;
+void IN( uint8_t *reg, uint8_t *bReg, uint8_t portVal, uint8_t *fReg ){
+	
+	
+	// In the 
+	*reg = portVal;
+	
+	printf( "IN A,(C) sees %X at port 0x%XFE", portVal, *bReg );
 
 	// S is set if input data is negative
-	if( getBit( &port, 7 ) == 0x01 ){
+	if( getBit( &portVal, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
 		setBit( fReg, 7, 0 );
 	}
 
 	// Z is set if input data is 0 otherwise reset
-	if( port == 0x00 ){
+	if( portVal == 0x00 ){
 		setBit( fReg, 6, 1 );
 	}else{
 		setBit( fReg, 6, 0 );

@@ -17,6 +17,7 @@
 #include "../include/util_bit_operations.h"
 #include "../include/ULA.h"
 #include "../include/console.h"
+#include "../include/keyboard.h"
 
 #define BUF_SIZE 5
 
@@ -95,9 +96,9 @@ void run( uint16_t addrs ){
 			// DI disables ( Sets IFF2 to disabled )    
 
 			// Emulate ULA interrupting and reading video memory only if INT enabled
-			//if( *reg->iff1 != 0 ){
+			if( *reg->iff1 != 0 ){
 				readKeys();
-			//}
+			}
 		
 			// Emulate keyboard interrupt (Maskable interupt RST38)
 			*reg->pc = 0x0038;
@@ -1099,6 +1100,8 @@ void execute( uint8_t* opcode ){
 				case 0x3B:
 					break;
 				case 0x3C:
+					printf("SRL H");
+					SRL( reg->h, reg->f );
 					break;
 				case 0x3D:
 					break;
@@ -1360,7 +1363,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xDB:
 			printf( "IN A,(C)" );
-			INA( reg->a, IOport[0xFE] );
+			INA( reg->a, readPort(0x00FE) );
 			break;
 		case 0xDC:
 			printf( "CALL C,%X", readNextWord() );
@@ -1789,7 +1792,11 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x78:
 				printf( "IN A,(C)" );
-				IN( reg->a, IOport[0xFE], reg->f );
+
+				uint8_t portFE = 0xFE;
+				uint16_t port = byteToWord( reg->b, &portFE );
+
+				IN( reg->a, reg->b, readPort( port ), reg->f );
 				break;
 			case 0x7B:
 				printf( "LD SP,(%X)", readNextWord() );
@@ -2242,4 +2249,43 @@ void writeByte( uint16_t addrs, uint8_t val ){
 	//setByte(addrs, val);
 }
 
+// Read the port at the given 16-bit address
+uint8_t readPort(uint16_t portAddrs){
 
+	// If 0x00FE
+	if( portAddrs == 0x00FE ){ 
+		return 0x1F;
+	}
+
+	// If keyboard ports
+	switch( portAddrs ){
+		case 0xFEFE:
+			return readKeyboard( 1 );
+			break;
+		case 0xFDFE:
+			return 0x27;
+			break;
+		case 0xFBFE:
+			return 0x1F;
+			break;					
+		case 0xF7FE:
+			return 0x1F;
+			break;
+		case 0xEFFE:
+			return 0x1F;
+			break;
+		case 0xDFFE:
+			return 0x1F;
+			break;
+		case 0xBFFE:
+			return 0x1F;
+			break;
+		case 0x7FFE:
+			return 0x1F;
+			break;
+		default:
+			break;
+	}
+
+	return 0;
+}

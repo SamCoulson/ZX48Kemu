@@ -1,5 +1,10 @@
 #include "../include/8-bit_arithmetic_group.h" 
 #include "../include/util_bit_operations.h"
+
+
+const uint8_t parityTable[256] = { 1 };
+
+
 // *** 8-Bit Arithmetic group*** 
 
 // ADD A,s
@@ -363,8 +368,8 @@ void XOR( uint8_t *dstReg, uint8_t* srcVal, uint8_t* fReg ){
 	setBit( fReg, 4, 0 );	
 
 	// P/V is set if parity is even
-	if( ( getBit( dstReg, 7 ) == getBit( srcVal, 7 ) ) && ( getBit( &result, 7 ) != getBit( dstReg, 7 ) )  ){ 
-	//Set to 1 overflow
+	if( parityTable[result] == 1 ){ 
+		//Set to 1 overflow
 		setBit( fReg, 2, 1 );
 	}else{
 		setBit( fReg, 2, 0 );	
@@ -465,7 +470,7 @@ void INC( uint8_t* val, uint8_t* fReg ){
 
 	// Z is one if result is zero
 	if( *val == 0x0 ){
-		setBit( fReg, 6, 1 );  // HAVE BEEN CHAGED FOR EXPERIMENT	
+		setBit( fReg, 6, 1 ); // Should be 1  	
 	}else{
 		setBit( fReg, 6, 0 );
 	}
@@ -474,7 +479,7 @@ void INC( uint8_t* val, uint8_t* fReg ){
 	//setBit( fReg, 4, 0 );	
 	
 	// N is set to 1
-	setBit( fReg, 1, 1 );	
+	setBit( fReg, 1, 0 );	
 }
 
 // DEC r

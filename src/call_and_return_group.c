@@ -39,6 +39,8 @@ void CALLC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 	}
 }
 
+// CALL NZ
+// Call if Z flag is reset
 // 0xC4
 void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
 	if( getBit( fReg, 1 ) != 0x00 ){
@@ -137,7 +139,7 @@ void RET( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp ){
 // OpCodes: 0xF8, 0xC0, 0xF0, 0xE8, 0xE0, 0xC8
 
 // 0xE0
-// When parity is ODD ***Check this***
+// When parity is ODD ***Check this*** P/V is reset
 void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	///if( getBit( fReg, 2 ) != 0x00 ){	
 	//	*pc = *spAddrs;
@@ -145,7 +147,7 @@ void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	//}
 }
 
-// 0xE8 ***Check this***
+// 0xE8 ***Check this*** P/V is set
 void RETPE( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	//if( getBit( fReg, 2 ) != 0x00 ){	
 	//	*pc = *spAddrs;
@@ -165,9 +167,11 @@ void RETM( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 
 }
 
-// 0xC0
+// RET NZ
+// Return if Z flag is zero /* Completely got me, surely non-zero means anything but 0 */
+// OpCodes: 0xC0
 void RETNZ( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
-	if( getBit( fReg, 6 ) == 0x01 ){	
+	if( getBit( fReg, 6 ) == 0x00 ){	
 		*pc = *spAddrs;
 		*sp+=2;	
 	}	
@@ -195,7 +199,7 @@ void RETNC( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 }
 
 // RET Z
-// Return on conditio that the Z flag is 0
+// Return on condition that the Z flag is 1
 // OpCodes: 0xC8
 void RETZ( uint16_t* pc, uint16_t* spAddrs, uint16_t *sp, uint8_t* fReg ){
 	if( getBit( fReg, 6 ) == 0x01 ){

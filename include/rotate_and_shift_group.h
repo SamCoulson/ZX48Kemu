@@ -30,5 +30,8 @@ void RRA( uint8_t* aReg, uint8_t* fReg );
 // OpCodes: 0xCB01
 void RLC( uint8_t* reg, uint8_t* fReg );
 
-
+// SRL
+// Contents of operand are shifted right 1-bit position, contents of bit 0 is copied into carry flag and bit 7 reset
+// OpCodes: CB38 - CB3F
+void SRL( uint8_t* reg, uint8_t* fReg );
 #endif // INC_ROTATEANDSHIFTGROUP_H  
