@@ -65,13 +65,13 @@ void RRA( uint8_t* aReg, uint8_t* fReg){
 // Contents of register are rotated left one position, the content of bit 7 is copied to the
 // carry flag and to bit 0.
 // OpCodes: 0xCB01 - 07
-void RLC( uint8_t* reg, uint8_t* fReg ){	
-
-	// Shift the bits in register left 1
-	*reg <<= 1;
+void RLC( uint8_t* reg, uint8_t* fReg ){		
 
 	// Copy contents of bit 7 to carry flag
 	setBit( fReg, 0, getBit( reg, 7 ) );
+
+	// Shift the bits in register left 1
+	*reg <<= 1;
 
 	// Copy contents of carry flag to bit 0 of register value
 	setBit( reg, 0, getBit( fReg, 0 ) );
@@ -80,7 +80,7 @@ void RLC( uint8_t* reg, uint8_t* fReg ){
 	if( getBit( reg, 7 ) == 0x01 ){
 		setBit( fReg, 7, 1 );
 	}else{
-		setBit( fReg, 7, 1 );
+		setBit( fReg, 7, 0 );
 	}
 
 	// Z is set if result is zero
@@ -93,6 +93,7 @@ void RLC( uint8_t* reg, uint8_t* fReg ){
 	setBit( fReg, 4, 0 );
 	
 	// P/V/ is set if parity even
+	setBit( fReg, 2, byte_parity( *reg ) );
 	
 	// N is reset
 	setBit( fReg, 1, 0 );	
@@ -125,7 +126,8 @@ void SRL( uint8_t* reg, uint8_t* fReg ){
 	setBit( fReg, 4, 0 );
 	
 	// P/V/ is set if parity even
-	
+	setBit( fReg, 2, byte_parity( *reg ) );	
+
 	// N is reset
 	setBit( fReg, 1, 0 );
 	

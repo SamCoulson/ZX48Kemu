@@ -5,7 +5,7 @@
 
 // *** Input and Output group ***
 
-// IN r,(C)
+// IN A,(n)
 // Read in one byte from IO mapped port (n) into register A 
 // OpCodes: 0xDB
 void INA( uint8_t *reg, uint8_t port ){
@@ -16,9 +16,12 @@ void INA( uint8_t *reg, uint8_t port ){
 // IN r,(C)
 // IO ported is selected through contents of register C which selects one of 256 ports, register B forms the 
 // second part a byte copied from that IO device address in to register r
+//
+// NOTE: ** Although the instruction in the manual does not give it away register B is also important here **
+// 	    as it can be used to address locations within the port specified in C.
+//
 // OpCodes: 0xED40, 0xED48, 0xED50, 0xED58, 0xED60, 0xED68, 0xED78 
 void IN( uint8_t *reg, uint8_t *bReg, uint8_t portVal, uint8_t *fReg ){
-	
 	
 	// In the 
 	*reg = portVal;

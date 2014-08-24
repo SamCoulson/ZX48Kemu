@@ -48,11 +48,32 @@ static Registers registers = {
 // Pointer to the register structure
 Registers* reg = &registers;
 
-// IO ports *** The CPU has 256 addressable ports *** 
-// This might be excessive for emualtion but all IO will park data at these location for read/write by external modules
+// IO ports *** The CPU has 256 addressable ports, using bits 0-7 of the address bus *** 
+// All IO routines will park data at these location for read/write by external modules
 
 uint8_t ports[256] = {0};
-static uint8_t* IOport = ports; 
+static uint8_t* IOport = ports;
+
+// List of function pointers for each of the 256 ports
+// Each function (port) takes a IO status i.e. READ or WRITE and an optional address which
+// can be used to use the upper-part of the address bus
+uint8_t (*portPtrs[256])( int, uint8_t );
+
+// Takes a port number and maps a function to it.
+void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) ){
+
+	if( port > 255 ){
+		printf("mapPort : Unable to map port, port number out of range\n");
+		return;
+	}
+
+	if( func == NULL ){
+		printf("mapPort : Unable to map port, func passed in is NULL\n");
+		return;
+	}
+
+	portPtrs[port] = func;
+}
 
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
@@ -65,6 +86,7 @@ void run( uint16_t addrs ){
 	
 	uint8_t timeToInterrupt = 200;
 
+	
 	//While less than 16k rom
 	while( *reg->pc < 0xFFFF ){			
 		
@@ -1792,11 +1814,8 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x78:
 				printf( "IN A,(C)" );
-
-				uint8_t portFE = 0xFE;
-				uint16_t port = byteToWord( reg->b, &portFE );
-
-				IN( reg->a, reg->b, readPort( port ), reg->f );
+	
+				IN( reg->a, reg->b, (*portPtrs[254])( READ, *reg->b )/*readPort( port )*/, reg->f );
 				break;
 			case 0x7B:
 				printf( "LD SP,(%X)", readNextWord() );
@@ -1940,12 +1959,12 @@ void execute( uint8_t* opcode ){
 			case 0x4E:
 				printf( "LD C,(IY+%X)",(int8_t) readNextByte() );
 				LD( reg->c, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
-				break;
-			case 0x5E:
+				break;	
+			case 0x56:
 				printf( "LD D,(IY+%X)",(int8_t) readNextByte() );
 				LD( reg->d, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
 				break;
-			case 0x56:
+			case 0x5E:
 				printf( "LD E,(IY+%X)",(int8_t) readNextByte() );
 				LD( reg->e, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
 				break;
@@ -2249,10 +2268,13 @@ void writeByte( uint16_t addrs, uint8_t val ){
 	//setByte(addrs, val);
 }
 
-// Read the port at the given 16-bit address
+// ** Used internally to read in data from ports and if needed the address bus **/
+// Read the port at the given 8-bit address on the lower-half of the address bus.
+// Note this param is a WORD as the address the Bus is still 16-bits wide.
+
 uint8_t readPort(uint16_t portAddrs){
 
-	// If 0x00FE
+	// If called from IN r,(C) then only need to be concerned with lower-half port address 0x00FE
 	if( portAddrs == 0x00FE ){ 
 		return 0x1F;
 	}
@@ -2260,28 +2282,29 @@ uint8_t readPort(uint16_t portAddrs){
 	// If keyboard ports
 	switch( portAddrs ){
 		case 0xFEFE:
-			return readKeyboard( 1 );
+			//return readKeyboard( 1 );
+			return 0x8F;
 			break;
 		case 0xFDFE:
-			return 0x27;
+			return 0xBF;
 			break;
 		case 0xFBFE:
-			return 0x1F;
+			return 0xBF;
 			break;					
 		case 0xF7FE:
-			return 0x1F;
+			return 0xBF;
 			break;
 		case 0xEFFE:
-			return 0x1F;
+			return 0xBF;
 			break;
 		case 0xDFFE:
-			return 0x1F;
+			return 0xBF;
 			break;
 		case 0xBFFE:
-			return 0x1F;
+			return 0xBF;
 			break;
 		case 0x7FFE:
-			return 0x1F;
+			return 0xBF;
 			break;
 		default:
 			break;
@@ -2289,3 +2312,6 @@ uint8_t readPort(uint16_t portAddrs){
 
 	return 0;
 }
+
+
+

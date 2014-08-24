@@ -9,4 +9,6 @@ void setBit(uint8_t *byte, uint8_t pos, uint8_t bitval);
 
 int getBit( uint8_t *byte, uint8_t pos );
 
+int byte_parity( unsigned char );
+
 #endif //INC_UTILBITOPERATIONS_H  

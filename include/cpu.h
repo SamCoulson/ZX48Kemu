@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include "memory.h"
 
+#define READ 0
+#define WRITE 1
+
 // 8-Bit Z80 main general purpose registers
 union _AF{
 	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
@@ -138,6 +141,9 @@ int initCPU();
 void execute(uint8_t* opcode);
 
 // Utility functions
+
+// Port handing
+void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) );
 
 // Memory handling
 

@@ -15,8 +15,8 @@ void console(){
 	
 	//system("cls");
 	
-	//if( *reg->pc == 0x0038 )
-	//	stepMode = 1;
+	if( *reg->pc == 0x0c0A )
+		stepMode = 1;
 
 	if( mode == 0 ){
 		printf("\nMain registers\tAlternate registers\n");
@@ -104,6 +104,17 @@ void console(){
 						printf( "\t%X %d: %02X\n",i ,j ,totalMem[i] );
 						i++;
 					}
+					--i;  // Step back one to compensate for last i++, this stops last-k
+					// being shown if it is omitted.
+					break;
+				case 0x5C08 :
+					printf( "LAST-K\t: %02X\n",totalMem[i]);
+					break;
+				case 0x5C09 :
+					printf( "REPDEL\t: %02X\n",totalMem[i]);
+					break;
+				case 0x5C0A :
+					printf( "REPPER\t: %02X\n",totalMem[i]);
 					break;
 				case 0x5C10 :
 					printf( "STRMS\t:\n" );
@@ -111,7 +122,10 @@ void console(){
 						printf( "\t%X : %02X\n",i ,totalMem[i] );
 						i++;
 					}
-					break;	
+					break;
+				case 0x5C3B :
+					printf( "FLAGS\t: %02X\n", totalMem[i] );
+					break;
 				case 0x5C3C :
 					printf( "TVFLAGS\t: %02X\n", totalMem[i] );
 					break;

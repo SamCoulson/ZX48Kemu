@@ -1,5 +1,6 @@
 #include "SDL/SDL.h"
 #include "../include/CPU.h"
+#include "../include/ULA.h"
 #include "../include/Memory.h"
 #include "../include/romloader.h"
 #include "../include/screen.h"
@@ -22,7 +23,7 @@ int main(int argc, char *argv[] ){
 
 	// Start at address 0x00
 	//initCPU();
-
+	initULA();
 	// Begin executing code from 0x00
 	run( 0x0000 );
 

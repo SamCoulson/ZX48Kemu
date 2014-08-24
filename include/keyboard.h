@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-uint8_t readKeyboard( uint8_t row );
+void readKeyboard();
 
 #endif // INC_KEYABORD_H

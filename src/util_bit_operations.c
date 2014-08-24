@@ -24,3 +24,12 @@ int getBit( uint8_t *byte, uint8_t pos ){
 		return 0; // If zero return 0
 	}
 }
+
+// Taken from http://bytes.com/topic/c/answers/705467-byte-parity-question
+// neat trick to return 1 as odd and 0 as even
+int byte_parity( unsigned char b ){
+	b ^= b >4;
+	b ^= b >2;
+	b ^= b >1;
+	return b & 1;
+}
