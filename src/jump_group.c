@@ -117,6 +117,7 @@ void JRNC( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 // Jump relative when z flag is 1
 // OpCodes: 0x28 
 void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
+	
 	// If Z flag is 0 jump relative to val
 	if( getBit( fReg, 6 ) == 0x01  ){
 		// Add value to pc
@@ -161,7 +162,7 @@ void DJNZ( uint8_t* disp, uint8_t* bReg, uint16_t* pc ){
 	--*bReg;
 		
 	if( *bReg != 0x00 ){
-		*pc += (int8_t)*disp;
+		*pc += (int8_t)*disp;	
 	}
 }
 

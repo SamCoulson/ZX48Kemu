@@ -120,10 +120,11 @@ void run( uint16_t addrs ){
 			// Emulate ULA interrupting and reading video memory only if INT enabled
 			if( *reg->iff1 != 0 ){
 				readKeys();
+				
 			}
-		
 			// Emulate keyboard interrupt (Maskable interupt RST38)
-			*reg->pc = 0x0038;
+			*reg->pc = 0x0038;	
+			
 
 			// Emulate an NMI( Non-maskable interrupt ), is always honered 
 			// independent of IFF (interrupt enable flip-flop) status.  Always resets to 0066h
@@ -171,6 +172,8 @@ void execute( uint8_t* opcode ){
 	uint8_t offset;	
 
 	printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
+
+//	++*reg->r;
 	
 	switch( *opcode ){
 		case 0x00:
@@ -302,7 +305,7 @@ void execute( uint8_t* opcode ){
 			RRA( reg->a, reg->f );
 			break;
 		case 0x20:
-			printf( "JR NZ,%d", (int8_t)readNextByte() );
+			printf( "JR NZ,%d", (int8_t)readNextByte() );	
 			JRNZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x21:
