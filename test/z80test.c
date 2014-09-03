@@ -222,7 +222,7 @@ int main( int argc, char* argv[] ){
 
 	printf("Testing 16Bit ADD16\n");
 	test_16bit_add();
-	printf("Testing 8Bit SUB successful\n");
+	//printf("Testing 8Bit SUB successful\n");
 
 	printf( "Testing successful" );
 

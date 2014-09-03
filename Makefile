@@ -2,7 +2,7 @@
 
 CC=gcc
 
-CFLAGS=-Wall -std=c99 
+CFLAGS= -O -Wall -std=c99 
 
 LDFLAGS=-I ./include/ 
 

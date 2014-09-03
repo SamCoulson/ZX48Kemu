@@ -433,7 +433,9 @@ void CP( uint8_t* reg, uint8_t* val, uint8_t* fReg ){
 	// N is set to 1 because we are subtracting
 	setBit( fReg, 1, 1 );	
 
-	// C is 1 if borrow or is otherwise 0  ***  Check this, i dont fully understand borrows at this level ***
+	// C is 1 if borrow or is otherwise 0 - Presumably if result is less than 0 and 1 must be carried in
+	// from the left, remember with carry we are only interested in the unsigned values.
+	// whatever the case if the top number is smaller than the bottom then a borrow will have occurred
 	( (int8_t)result < 0 ) ? setBit( fReg, 0, 1 ) : setBit( fReg, 0, 0 ); 
 		
 }	
