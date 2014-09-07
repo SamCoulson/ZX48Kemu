@@ -173,7 +173,7 @@ void execute( uint8_t* opcode ){
 
 	printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
 
-//	++*reg->r;
+	++*reg->r;
 	
 	switch( *opcode ){
 		case 0x00:
@@ -1129,6 +1129,8 @@ void execute( uint8_t* opcode ){
 					SRL( reg->h, reg->f );
 					break;
 				case 0x3D:
+					printf("SRL L");
+					SRL( reg->l, reg->f );	
 					break;
 				case 0x3E:
 					break;
@@ -1396,6 +1398,10 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xDD: /* IX registers */
 			switch( *( getNextByte() ) ){
+			case 0x09:
+				printf( "ADD IX + BC" );
+				ADD16( reg->ix, reg->bc ,reg->f );
+				break;
 			case 0x21:
 				printf( "LD IX,+%X", readNextWord() );
 				LD16( reg->ix, getNextWord() );
@@ -1406,7 +1412,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x23:
 				printf( "INC IX" );
-				INC16( reg->iy );
+				INC16( reg->ix );
 				break;
 			case 0x2A:
 				printf( "LD IX(%X)", readNextWord() );

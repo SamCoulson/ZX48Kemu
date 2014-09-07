@@ -103,7 +103,7 @@ void RLC( uint8_t* reg, uint8_t* fReg ){
 // Contents of operand are shifted right 1-bit position, contents of bit 0 is copied into carry flag and bit 7 reset
 // OpCodes: CB38 - CB3F
 void SRL( uint8_t* reg, uint8_t* fReg ){
-	// Copy contents of bit 7 to Carry flag
+	// Copy contents of bit 0 to Carry flag
 	setBit( fReg, 0, getBit( reg, 0 ) );
 
 	// Shift the bits in register right 1

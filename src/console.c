@@ -15,8 +15,8 @@ void console(){
 	
 	//system("cls");
 	
-	if( *reg->pc == 0x0F2C )
-		stepMode = 1;
+	if( *reg->pc == 0x10A8 ) 
+		stepMode = 1; 
 
 	if( mode == 0 ){
 		printf("\nMain registers\tAlternate registers\n");
@@ -115,6 +115,9 @@ void console(){
 					break;
 				case 0x5C0A :
 					printf( "REPPER\t: %02X\n",totalMem[i]);
+					break;
+				case 0x5C0D :
+					printf( "KDATA\t: %02X\n",totalMem[i]);
 					break;
 				case 0x5C10 :
 					printf( "STRMS\t:\n" );
