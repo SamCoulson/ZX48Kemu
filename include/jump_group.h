@@ -66,22 +66,7 @@ void JRZ( uint16_t* pc, uint8_t* val, uint8_t* fReg );
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero
 // Note: has signed int type because value may be + or -
 // OpCodes: 0x20
-void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg );
-
-// JP(HL)
-// Load program counter with contents of address pointed to by HL register
-// OpCodes: 0xE9
-void JPHL();
-
-// JP(IX)
-// Load program counter with contents of address pointed to by IX register
-// OpCodes: 0xDDE9
-void JPIX(); 
-
-// JP(IY)
-// Load program counter with contents of address pointed to by IY register
-// OpCodes: 0xFDE9
-void JPIY();		
+void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg );	
 
 // DJNZ, e
 // Jump on the condition of B reg being non-zero

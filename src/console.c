@@ -15,7 +15,7 @@ void console(){
 	
 	//system("cls");
 	
-	if( *reg->pc == 0x10A8 ) 
+	if( *reg->pc == 0x03F0 ) 
 		stepMode = 1; 
 
 	if( mode == 0 ){

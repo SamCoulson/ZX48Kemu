@@ -5,7 +5,7 @@
 
 // JP nn
 // Jump to the memory location using a 16-bit address specified by the combined 8-bit values  
-// OpCodes: 0xC3, 0xE9
+// OpCodes: 0xC3, 0xE9, 0xDDE9, 0xEDE9
 void JP( uint16_t* pc, uint16_t* addrs ){
 	// Set the address the pc points to jump address in the minus one, to compensate for next incremnet on execution loop
 	*pc = (*addrs)-1;	
@@ -51,24 +51,34 @@ void JPPO( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
 	//	// Add value to pc
 	//	*pc = (*addrs)-1;
 	//}
-	// Else do nothing	
+	// Else do nothing
+	printf("Not yet implemented\n");	
 }
 
 // 0xEA ***Check this***
 void JPPE( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
 	// If parity bit is even
-
+	printf("Not yet implemented\n");
 }
 
 // 0xF2
+// Jump if positive sign is 1
 void JPP( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
-	
-
+	// jump if Sign bit is 0 (positive)
+	if( getBit( fReg, 7 ) == 0x00 ){
+		// Add value to pc
+		*pc = (*addrs)-1;
+	}
 }
 
 // 0xFA
+// Jump if negative sign is 1
 void JPM( uint16_t* pc, uint16_t* addrs, uint8_t* fReg ){
-	// Sign Negative
+	// Jump if sign bit is 1 (negative)
+	if( getBit( fReg, 7 ) == 0x01 ){
+		// Add value to pc
+		*pc = (*addrs)-1;
+	}
 }
 
 // JPNZ,nn
@@ -139,20 +149,6 @@ void JRNZ( uint16_t* pc, uint8_t* val, uint8_t* fReg ){
 	// If not, do nothing and execute next instruction
 }
 
-// JP(HL)
-// Load program counter with contents of address pointed to by HL register
-// OpCodes: 0xE9
-void JPHL();
-
-// JP(IX)
-// Load program counter with contents of address pointed to by IX register
-// OpCodes: 0xDDE9
-void JPIX(); 
-
-// JP(IY)
-// Load program counter with contents of address pointed to by IY register
-// OpCodes: 0xFDE9
-void JPIY();		
 
 // DJNZ, e
 // Jump on the condition of B reg being non-zero

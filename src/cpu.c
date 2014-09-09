@@ -1137,6 +1137,8 @@ void execute( uint8_t* opcode ){
 				case 0x3F:
 					break;
 				case 0x40:
+					printf( "BIT 0" );
+					BIT( 0, reg->b, reg->f );
 					break;
 				case 0x41:
 					break;
@@ -1195,6 +1197,8 @@ void execute( uint8_t* opcode ){
 				case 0x59:
 					break;
 				case 0x5A:
+					printf( "BIT 3,D" );
+					BIT( 3, reg->d, reg->f );
 					break;	
 				case 0x5B:
 					break;
@@ -1684,8 +1688,8 @@ void execute( uint8_t* opcode ){
 				PUSH( getWordAt( reg->sp ), reg->sp, reg->ix );
 				break;
 			case 0xE9:
-				printf( "JP(IX)" );
-				JP( reg->pc, getWordAt( reg->ix ) );
+				printf( "JP IX" );
+				JP( reg->pc, reg->ix );
 				break;
 			case 0xF9:
 				printf( "LD SP,IX" );
@@ -1883,7 +1887,7 @@ void execute( uint8_t* opcode ){
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->af );
 			break;
 		case 0xF2:
-			printf( "JP P,%X***Check this", readNextWord() );
+			printf( "JP P,%X", readNextWord() );
 			JPP( reg->pc, getNextWord(), reg->f  );
 			break;
 		case 0xF3:
