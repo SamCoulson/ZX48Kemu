@@ -39,11 +39,11 @@ void CALLC( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 	}
 }
 
-// CALL NZ
+// CALL NZ - Really not sure why these work when expression evaluates to 0 instead of 1
 // Call if Z flag is reset
 // 0xC4
 void CALLNZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
-	if( getBit( fReg, 1 ) != 0x00 ){
+	if( getBit( fReg, 1 ) == 0x00 ){
 		// Make room for the pc address
 		--spAddrs;
 		*sp-=2;
@@ -86,18 +86,20 @@ void CALLPO( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uin
 
 		// Set the pc to point to the address -1 to compensate the autoincrment on next loop
 		*pc = *addrs-1;
-	}*/	
+	}*/
+	printf("Not implemented\n");	
 }
 
 // 0xEC
 void CALLPE( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
-// Parity even	
+// Parity even
+	printf("Not implemented\n");		
 }
 
 // 0xF4
 void CALLP( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
 // Sign positive
-
+	printf("Not implemented\n");	
 }
 
 // CALL Z,nn
@@ -121,7 +123,7 @@ void CALLZ( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint
 // 0xFC
 void CALLM( uint16_t* addrs, uint16_t* spAddrs, uint16_t* sp, uint16_t* pc, uint8_t* fReg ){
 	// Sign Negative
-
+	printf("Not implemented\n");	
 }
 
 // RET
@@ -145,6 +147,7 @@ void RETPO( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	//	*pc = *spAddrs;
 	//	*sp+=2;	
 	//}
+	printf("Not implemented\n");		
 }
 
 // 0xE8 ***Check this*** P/V is set
@@ -153,18 +156,19 @@ void RETPE( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	//	*pc = *spAddrs;
 	//	*sp+=2;	
 	//}
+	printf("Not implemented\n");		
 }
 
 // 0xF0 ***Check this***
 void RETP( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
-
+	printf("Not implemented\n");	
 
 }
 
 // 0xF8 ***Check this***
 void RETM( uint16_t* pc, uint16_t* spAddrs, uint16_t* sp, uint8_t* fReg ){
 	// Sign negative
-
+	printf("Not implemented\n");	
 }
 
 // RET NZ
