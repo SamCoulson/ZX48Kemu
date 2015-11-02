@@ -1,4 +1,4 @@
-#include "../include/CPU.h"
+#include "../include/cpu.h"
 #include "../include/ULA.h"
 #include "../include/memory.h"
 #include "../include/screen.h"
@@ -22,22 +22,22 @@ uint8_t ulaPort( int ioStatus, uint8_t addrs ){
 				break;
 			case 0xFB:
 				return halfRows[2];
-				break;	
+				break;
 			case 0xF7:
 				return halfRows[3];
-				break;	
+				break;
 			case 0xEF:
 				return halfRows[4];
-				break;	
+				break;
 			case 0xDF:
 				return halfRows[5];
-				break;	
+				break;
 			case 0xBF:
 				return halfRows[6];
-				break;	
+				break;
 			case 0x7F:
 				return halfRows[7];
-				break;	
+				break;
 			default:
 				break;
 		}
@@ -55,12 +55,12 @@ void initULA(){
 // readKeys() should be called outside of the CPU
 void readKeys(){
 	// Read the keys from the keyboard and set the appropriate bits in each of the half row bytes.
-	readKeyboard();	
+	readKeyboard();
 }
 
 // Potentially have this as a way to emulate the ULA sending a clock tick to the CPU
 // however its not a clock tick in the sense of an operation per tick but instead an instruction per tick
-// maybe able to ties this to a timer somehow. 
+// maybe able to ties this to a timer somehow.
 // void execute( opCode ){
 //
 //
@@ -68,6 +68,6 @@ void readKeys(){
 
 void readVideoRAM( unsigned char* mem ){
 
-	updateScreen();	
+	updateScreen();
 
 }

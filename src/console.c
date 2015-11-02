@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
+//#include <conio.h>
+#include <curses.h>
 #include "../include/console.h"
 #include "../include/cpu.h"
 #include "../include/util_bit_operations.h"
@@ -12,26 +13,26 @@ void console(){
 
 	static int key = 0;
 	static int mode = 0;
-	
+
 	//system("cls");
-	
-	if( *reg->pc == 0x18E1 ) 
-		stepMode = 1; 
+
+	if( *reg->pc == 0x18E1 )
+		stepMode = 1;
 
 	if( mode == 0 ){
 		printf("\nMain registers\tAlternate registers\n");
-		printf("AF: %02x %02x", *reg->a, *reg->f );  
+		printf("AF: %02x %02x", *reg->a, *reg->f );
 		printf("\tAF': %02x %02x\n",*reg->alta, *reg->altf );
-		printf("BC: %02x %02x", *reg->b, *reg->c );  
+		printf("BC: %02x %02x", *reg->b, *reg->c );
 		printf("\tBC': %02x %02x\n", *reg->altb, *reg->altc );
-		printf("DE: %02x %02x", *reg->d, *reg->e );  
+		printf("DE: %02x %02x", *reg->d, *reg->e );
 		printf("\tDE': %02x %02x\n", *reg->altd, *reg->alte );
 
-		printf("HL: %02x %02x", *reg->h, *reg->l );  
+		printf("HL: %02x %02x", *reg->h, *reg->l );
 		printf("\tHL': %02x %02x\n", *reg->alth, *reg->altl );
 
 		printf("\nSP: %04x", *reg->sp );
-		printf( "\nPC: %04x\n", *reg->pc );	
+		printf( "\nPC: %04x\n", *reg->pc );
 
 		printf("\nIX: %04x", *reg->ix );
 		printf("\tIY: %04x", *reg->iy );
@@ -60,12 +61,12 @@ void console(){
 			if( *reg->sp == i ){
 				printf( "\t<" );
 			}
-			
+
 		}
 	printf("\n" );
 	}
 
-	// Prints the channels 
+	// Prints the channels
 	if( mode == 1 ){
 		for( int i = 0x5CB6; i < 0x5CD7; i+=2 ){
 			printf("\n%X %02X %02X", i, totalMem[i], totalMem[i+1] );
@@ -91,7 +92,7 @@ void console(){
 				printf("\n");
 				column = 0;
 			}
-		}	
+		}
 	}
 
 
@@ -154,14 +155,14 @@ void console(){
 					printf( "DF-SZ\t: %02X\n", totalMem[i] );
 					break;
 				case 0x5C7F :
-					printf( "P-POSN\t: %02X\n", totalMem[i] );	
-					break;	
+					printf( "P-POSN\t: %02X\n", totalMem[i] );
+					break;
 				case 0x5CB2 :
 					printf( "RAM-TOP\t: %02X %02X\n", totalMem[i], totalMem[i++] );
 					break;
 				case 0x5CB4 :
 					printf( "P-RAMT\t: %02X %02X\n", totalMem[i], totalMem[i++] );
-					break;	
+					break;
 				default:
 				break;
 			}
@@ -169,10 +170,10 @@ void console(){
 	}
 
 
-	if( kbhit() || stepMode ){	
+	//if( kbhit() || stepMode ){
 		key = getch();
-		
-		// printf("key press = %d\n", key);
+
+	  printf("key press = %d\n", key);
 
 		if( key == 113 ){
 			exit(1); // key q
@@ -188,8 +189,6 @@ void console(){
 			mode = 2;
 		}else if( key == 107 ){
 			mode = 3; // k key
-		}		
+		}
 	}
-}
-
-
+//}

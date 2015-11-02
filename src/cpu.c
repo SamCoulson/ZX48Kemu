@@ -1,7 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
+//#include <conio.h>
+#include <ncurses.h>
 #include "../include/cpu.h"
 #include "../include/8-bit_load_group.h"
 #include "../include/16-bit_load_group.h"
@@ -23,12 +24,12 @@
 
 // Declare and initialise structure of pointers to register unions, this must be here not in the .h file
 static Registers registers = {
-        // Assign const pointers to main registers	
+        // Assign const pointers to main registers
 	.a = &af._af[1], .f = &af._af[0], .af = &af.af,
 	.b = &bc._bc[1], .c = &bc._bc[0], .bc = &bc.bc,
 	.d = &de._de[1], .e = &de._de[0], .de = &de.de,
 	.h = &hl._hl[1], .l = &hl._hl[0], .hl = &hl.hl,
-	// Assign const pointers to alternative registers 
+	// Assign const pointers to alternative registers
 	.alta = &altaf._af[1], .altf = &altaf._af[0], .altaf = &altaf.af,
 	.altb = &altbc._bc[1], .altc = &altbc._bc[0], .altbc = &altbc.bc,
 	.altd = &altde._de[1], .alte = &altde._de[0], .altde = &altde.de,
@@ -42,13 +43,13 @@ static Registers registers = {
 	// IFF (Interrupt enabled flip-flop)
 	.iff1 = &iff1, .iff2 = &iff2,
 	// CPU Mode
-	.mode = &mode	
+	.mode = &mode
 };
 
 // Pointer to the register structure
 Registers* reg = &registers;
 
-// IO ports *** The CPU has 256 addressable ports, using bits 0-7 of the address bus *** 
+// IO ports *** The CPU has 256 addressable ports, using bits 0-7 of the address bus ***
 // All IO routines will park data at these location for read/write by external modules
 
 uint8_t ports[256] = {0};
@@ -77,34 +78,34 @@ void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) ){
 
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
-	
+
 	// Begin executing from 0x0000
 	*reg->pc = addrs;
 
 	// DEBUG
 	*reg->pc = 0x0000;
-	
+
 	uint8_t timeToInterrupt = 200;
 
-	
+
 	//While less than 16k rom
-	while( *reg->pc < 0xFFFF ){			
-		
-		console();	
+	while( *reg->pc < 0xFFFF ){
+
+		console();
 
 		// Execute the instruction pointed to by pc
 		execute( &totalMem[*reg->pc]  );
 
 		// Progess the PC by 1
 		getNextByte();
-			
-		// Do interrupts ( Peripheral service routines )	
+
+		// Do interrupts ( Peripheral service routines )
 		if( timeToInterrupt == 0x00 ){
 
 			// Automatically save the current PC location on stack
-			// Need to accomodate autoincrement of PC on return 
-			--*reg->pc;	
-			PUSH( getWordAt( reg->sp ), reg->sp, reg->pc );	
+			// Need to accomodate autoincrement of PC on return
+			--*reg->pc;
+			PUSH( getWordAt( reg->sp ), reg->sp, reg->pc );
 
 			// INT - Software maskable interrupt
 			// Responds depening on CPU Mode. ( See IM 0,1,2 in GPA )
@@ -115,24 +116,24 @@ void run( uint16_t addrs ){
 			// IFF1 actually hold the state and IFF2 is used as a temporary storage space
 			// for IFF1 state.
 			// EI enables ( Sets IFF1 to enabled )
-			// DI disables ( Sets IFF2 to disabled )    
+			// DI disables ( Sets IFF2 to disabled )
 
 			// Emulate ULA interrupting and reading video memory only if INT enabled
 			if( *reg->iff1 != 0 ){
 				readKeys();
-				
+
 			}
 			// Emulate keyboard interrupt (Maskable interupt RST38)
-			*reg->pc = 0x0038;	
-			
+			*reg->pc = 0x0038;
 
-			// Emulate an NMI( Non-maskable interrupt ), is always honered 
+
+			// Emulate an NMI( Non-maskable interrupt ), is always honered
 			// independent of IFF (interrupt enable flip-flop) status.  Always resets to 0066h
 			// After an NMI on IFF1 is reset, IFF2 preserves the state as part of being able to restore
 			// the CPU state before execution of NMI routine.
 			// when LD A,I or LD A,R or RETN occurs the state of IFF2 is copied to
-			// parut flag and can then be tested 
-			
+			// parut flag and can then be tested
+
 			// Read video RAM
 			readVideoRAM( totalMem );
 
@@ -145,7 +146,7 @@ void run( uint16_t addrs ){
 
 		}else{
 			//printf( "\nTime to interrupt = %d\n", timeToInterrupt );
-			timeToInterrupt--;	
+			timeToInterrupt--;
 		}
 
 		// RESET - Set IFF1 and IIF2 to 0.
@@ -153,28 +154,28 @@ void run( uint16_t addrs ){
 		// HALT - May also need to be implemented as it can be software generated, it issues some NOP's
 		// while waiting for a NMI or interrupt request ( only is IIF is enabled )
 
-		// R Register should be implemented, 7-bits are incremetend after each instrutrion fetch
-	
-		// computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed	
+		// R Register should be implemented, 7-bits are incremented after each instruction fetch
+
+		// Computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed
 
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
 		if( *reg->pc == 0x11DC ){
 			*reg->pc = 0x11EF;
 			// Set HL to +FFFF fro RAM-TOP
-			*reg->hl = 0xFFFF;	
+			*reg->hl = 0xFFFF;
 		}
 	}
 }
 
 
-void execute( uint8_t* opcode ){	
+void execute( uint8_t* opcode ){
 
-	uint8_t offset;	
+	uint8_t offset;
 
 	printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
 
 	++*reg->r;
-	
+
 	switch( *opcode ){
 		case 0x00:
 			printf( "NOP (Not implemented yet!");
@@ -242,7 +243,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x10:
 			printf( "DJNZ %d", (int8_t)readNextByte() );
-			DJNZ( getNextByte(), reg->b, reg->pc );					
+			DJNZ( getNextByte(), reg->b, reg->pc );
 			break;
 		case 0x11:
 			printf( "LD DE,+%X", readNextWord() );
@@ -305,7 +306,7 @@ void execute( uint8_t* opcode ){
 			RRA( reg->a, reg->f );
 			break;
 		case 0x20:
-			printf( "JR NZ,%d", (int8_t)readNextByte() );	
+			printf( "JR NZ,%d", (int8_t)readNextByte() );
 			JRNZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x21:
@@ -314,7 +315,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x22:
 			printf( "LD (%X),HL", readNextWord() );
-			LD16( getWordAt( getNextWord() ), reg->hl );							
+			LD16( getWordAt( getNextWord() ), reg->hl );
 			break;
 		case 0x23:
 			printf( "INC HL" );
@@ -344,7 +345,7 @@ void execute( uint8_t* opcode ){
 			ADD16( reg->hl, reg->hl, reg->f );
 			break;
 		case 0x2A:
-			printf( "LD HL,(%X)", readNextWord() ); 
+			printf( "LD HL,(%X)", readNextWord() );
 			LD16( reg->hl, getWordAt( getNextWord() ) );
 			break;
 		case 0x2B:
@@ -408,7 +409,7 @@ void execute( uint8_t* opcode ){
 			ADD16( reg->hl, reg->sp, reg->f );
 			break;
 		case 0x3A:
-			printf( "LD A,(%X)", readNextWord() );	
+			printf( "LD A,(%X)", readNextWord() );
 			LD( reg->a, getByteAt( *(getNextWord()) ) );
 			break;
 		case 0x3B:
@@ -586,7 +587,7 @@ void execute( uint8_t* opcode ){
 		case 0x66:
 			printf( "LD H,(HL)" );
 			LD( reg->h, getByteAt( *reg->hl ) );
-			break; 
+			break;
 		case 0x67:
 			printf( "LD H,A" );
 			LD( reg->h, reg->a );
@@ -898,7 +899,7 @@ void execute( uint8_t* opcode ){
 			printf( "OR H" );
 			OR( reg->a, reg->h, reg->f );
 			break;
-		case 0xB5:	
+		case 0xB5:
 			printf( "OR L" );
 			OR( reg->a, reg->l, reg->f );
 			break;
@@ -927,7 +928,7 @@ void execute( uint8_t* opcode ){
 			CP( reg->a, reg->e, reg->f );
 			break;
 		case 0xBC:
-			printf( "CP H");	
+			printf( "CP H");
 			CP( reg->a, reg->h, reg->f );
 			break;
 		case 0xBD:
@@ -1025,7 +1026,7 @@ void execute( uint8_t* opcode ){
 				case 0x09:
 					break;
 				case 0x0A:
-					break;	
+					break;
 				case 0x0B:
 					break;
 				case 0x0C:
@@ -1057,7 +1058,7 @@ void execute( uint8_t* opcode ){
 				case 0x19:
 					break;
 				case 0x1A:
-					break;	
+					break;
 				case 0x1B:
 					break;
 				case 0x1C:
@@ -1089,7 +1090,7 @@ void execute( uint8_t* opcode ){
 				case 0x29:
 					break;
 				case 0x2A:
-					break;	
+					break;
 				case 0x2B:
 					break;
 				case 0x2C:
@@ -1121,7 +1122,7 @@ void execute( uint8_t* opcode ){
 				case 0x39:
 					break;
 				case 0x3A:
-					break;	
+					break;
 				case 0x3B:
 					break;
 				case 0x3C:
@@ -1130,7 +1131,7 @@ void execute( uint8_t* opcode ){
 					break;
 				case 0x3D:
 					printf("SRL L");
-					SRL( reg->l, reg->f );	
+					SRL( reg->l, reg->f );
 					break;
 				case 0x3E:
 					break;
@@ -1153,7 +1154,7 @@ void execute( uint8_t* opcode ){
 				case 0x46:
 					printf( "BIT 0" );
 					BIT( 0, getByteAt( *reg->hl ), reg->f );
-					break;	
+					break;
 				case 0x47:
 					break;
 				case 0x48:
@@ -1161,7 +1162,7 @@ void execute( uint8_t* opcode ){
 				case 0x49:
 					break;
 				case 0x4A:
-					break;	
+					break;
 				case 0x4B:
 					break;
 				case 0x4C:
@@ -1199,7 +1200,7 @@ void execute( uint8_t* opcode ){
 				case 0x5A:
 					printf( "BIT 3,D" );
 					BIT( 3, reg->d, reg->f );
-					break;	
+					break;
 				case 0x5B:
 					break;
 				case 0x5C:
@@ -1259,7 +1260,7 @@ void execute( uint8_t* opcode ){
 				case 0x86:
 					printf( "RES 0, (HL)" );
 					RES( 0, getByteAt( *reg->hl ) );
-					break;	
+					break;
 				case 0x8E:
 					printf( "RES 1, (HL)" );
 					RES( 1, getByteAt( *reg->hl ) );
@@ -1284,10 +1285,10 @@ void execute( uint8_t* opcode ){
 					printf( "RES 6, (HL)" );
 					RES( 6, getByteAt( *reg->hl ) );
 					break;
-				case 0xBC:	
+				case 0xBC:
 					printf( "RES 7, H" );
 					RES( 7, reg->h );
-					break;	
+					break;
 				case 0xBE:
 					printf( "RES 7, (HL)" );
 					RES( 7, getByteAt( *reg->hl ) );
@@ -1295,13 +1296,13 @@ void execute( uint8_t* opcode ){
 				case 0xC6:
 					printf( "SET 0, (HL)" );
 					SET( 0, getByteAt( *reg->hl ) );
-					break;	
+					break;
 				case 0xCE:
 					printf( "SET 1, (HL)" );
 					SET( 1, getByteAt( *reg->hl ) );
 					break;
 				case 0xD6:
-					printf( "SET 2, (HL)" );	
+					printf( "SET 2, (HL)" );
 					SET( 2, getByteAt( *reg->hl ) );
 					break;
 				case 0xDE:
@@ -1412,7 +1413,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x22:
 				printf( "LD (%X),IX", readNextWord() );
-				LD16( getWordAt( getNextWord() ), reg->ix );	
+				LD16( getWordAt( getNextWord() ), reg->ix );
 				break;
 			case 0x23:
 				printf( "INC IX" );
@@ -1440,27 +1441,27 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x46:
 				printf( "LD B,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->b, getByteAt( *reg->ix +(int8_t) *(getNextByte()) ) ); 
+				LD( reg->b, getByteAt( *reg->ix +(int8_t) *(getNextByte()) ) );
 				break;
 			case 0x4E:
 				printf( "LD C,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->c, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) ); 
+				LD( reg->c, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) );
 				break;
 			case 0x5E:
 				printf( "LD D,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->d, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) ); 
+				LD( reg->d, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) );
 				break;
 			case 0x56:
 				printf( "LD E,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->e, getByteAt( *reg->ix + (int8_t)*(getNextByte() ) ) ); 
+				LD( reg->e, getByteAt( *reg->ix + (int8_t)*(getNextByte() ) ) );
 				break;
 			case 0x66:
 				printf( "LD H,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->h, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) ); 
+				LD( reg->h, getByteAt( *reg->ix +(int8_t) *(getNextByte() ) ) );
 				break;
 			case 0x6E:
 				printf( "LD L,(IX+%X)",(int8_t) readNextByte() );
-				LD( reg->l, getByteAt( *reg->ix +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->l, getByteAt( *reg->ix +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x70:
 				printf( "LD (IX+%X),B",(int8_t) readNextByte() );
@@ -1468,7 +1469,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x71:
 				printf( "LD (IX+%X),C", (int8_t)readNextByte() );
-				LD( getByteAt( *reg->ix + (int8_t)*( getNextByte() ) ), reg->c );				
+				LD( getByteAt( *reg->ix + (int8_t)*( getNextByte() ) ), reg->c );
 				break;
 			case 0x72:
 				printf( "LD (IX+%X),D", (int8_t)readNextByte() );
@@ -1492,7 +1493,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x7E:
 				printf( "LD A,(IX+%X)", (int8_t)readNextByte() );
-				LD( reg->a, getByteAt( *reg->ix + (int8_t)*( getNextByte() ) ) ); 
+				LD( reg->a, getByteAt( *reg->ix + (int8_t)*( getNextByte() ) ) );
 				break;
 			case 0x86:
 				printf( "ADD (IX+%X)", (int8_t)readNextByte() );
@@ -1524,11 +1525,11 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0xCB:
 				offset = *( getNextByte() );
-				switch( *( getNextByte() ) ){	
+				switch( *( getNextByte() ) ){
 					case 0x06:
 						printf( "RLC(IX+%X)", offset );
 						RLC( getByteAt( *reg->ix + (int8_t) *( getNextByte() ) ), reg->f );
-						break;	
+						break;
 					case 0x08:
 						break;
 					case 0x09:
@@ -1540,7 +1541,7 @@ void execute( uint8_t* opcode ){
 					case 0x0C:
 						break;
 					case 0x0D:
-						break;	
+						break;
 					case 0x0E:
 						break;
 					case 0x0F:
@@ -1556,7 +1557,7 @@ void execute( uint8_t* opcode ){
 					case 0x14:
 						break;
 					case 0x15:
-						break;	
+						break;
 					case 0x16:
 						break;
 					case 0x17:
@@ -1573,12 +1574,12 @@ void execute( uint8_t* opcode ){
 						break;
 					case 0x2E:
 						break;
-					case 0x3E:	
+					case 0x3E:
 						break;
 					case 0x46:
 						printf( "BIT 0, (IX+%X)", (int8_t)offset );
 						BIT( 0, getByteAt( *reg->ix + (int8_t)offset ), reg->f );
-						break;	
+						break;
 					case 0x4E:
 						printf( "BIT 1, (IX+%X)", (int8_t)offset );
 						BIT( 1, getByteAt( *reg->ix + (int8_t)offset ), reg->f );
@@ -1610,7 +1611,7 @@ void execute( uint8_t* opcode ){
 					case 0x86:
 						printf( "RES 0, (IX+%X)", (int8_t)offset );
 						RES( 0, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;	
+						break;
 					case 0x8E:
 						printf( "RES 1, (IX+%X)", (int8_t)offset );
 						RES( 1, getByteAt( *reg->ix + (int8_t)offset ) );
@@ -1634,7 +1635,7 @@ void execute( uint8_t* opcode ){
 					case 0xB6:
 						printf( "RES 6, (IX+%X)", (int8_t)offset );
 						RES( 6, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;	
+						break;
 					case 0xBE:
 						printf( "RES 7, (IX+%X)", (int8_t)offset );
 						RES( 7, getByteAt( *reg->ix + (int8_t)offset ) );
@@ -1642,13 +1643,13 @@ void execute( uint8_t* opcode ){
 					case 0xC6:
 						printf( "SET 0, (IX+%X)", (int8_t)offset );
 						SET( 0, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;	
+						break;
 					case 0xCE:
 						printf( "SET 1, (IX+%X)", (int8_t)offset );
 						SET( 1, getByteAt( *reg->ix + (int8_t)offset ) );
 						break;
 					case 0xD6:
-						printf( "SET 2, (IX+%X)", (int8_t)offset );	
+						printf( "SET 2, (IX+%X)", (int8_t)offset );
 						SET( 2, getByteAt( *reg->ix + (int8_t)offset ) );
 						break;
 					case 0xDE:
@@ -1666,7 +1667,7 @@ void execute( uint8_t* opcode ){
 					case 0xF6:
 						printf( "SET 6, (IX+%X)", (int8_t)offset );
 						SET( 6, getByteAt( *reg->ix + (int8_t)offset ) );
-						break;	
+						break;
 					case 0xFE:
 						printf( "SET 7, (IX+%X)", (int8_t)offset );
 						SET( 7, getByteAt( *reg->ix + (int8_t)offset ) );
@@ -1767,7 +1768,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x43:
 				printf( "LD (%X),BC", readNextWord() );
-				LD16( getWordAt( getNextWord() ) ,reg->bc );				
+				LD16( getWordAt( getNextWord() ) ,reg->bc );
 				break;
 			case 0x46:
 				printf( "IM 0" );
@@ -1791,10 +1792,10 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x53:
 				printf( "LD (%X),DE", readNextWord() );
-				LD16( getWordAt( getNextWord() ) ,reg->de );				
+				LD16( getWordAt( getNextWord() ) ,reg->de );
 				break;
 			case 0x56:
-				printf( "IM 1" ); 
+				printf( "IM 1" );
 				IM1( reg->mode );
 				break;
 			case 0x57:
@@ -1827,7 +1828,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x78:
 				printf( "IN A,(C)" );
-	
+
 				IN( reg->a, reg->b, (*portPtrs[254])( READ, *reg->b )/*readPort( port )*/, reg->f );
 				break;
 			case 0x7B:
@@ -1934,11 +1935,11 @@ void execute( uint8_t* opcode ){
 			switch( *(getNextByte()) ){
 			case 0x21:
 				printf( "LD IY,+%X", readNextWord() );
-				LD16( reg->iy, getNextWord() );				
+				LD16( reg->iy, getNextWord() );
 				break;
 			case 0x22:
 				printf( "LD (%X),IY", readNextWord() );
-				LD16( getWordAt( getNextWord() ) , reg->iy );	
+				LD16( getWordAt( getNextWord() ) , reg->iy );
 				break;
 			case 0x23:
 				printf( "INC IX" );
@@ -1963,31 +1964,31 @@ void execute( uint8_t* opcode ){
 			case 0x36:
 				printf( "LD (IY+%X),%02X**", (int8_t)readNextByte(), readByteAt( *reg->pc+2 ) );
 				LD( getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ), getByteAt( *reg->pc+2 ) );
-				getNextByte();				
+				getNextByte();
 				break;
 			case 0x46:
 				printf( "LD B,(IY+%X)", (int8_t)readNextByte() );
-				LD( reg->b, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->b, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x4E:
 				printf( "LD C,(IY+%X)",(int8_t) readNextByte() );
-				LD( reg->c, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
-				break;	
+				LD( reg->c, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
+				break;
 			case 0x56:
 				printf( "LD D,(IY+%X)",(int8_t) readNextByte() );
-				LD( reg->d, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->d, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x5E:
 				printf( "LD E,(IY+%X)",(int8_t) readNextByte() );
-				LD( reg->e, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->e, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x66:
 				printf( "LD H,(IY+%X)",(int8_t) readNextByte() );
-				LD( reg->h, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->h, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x6E:
 				printf( "LD L,(IY+%X)",(int8_t) readNextByte() );
-				LD( reg->l, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) ); 
+				LD( reg->l, getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ) );
 				break;
 			case 0x70:
 				printf( "LD (IY+%X),B",(int8_t) readNextByte() );
@@ -2016,10 +2017,10 @@ void execute( uint8_t* opcode ){
 			case 0x77:
 				printf( "LD (IY+%X),A",(int8_t) readNextByte() );
 				LD( getByteAt( *reg->iy +(int8_t) *( getNextByte() ) ), reg->a );
-				break;	
+				break;
 			case 0x7E:
 				printf( "LD A,(IY+%X",(int8_t) readNextByte() );
-				LD( reg->a, getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ) );  
+				LD( reg->a, getByteAt( *reg->iy + (int8_t)*( getNextByte() ) ) );
 				break;
 			case 0x86:
 				printf( "ADD (IY+%X)",(int8_t) readNextByte() );
@@ -2055,7 +2056,7 @@ void execute( uint8_t* opcode ){
 					case 0x06:
 						printf( "RLC(IY+%X)", offset );
 						RLC( getByteAt( *reg->iy + (int8_t) *( getNextByte() ) ), reg->f );
-						break;	
+						break;
 					case 0x0E:
 						break;
 					case 0x16:
@@ -2066,12 +2067,12 @@ void execute( uint8_t* opcode ){
 						break;
 					case 0x2E:
 						break;
-					case 0x3E:	
+					case 0x3E:
 						break;
 					case 0x46:
 						printf( "BIT 0, (IY+%X)",(int8_t) offset );
 						BIT( 0, getByteAt( *reg->iy +(int8_t) offset ), reg->f );
-						break;break;	
+						break;break;
 					case 0x4E:
 						printf( "BIT 1, (IY+%X)",(int8_t) offset );
 						BIT( 1, getByteAt( *reg->iy +(int8_t) offset ), reg->f );
@@ -2103,7 +2104,7 @@ void execute( uint8_t* opcode ){
 					case 0x86:
 						printf( "RES 0, (IY+%X)",(int8_t) offset );
 						RES( 0, getByteAt( *reg->iy +(int8_t) offset ) );
-						break;	
+						break;
 					case 0x8E:
 						printf( "RES 1, (IY+%X)",(int8_t) offset );
 						RES( 1, getByteAt( *reg->iy +(int8_t) offset ) );
@@ -2135,13 +2136,13 @@ void execute( uint8_t* opcode ){
 					case 0xC6:
 						printf( "SET 0, (IY+%X)", (int8_t)offset );
 						SET( 0, getByteAt( *reg->iy +(int8_t) offset ) );
-						break;	
+						break;
 					case 0xCE:
 						printf( "SET 1, (IY+%X) ",(int8_t) offset );
 						SET( 1, getByteAt( *reg->iy + (int8_t)offset ) );
 						break;
 					case 0xD6:
-						printf( "SET 2, (IY+%X) ",(int8_t) offset );	
+						printf( "SET 2, (IY+%X) ",(int8_t) offset );
 						SET( 2, getByteAt( *reg->iy +(int8_t) offset ) );
 						break;
 					case 0xDE:
@@ -2203,15 +2204,15 @@ void execute( uint8_t* opcode ){
 			break;
 		default:
 			break;
-		} 
-		
+		}
+
 		printf( "\n");
 }
 
 // Return the 16-bit value of two 8-bit combined registers
 uint16_t byteToWord( uint8_t *byte1, uint8_t *byte2 ){
 	uint16_t word = 0x00;
-	
+
 	word = (word | *byte1);
 
 	word <<= 8;
@@ -2246,7 +2247,7 @@ uint8_t readNextByte(){
 }
 
 uint16_t* getNextWord(){
-	// Dereference into the memory location and return the word of the next two bytes	
+	// Dereference into the memory location and return the word of the next two bytes
 	uint16_t* word = getWord( ++*reg->pc );
 	// Increment pc again to point at at the second byte in the word, ready for next increment by execution loop
 	++*reg->pc;
@@ -2261,9 +2262,9 @@ uint16_t readNextWord(){
 
 uint8_t* getByteAt( uint16_t addrs ){
 
-	uint8_t* byte = getByte( addrs );	
-	// Return a pointer to the byte at a given 16-bit memory address	
-	return byte;	
+	uint8_t* byte = getByte( addrs );
+	// Return a pointer to the byte at a given 16-bit memory address
+	return byte;
 }
 
 uint16_t* getWordAt( uint16_t* addrs ){
@@ -2288,7 +2289,7 @@ void writeByte( uint16_t addrs, uint8_t val ){
 uint8_t readPort(uint16_t portAddrs){
 
 	// If called from IN r,(C) then only need to be concerned with lower-half port address 0x00FE
-	if( portAddrs == 0x00FE ){ 
+	if( portAddrs == 0x00FE ){
 		return 0x1F;
 	}
 
@@ -2303,7 +2304,7 @@ uint8_t readPort(uint16_t portAddrs){
 			break;
 		case 0xFBFE:
 			return 0xBF;
-			break;					
+			break;
 		case 0xF7FE:
 			return 0xBF;
 			break;
@@ -2325,6 +2326,3 @@ uint8_t readPort(uint16_t portAddrs){
 
 	return 0;
 }
-
-
-
