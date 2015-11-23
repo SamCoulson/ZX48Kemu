@@ -1,25 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <conio.h>
 #include <curses.h>
+#include "../include/gui_ncurses.h"
 #include "../include/console.h"
 #include "../include/cpu.h"
 #include "../include/util_bit_operations.h"
 
 extern Registers *reg;
 
+int key = 0;
+
 void console(){
+
+	// Curses must be initialised first
+  initscr();
+  // Disable buffering so that keys presses are sent straight away not at new line
+  cbreak();
+  // Disable echo so that keys are not printed back to the screen
+  noecho();
+	// Make getch a non blocking called
+	nodelay(stdscr, TRUE);
+
+  // Get the terminal window size
+  int h, w;
+  getmaxyx(stdscr, h, w);
+
+  // A refresh of stdscr must be called before windows can be drawn
+  refresh();
+
+  // Create window
+  WINDOW* win = createWindow(20, 60, 1, 1, "CPU Registers");
+
+	// Print out all cpu register values
+	mvwprintw(win, 3, 1, "AF: %02x %02x", *reg->a, *reg->f);
+	mvwprintw(win, 3, 15, "AF': %02x %02x",*reg->alta, *reg->altf );
+	mvwprintw(win, 4, 1, "BC: %02x %02x", *reg->b, *reg->c );
+	mvwprintw(win, 4, 15, "BC': %02x %02x", *reg->altb, *reg->altc );
+	mvwprintw(win, 5, 1, "DE: %02x %02x", *reg->d, *reg->e );
+	mvwprintw(win, 5, 15, "DE': %02x %02x", *reg->altd, *reg->alte );
+
+	mvwprintw(win, 6, 1, "HL: %02x %02x", *reg->h, *reg->l );
+	mvwprintw(win, 6, 15, "HL': %02x %02x", *reg->alth, *reg->altl );
+
+	mvwprintw(win, 8, 1, "SP: %04x", *reg->sp );
+	mvwprintw(win, 9, 1, "PC: %04x", *reg->pc );
+
+	mvwprintw(win, 8, 15, "IX: %04x", *reg->ix );
+	mvwprintw(win, 9, 15, "IY: %04x", *reg->iy );
+
+	mvwprintw(win, 11, 1, "I: %02x", *reg->i );
+	mvwprintw(win, 11, 15, "R: %02x", *reg->r );
+
+	mvwprintw(win, 13, 1, "EFF 1: %d", *reg->iff2 );
+	mvwprintw(win, 13, 15, "EFF 2: %d", *reg->iff1 );
+
+	// Window must be refreshed before text will appear
+	wrefresh(win);
+
+  // Wait for input from keyboard or mouse
+  //int key = getch();
+
+  // Must be called to restore terminal settings
+  //endwin();
+
 	static uint8_t stepMode = 1;
 
-	static int key = 0;
+
 	static int mode = 0;
 
 	//system("cls");
 
 	if( *reg->pc == 0x18E1 )
 		stepMode = 1;
-
+/*
 	if( mode == 0 ){
+
 		printf("\nMain registers\tAlternate registers\n");
 		printf("AF: %02x %02x", *reg->a, *reg->f );
 		printf("\tAF': %02x %02x\n",*reg->alta, *reg->altf );
@@ -64,7 +119,7 @@ void console(){
 
 		}
 	printf("\n" );
-	}
+}*/
 
 	// Prints the channels
 	if( mode == 1 ){
@@ -169,11 +224,13 @@ void console(){
 		}
 	}
 
+	int newkey = getch();
 
-	//if( kbhit() || stepMode ){
-		key = getch();
+	if( newkey != key ) key = newkey;
 
-	  printf("key press = %d\n", key);
+	if( key != ERR /*|| stepMode*/ ){
+
+	  //printf("key press = %d\n", key);
 
 		if( key == 113 ){
 			exit(1); // key q
@@ -191,4 +248,4 @@ void console(){
 			mode = 3; // k key
 		}
 	}
-//}
+}
