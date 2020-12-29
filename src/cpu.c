@@ -24,7 +24,7 @@
 
 // Declare and initialise structure of pointers to register unions, this must be here not in the .h file
 static Registers registers = {
-        // Assign const pointers to main registers
+  // Assign const pointers to main registers
 	.a = &af._af[1], .f = &af._af[0], .af = &af.af,
 	.b = &bc._bc[1], .c = &bc._bc[0], .bc = &bc.bc,
 	.d = &de._de[1], .e = &de._de[0], .de = &de.de,
@@ -38,7 +38,7 @@ static Registers registers = {
 	.i = &ir._ir[1], .r = &ir._ir[0], .ir = &ir.ir,
 	// 16-bit index registers
 	.ix = &ix, .iy = &iy,
-      	// 16-bit stack pointer and program pointer
+  // 16-bit stack pointer and program pointer
 	.sp = &sp, .pc = &pc,
 	// IFF (Interrupt enabled flip-flop)
 	.iff1 = &iff1, .iff2 = &iff2,
@@ -156,7 +156,7 @@ void run( uint16_t addrs ){
 
 		// R Register should be implemented, 7-bits are incremented after each instruction fetch
 
-		// Computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed
+		// Computer memory because the capacitors holding 1/0 state loose charge and so need to be refreshed
 
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
 		if( *reg->pc == 0x11DC ){

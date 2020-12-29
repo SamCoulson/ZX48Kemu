@@ -122,11 +122,11 @@ void console(){
 }*/
 
 	// Prints the channels
-	if( mode == 1 ){
+	/*if( mode == 1 ){
 		for( int i = 0x5CB6; i < 0x5CD7; i+=2 ){
 			printf("\n%X %02X %02X", i, totalMem[i], totalMem[i+1] );
 		}
-	}
+	}*/
 
 	// Print content of video memory
 	if( mode == 3 ){
@@ -233,6 +233,7 @@ void console(){
 	  //printf("key press = %d\n", key);
 
 		if( key == 113 ){
+      endwin();
 			exit(1); // key q
 		}else if( key == 115 ){
 			mode = 0; // key s

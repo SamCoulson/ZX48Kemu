@@ -11,12 +11,12 @@
 
 // Declare and initialise a register set for testing
 static Registers registers = {
-        // Assign const pointers to main registers	
+        // Assign const pointers to main registers
 	.a = &af._af[1], .f = &af._af[0], .af = &af.af,
 	.b = &bc._bc[1], .c = &bc._bc[0], .bc = &bc.bc,
 	.d = &de._de[1], .e = &de._de[0], .de = &de.de,
 	.h = &hl._hl[1], .l = &hl._hl[0], .hl = &hl.hl,
-	// Assign const pointers to alternative registers 
+	// Assign const pointers to alternative registers
 	.alta = &altaf._af[1], .altf = &altaf._af[0], .altaf = &altaf.af,
 	.altb = &altbc._bc[1], .altc = &altbc._bc[0], .altbc = &altbc.bc,
 	.altd = &altde._de[1], .alte = &altde._de[0], .altde = &altde.de,
@@ -28,7 +28,7 @@ static Registers registers = {
       	// 16-bit stack pointer and program pointer
 	.sp = &sp, .pc = &pc,
 	// IFF (Interrupt enabled flip-flop)
-	.iff1 = &iff1, .iff2 = &iff2 	
+	.iff1 = &iff1, .iff2 = &iff2
 };
 
 // Pointer to the register structure
@@ -61,19 +61,19 @@ int resetCPU(){
 }
 
 static void test_bit_manipulation(){
-	
-	// Test Bit 
+
+	// Test Bit
 	resetCPU();
 	// Signed bit is 0
 	uint8_t foo = 0x0;
-	printf("Signed bit = %d\n", (foo & ( 1 << 7 ) ) ); 
+	printf("Signed bit = %d\n", (foo & ( 1 << 7 ) ) );
 	foo |= ( 1 << 7 );
 	printf("Signed bit = %d\n", (foo & ( 1 << 7 ) ) );
-		
+
 }
 
 static void test_8bit_add(){
-	
+
 	// Test Carry flag
 	resetCPU();
 	*reg->a = 128;
@@ -94,30 +94,30 @@ static void test_8bit_add(){
 	*reg->b = 64; // 0100 0000
 	ADD( reg->a, reg->b, reg->f );
 	assert( *reg->a == 128 && getBit( reg->f, 2 ) == 0x01  && "test_8bit_add() - P/V Flag" );
-	
+
 	// Test H (Half carry) flag
 	//resetCPU();
 	//*reg->a = 4;
 	//*reg->b = 4;
 	//ADD( reg->a, reg->b, reg->f );
 	//assert( *reg->a == 8 && getBit( reg->f, 4 ) == 0x01  && "test_8bit_add() - H Flag" );
-	
+
 	const uint8_t values[6] = { 0, 1, 127, 128, 129, 255 };
 
 	resetCPU();
 	for( int i = 0; i < sizeof( values ); i++){
 
-		*reg->a = values[i]; 
-		printf("Uint Sint  Uint Sint\n");	
+		*reg->a = values[i];
+		printf("Uint Sint  Uint Sint \tUint Sint\n");
 
 		for( int j = 0; j < sizeof( values ); j++ ){
-			
+
 			*reg->b = values[j];
-			
-			printf("%3d(%4d) + %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b, (int8_t)*reg->b ); 
-			
+
+			printf("%3d(%4d) + %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b, (int8_t)*reg->b );
+
 			ADD( reg->a, reg->b, reg->f );
-		
+
 			printf(" %3d(%4d) C = %d V = %d\n", *reg->a, (int8_t)*reg->a, getBit( reg->f, 0 ),
 			     getBit( reg->f, 2 ) );
 			// Reset a
@@ -148,30 +148,30 @@ static void test_8bit_sub(){
 	*reg->b = 128; // 0100 0000
 	SUB( reg->a, reg->b, reg->f );
 	assert( *reg->a == 0 && getBit( reg->f, 2 ) == 0x01  && "test_8bit_sub() - P/V Flag" );
-	
+
 	// Test H (Half carry) flag
 	//resetCPU();
 	//*reg->a = 4;
 	//*reg->b = 4;
 	//ADD( reg->a, reg->b, reg->f );
 	//assert( *reg->a == 8 && getBit( reg->f, 4 ) == 0x01  && "test_8bit_add() - H Flag" );
-	
+
 	const uint8_t values[6] = { 0, 1, 127, 128, 129, 255 };
 
 	resetCPU();
 	for( int i = 0; i < sizeof( values ); i++){
 
-		*reg->a = values[i]; 
-		printf("Uint Sint  Uint Sint\n");	
+		*reg->a = values[i];
+		printf("Uint Sint  Uint Sint\n");
 
 		for( int j = 0; j < sizeof( values ); j++ ){
-			
+
 			*reg->b = values[j];
-			
-			printf("%3d(%4d) - %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b, (int8_t)*reg->b ); 
-			
+
+			printf("%3d(%4d) - %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b, (int8_t)*reg->b );
+
 			SUB( reg->a, reg->b, reg->f );
-		
+
 			printf(" %3d(%4d) C = %d V = %d\n", *reg->a, (int8_t)*reg->a, getBit( reg->f, 0 ),
 			     getBit( reg->f, 2 ) );
 			// Reset a
@@ -179,7 +179,7 @@ static void test_8bit_sub(){
 		}
 
 	}
-	
+
 
 }
 
@@ -190,32 +190,32 @@ static void test_16bit_add(){
 	*reg->de = 32768;
 	printf("%d + %d", *reg->bc, *reg->de);
 	ADD16( reg->bc, reg->de, reg->f );
-	printf(" = %d\n", *reg->bc );	
+	printf(" = %d\n", *reg->bc );
 	printf("Carry flag = %d\n", getBit( reg->f, 0 ) );
 	assert( *reg->bc == 0x00 && getBit( reg->f, 0) == 0x01  && "test_16bit_sub() - Carry Flag" );
-	
+
 	// test half carry
 	resetCPU();
 	*reg->bc = 128;
 	*reg->de = 128;
 	printf("%d + %d", *reg->bc, *reg->de);
 	ADD16( reg->bc, reg->de, reg->f );
-	printf(" = %d\n", *reg->bc );	
+	printf(" = %d\n", *reg->bc );
 	printf("Half Carry flag = %d\n", getBit( reg->f, 4 ) );
 	assert( *reg->bc == 256 && getBit( reg->f, 4) == 0x01  && "test_16bit_sub() - Carry Flag" );
-	
-	
+
+
 }
 
 int main( int argc, char* argv[] ){
 
 	printf("Testing started!\n");
-	//test_bit_manipulation();
+	test_bit_manipulation();
 
 	printf("Testing 8Bit ADD\n");
 	test_8bit_add();
 	printf("Testing 8Bit ADD successful\n");
-	
+
 	printf("Testing 8Bit SUB\n");
 	test_8bit_sub();
 	printf("Testing 8Bit SUB successful\n");
