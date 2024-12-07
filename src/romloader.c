@@ -1,5 +1,8 @@
 #include "../include/romloader.h"
 
+unsigned char *romMemPtr; 
+int romFileSize; 
+
 int loadROMFile(const char* filename){
 
 	// ROMfile handle

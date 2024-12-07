@@ -3,73 +3,36 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "memory.h"
+//#include "memory.h"
 
 #define READ 0
 #define WRITE 1
 
-// 8-Bit Z80 main general purpose registers
-union _AF{
-	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
-	uint16_t af;
-}af;
+extern union _AF af;
+extern union _BC bc;
+extern union _DE de;
+extern union _HL hl;
+extern union _ALTAF altaf;
+extern union _ALTBC altbc;
+extern union _ALTDE altde;
+extern union _ALTHL althl;
 
-union _BC{
-	uint8_t _bc[2];		// Byte counter
-	uint16_t bc;
-}bc;
-
-union _DE{
-	uint8_t _de[2];
-	uint16_t de;
-}de;
-	
-union _HL{
-	uint8_t _hl[2];
-	uint16_t hl;
-}hl;
-
-// 8-Bit Z80 alternative general purpose registers
-union _ALTAF{
-	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
-	uint16_t af;
-}altaf;
-
-union _ALTBC{
-	uint8_t _bc[2];		// Byte counter
-	uint16_t bc;
-}altbc;
-
-union _ALTDE{
-	uint8_t _de[2];
-	uint16_t de;
-}altde;
-	
-union _ALTHL{
-	uint8_t _hl[2];
-	uint16_t hl;
-}althl;
-
-// 8-Bit special registers - Interrupt vector
-union _IR{
-	uint8_t _ir[2];
-	uint16_t ir;
-}ir;
+extern union _IR ir;
 
 // 16-Bit index registers
-uint16_t ix;
-uint16_t iy;
+extern uint16_t ix;
+extern uint16_t iy;
 
 // 16-Bit stack pointer and program counter 
-uint16_t sp;
-uint16_t pc; // AKA Instruction pointer
+extern uint16_t sp;
+extern uint16_t pc; // AKA Instruction pointer
 
 // IFFI (Interrupt enabled flip-flop)
-int iff1;
-int iff2;
+extern int iff1;
+extern int iff2;
 
 // Mode ( CPU mode )
-int mode;
+extern int mode;
 
 // Structure to hold pointers to all register union
 typedef struct _REGISTERS{
@@ -129,6 +92,8 @@ typedef struct _REGISTERS{
 	int* const mode;
 
 }Registers;
+
+extern Registers* reg;
 
 //uint8_t ports[256];
 

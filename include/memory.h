@@ -19,6 +19,6 @@ uint16_t* getWord( uint16_t addrs );
 void setByte(uint16_t loc, uint8_t val);
 
 // Total 64K Spectrum memory
-unsigned char totalMem[65536];
+extern unsigned char totalMem[65536];
 
 #endif // INC_MEMORY_H

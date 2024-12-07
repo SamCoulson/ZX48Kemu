@@ -7,7 +7,8 @@
 #define SCREEN_Y_START 50
 
 
-SDL_Surface* screen = NULL;
+SDL_Window* screen = NULL;
+SDL_Renderer* sdlRenderer = NULL;
 SDL_Event event;
 
 int initSDL(){
@@ -22,15 +23,21 @@ int initSDL(){
 	}
 
 	 //Set up screen
-	screen = SDL_SetVideoMode( 356, 292, 8, SDL_HWSURFACE );
+	screen = SDL_CreateWindow("ZX48KEmu", 
+			SDL_WINDOWPOS_UNDEFINED, 
+			SDL_WINDOWPOS_UNDEFINED, 
+			356, 292, 
+			SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
+
+	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
 
 	//Apply image to screen
-	//SDL_BlitSurface( hello, NULL, screen, NULL );
 
-	SDL_FillRect( SDL_GetVideoSurface(), NULL, SDL_MapRGB( screen->format, 0, 0, 0 )  );
+	SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
+	SDL_RenderClear(sdlRenderer);
+	SDL_RenderPresent(sdlRenderer);
 
 	//Update Screen
-	SDL_Flip( screen );
 
 /*
 	// Test 8x8 block for screen
@@ -149,11 +156,11 @@ void updateScreen(){
 	int third = 0;
 		
 	// Determine picel colors
-	Uint32 foreground = SDL_MapRGB( screen->format, 0, 0, 0 ); 
-	Uint32 background = SDL_MapRGB( screen->format, 255, 255, 255 );
-	
+	//Uint32 foreground = SDL_MapRGB( screen->format, 0, 0, 0 ); 
+	//Uint32 background = SDL_MapRGB( screen->format, 255, 255, 255 );
+
 	// Set the whole screen to what ever border colour is
-	SDL_FillRect( screen, NULL, background );
+	SDL_RenderPresent( sdlRenderer );
 
 	// Loop through the thirds
 	for( int i = 0; i < 3; i++ ){
@@ -173,9 +180,14 @@ void updateScreen(){
 					for( bit = 7; bit > -1; bit-- ){
 						// Set on pixel to forground color
 						if( pixel & (1 << (bit) ) ){
-							putColor( screen, x, y, foreground );
+							//putColor( screen, x, y, foreground );
+							SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
+							SDL_RenderDrawPoint(sdlRenderer, x, y);
 						}else{
-							putColor( screen, x, y, background );
+
+							SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
+							SDL_RenderDrawPoint(sdlRenderer, x, y);
+							//putColor( screen, x, y, background );
 						}
 						x++;
 					}
@@ -191,7 +203,8 @@ void updateScreen(){
 		vidStart += 1792; // Move pointer forwards to start of the next set of bytes for the next third 
 	}
 
-	SDL_Flip( screen );
+	SDL_RenderPresent( sdlRenderer );
+
 }
 
 void putColor(SDL_Surface *surface, int x, int y, Uint32 color){

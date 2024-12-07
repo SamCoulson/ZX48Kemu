@@ -18,9 +18,71 @@
 #include "../include/util_bit_operations.h"
 #include "../include/ULA.h"
 #include "../include/console.h"
+#include "../include/memory.h"
 #include "../include/keyboard.h"
 
 #define BUF_SIZE 5
+int mode;
+uint16_t ix;
+uint16_t iy;
+
+// 16-Bit stack pointer and program counter 
+uint16_t sp;
+uint16_t pc; // AKA Instruction pointer
+
+// IFFI (Interrupt enabled flip-flop)
+int iff1;
+int iff2;
+
+// 8-Bit Z80 main general purpose registers
+union _AF{
+	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
+	uint16_t af;
+}af;
+
+union _BC{
+	uint8_t _bc[2];		// Byte counter
+	uint16_t bc;
+}bc;
+
+union _DE{
+	uint8_t _de[2];
+	uint16_t de;
+}de;
+	
+union _HL{
+	uint8_t _hl[2];
+	uint16_t hl;
+}hl;
+
+
+union _ALTAF{
+	uint8_t _af[2];		// Accumulater	// Flags register (Set = 1, Reset = 0)
+	uint16_t af;
+}altaf;
+
+union _ALTBC{
+	uint8_t _bc[2];		// Byte counter
+	uint16_t bc;
+}altbc;
+
+union _ALTDE{
+	uint8_t _de[2];
+	uint16_t de;
+}altde;
+	
+union _ALTHL{
+	uint8_t _hl[2];
+	uint16_t hl;
+}althl;
+
+
+// 8-Bit special registers - Interrupt vector
+union _IR{
+	uint8_t _ir[2];
+	uint16_t ir;
+}ir;
+
 
 // Declare and initialise structure of pointers to register unions, this must be here not in the .h file
 static Registers registers = {
@@ -122,8 +184,7 @@ void run( uint16_t addrs ){
 			if( *reg->iff1 != 0 ){
 				readKeys();
 
-			}
-			// Emulate keyboard interrupt (Maskable interupt RST38)
+			} // Emulate keyboard interrupt (Maskable interupt RST38)
 			*reg->pc = 0x0038;
 
 

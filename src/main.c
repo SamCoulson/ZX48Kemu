@@ -1,7 +1,4 @@
-#include "SDL/SDL.h"
-#include "../include/cpu.h"
-#include "../include/ULA.h"
-#include "../include/memory.h"
+#include "SDL2/SDL.h"
 #include "../include/romloader.h"
 #include "../include/screen.h"
 #include <stdio.h>

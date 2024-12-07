@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 // Size of ROM file
-int romFileSize; 
+extern int romFileSize; 
 
 // Loads the ROM image into the memory
 int loadROMFile( const char* filename );
@@ -22,6 +22,6 @@ void dumpROMData();
 
 // Pointer to memory holding ROM data
 // ROM memory pointer
-unsigned char *romMemPtr; 
+extern unsigned char *romMemPtr; 
 
 #endif // INC_ROMLOADER_H
