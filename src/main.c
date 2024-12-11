@@ -1,16 +1,16 @@
-#include "SDL2/SDL.h"
+#include "raylib.h"
 #include "../include/romloader.h"
 #include "../include/screen.h"
 #include <stdio.h>
 
-int main(int argc, char *argv[] ){
+int main(){
 
 	// Re-direct output to console as SDL will disable it *Windows only*
 	//freopen( "CON" ,"w", stdout);
 
 	printf( "Output to console enabled\n");
-
-	initSDL();
+ 	
+	initWindow();
 
 	// Load the spectrum 48K ROM from file
 	loadROMFile( "48.rom" );
@@ -21,12 +21,13 @@ int main(int argc, char *argv[] ){
 	// Start at address 0x00
 	//initCPU();
 	initULA();
+
 	// Begin executing code from 0x00
 	run( 0x0000 );
 
 	getchar();
 
-	SDL_Quit();
+	CloseWindow();
 
 	return 0;
 }

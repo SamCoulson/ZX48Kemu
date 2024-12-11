@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include "../include/screen.h"
 #include "../include/memory.h"
 
@@ -6,40 +7,18 @@
 #define SCREEN_X_START 50
 #define SCREEN_Y_START 50
 
+int initWindow(){
 
-SDL_Window* screen = NULL;
-SDL_Renderer* sdlRenderer = NULL;
-SDL_Event event;
+	const int screenWidth = 640;
+	const int screenHeight = 480;
 
-int initSDL(){
+	//initSDL();
+	InitWindow(screenWidth, screenHeight, "ZX Spectrum emulator");
 
-	//Start SDL
-	int result = SDL_Init( SDL_INIT_VIDEO );
+	BeginDrawing();
+		ClearBackground(RAYWHITE);
+	EndDrawing();                     
 
-	if(result != 0)
-	{
-		printf("Could not initialise SDL\n");
-		return 1;
-	}
-
-	 //Set up screen
-	screen = SDL_CreateWindow("ZX48KEmu", 
-			SDL_WINDOWPOS_UNDEFINED, 
-			SDL_WINDOWPOS_UNDEFINED, 
-			356, 292, 
-			SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
-
-	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
-
-	//Apply image to screen
-
-	SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
-	SDL_RenderClear(sdlRenderer);
-	SDL_RenderPresent(sdlRenderer);
-
-	//Update Screen
-
-/*
 	// Test 8x8 block for screen
 	totalMem[ 0x4000 ] = 0x00;
 	totalMem[ 0x4100 ] = 0x3C;
@@ -133,34 +112,23 @@ int initSDL(){
 	totalMem[ 0x55E0 ] = 0xFF;
 	totalMem[ 0x56E0 ] = 0xFF;
 	totalMem[ 0x57E0 ] = 0xFF;
-*/	
+
 
 	return 0;
 }
 
 void updateScreen(){
-
-	SDL_PollEvent( &event );
-
-	// Row counter
-	uint8_t column = 0, row = 0;	
 	
+	BeginDrawing();
+
 	int x = SCREEN_X_START, y = SCREEN_Y_START; // Pixel coords
 
-	int scale = 8; // Scale for different screen ratio's.
-	
 	uint16_t vidStart = 0x4000;
 	uint16_t vidBufLoc = vidStart; // Current address into memory buffer	
 	
 	int bit = 0;
-	int third = 0;
-		
-	// Determine picel colors
-	//Uint32 foreground = SDL_MapRGB( screen->format, 0, 0, 0 ); 
-	//Uint32 background = SDL_MapRGB( screen->format, 255, 255, 255 );
 
 	// Set the whole screen to what ever border colour is
-	SDL_RenderPresent( sdlRenderer );
 
 	// Loop through the thirds
 	for( int i = 0; i < 3; i++ ){
@@ -180,14 +148,9 @@ void updateScreen(){
 					for( bit = 7; bit > -1; bit-- ){
 						// Set on pixel to forground color
 						if( pixel & (1 << (bit) ) ){
-							//putColor( screen, x, y, foreground );
-							SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
-							SDL_RenderDrawPoint(sdlRenderer, x, y);
+							DrawPixel(x, y, BLACK);
 						}else{
-
-							SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
-							SDL_RenderDrawPoint(sdlRenderer, x, y);
-							//putColor( screen, x, y, background );
+							DrawPixel(x, y, WHITE);
 						}
 						x++;
 					}
@@ -203,45 +166,36 @@ void updateScreen(){
 		vidStart += 1792; // Move pointer forwards to start of the next set of bytes for the next third 
 	}
 
-	SDL_RenderPresent( sdlRenderer );
-
+	EndDrawing();
 }
 
-void putColor(SDL_Surface *surface, int x, int y, Uint32 color){
 
-	int bpp = surface->format->BytesPerPixel;
 
-	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-	switch( bpp ) 
-	{
-	    case 1:
-		*p = color;
-		break;
 
-	    case 2:
-		*(Uint16 *)p = color;
-		break;
 
-	    case 3:
-		if(SDL_BYTEORDER == SDL_BIG_ENDIAN) 
-			{
-		    p[0] = (color >> 16) & 0xff;
-		    p[1] = (color >> 8) & 0xff;
-		    p[2] = color & 0xff;
-		} 
-			else 
-			{
-		    p[0] = color & 0xff;
-		    p[1] = (color >> 8) & 0xff;
-		    p[2] = (color >> 16) & 0xff;
-		}
-		break;
 
-	    case 4:
-		*(Uint32 *)p = color;
-		break;
-	}
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
