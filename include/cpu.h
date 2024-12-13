@@ -98,7 +98,7 @@ extern Registers* reg;
 //uint8_t ports[256];
 
 // Start the CPU running
-void run( uint16_t addrs );
+extern void run( uint16_t addrs );
 
 int initCPU();
 

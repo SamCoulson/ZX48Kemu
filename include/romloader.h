@@ -9,7 +9,7 @@
 extern int romFileSize; 
 
 // Loads the ROM image into the memory
-int loadROMFile( const char* filename );
+extern int loadROMFile( const char* filename );
 
 // Returns a pointer to the beginning of the loaded data
 uint8_t* getROMData();

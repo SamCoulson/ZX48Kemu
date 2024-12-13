@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // Loads the system ROM data into memory
-int loadROM( uint8_t* src, unsigned int noBytes);
+extern int loadROM( uint8_t* src, unsigned int noBytes);
 
 // Output the ROM file contents to a text file
 void memDump();

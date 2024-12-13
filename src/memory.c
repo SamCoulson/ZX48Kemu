@@ -26,7 +26,7 @@ void memDump(){
 	// Point at beginning of memory
 	ROM = totalMem;	
 
-	printf( "Size of memory is %d KBytes\n", sizeof(totalMem)/1024);
+	printf( "Size of memory is %lu KBytes\n", sizeof(totalMem)/1024);
 
 	for(int i = 0; i < 5/*sizeof(totalMem)*/; i++ ){
 		if(ROM[i] == 0x0d)

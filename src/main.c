@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include "../include/romloader.h"
 #include "../include/screen.h"
+#include "../include/cpu.h"
+#include "../include/memory.h"
+#include "../include/ULA.h"
 #include <stdio.h>
 
 int main(){

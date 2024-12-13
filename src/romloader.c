@@ -35,7 +35,12 @@ int loadROMFile(const char* filename){
 		}
 
 		// Read in all the data into the memory buffer
-		fread( romMemPtr, size, 1, romFile );
+		const size_t ret_code = fread( romMemPtr, size, 1, romFile );
+
+		if (ret_code == size)
+		{
+			printf("Successfully read rom in to memory\n");
+		}	
 
 		// Add termination character
 		romMemPtr[size+1] = '\0';
