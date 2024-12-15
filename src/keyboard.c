@@ -1,7 +1,4 @@
-#include "SDL2/SDL.h"
 #include "../include/keyboard.h"
-
-extern SDL_Event event;
 
 // The keyboard can be directly accessed by the Z80 cpu, by way of the upper-half of the 8-15 bits
 // of the address bus.  When it does this, a specific row of the 8 posible rows will be specified,
@@ -27,26 +24,26 @@ uint8_t halfRows[8] = { [0 ... 7] = 0xBF };
 // the important thing is that all it does is acts as keybaord unit out side of the CPU.
 void readKeyboard(){
 
-	if( event.type == SDL_KEYDOWN  ){
+	//if( event.type == SDL_KEYDOWN  ){
 			
-		switch( event.key.keysym.sym ){
+	//	switch( event.key.keysym.sym ){
 			// Row 1
-			case SDLK_z:
+	//		case SDLK_z:
 				//key = 0x41; 	
-				break;
-			case SDLK_x:
+	//			break;
+	//		case SDLK_x:
 				//key = 0x41; 	
-				break;
-			case SDLK_c:
+	//			break;
+	//		case SDLK_c:
 				//key = 0x41; 	
-				break;
-			case SDLK_v:
-				halfRows[0] = 0x8F; 	
-				break;
-			default:
-				break;
-		}
-	}
-	halfRows[0] = 0x8F; // *** USE FOR DEBUG TO SIMULATE A KEY PRESS ***
+	//			break;
+	//		case SDLK_v:
+	//			halfRows[0] = 0x8F; 	
+	//			break;
+	//		default:
+	//			break;
+	//	}
+	//}
+//	halfRows[0] = 0x8F; // *** USE FOR DEBUG TO SIMULATE A KEY PRESS ***
 
 }

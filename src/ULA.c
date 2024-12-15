@@ -1,5 +1,5 @@
 #include "../include/cpu.h"
-#include "../include/ULA.h"
+#include "../include/ula.h"
 #include "../include/memory.h"
 #include "../include/screen.h"
 #include "../include/keyboard.h"
@@ -67,7 +67,7 @@ void readKeys(){
 // }
 
 void readVideoRAM( unsigned char* mem ){
-
-	updateScreen();
+	shouldUpdateScreen = true;
+	//updateScreen();
 
 }
