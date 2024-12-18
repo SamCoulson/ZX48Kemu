@@ -19,6 +19,9 @@
 #include "../include/keyboard.h"
 
 #define BUF_SIZE 5
+
+int t_counter = 0;
+
 int mode;
 uint16_t ix;
 uint16_t iy;
@@ -141,7 +144,7 @@ void execute( uint8_t* opcode ){
 
 	uint8_t offset;
 
-	printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
+	//printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
 
 	++*reg->r;
 
@@ -248,6 +251,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x19:
 			printf("ADD HL,DE");
+			t_counter += 11;
 			ADD16( reg->hl, reg->de, reg->f );
 			break;
 		case 0x1A:
@@ -276,6 +280,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x20:
 			printf( "JR NZ,%d", (int8_t)readNextByte() );
+			t_counter += 7;
 			JRNZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x21:
@@ -288,6 +293,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x23:
 			printf( "INC HL" );
+			t_counter += 6;
 			INC16( reg->hl );
 			break;
 		case 0x24:
@@ -307,6 +313,7 @@ void execute( uint8_t* opcode ){
 			break;*/
 		case 0x28:
 			printf( "JR Z,+%X", readNextByte() );
+			t_counter += 12;
 			JRZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x29:
@@ -319,6 +326,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x2B:
 			printf( "DEC HL");
+			t_counter += 6;
 			DEC16( reg->hl );
 			break;
 		case 0x2C:
@@ -339,6 +347,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x30:
 			printf("JR NC,%d", readNextByte() );
+			t_counter += 12;
 			JRNC( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x31:
@@ -359,10 +368,12 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x35:
 			printf( "DEC (HL)" );
+			t_counter += 6;
 			DEC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x36:
 			printf( "LD (HL),+%X", readNextByte() );
+			t_counter += 7;
 			LD( getByteAt( *reg->hl ), getNextByte() );
 			break;
 		case 0x37:
@@ -403,58 +414,72 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x40:
 			printf( "LD B,B" );
+			t_counter += 4;
 			LD( reg->b, reg->b );
 			break;
 		case 0x41:
 			printf( "LD B,C" );
+			t_counter += 4;
 			LD( reg->b, reg->c );
 			break;
 		case 0x42:
 			printf( "LD B,D" );
+			t_counter += 4;
 			LD( reg->b, reg->d );
 			break;
 		case 0x43:
 			printf( "LD B,E" );
+			t_counter += 4;
 			LD( reg->b, reg->e );
 			break;
 		case 0x44:
 			printf( "LD B,H" );
+			t_counter += 4;
 			LD( reg->b, reg->h );
 			break;
 		case 0x45:
 			printf( "LD B,L" );
+			t_counter += 4;
 			LD( reg->b, reg->l );
 			break;
 		case 0x46:
 			printf( "LD B,(HL)" );
+			t_counter += 4;
 			LD( reg->b, getByteAt( *reg->hl ) );
 			break;
 		case 0x47:
 			printf( "LD B,A");
+			t_counter += 4;
 			LD( reg->b, reg->a );
 			break;
 		case 0x48:
 			printf( "LD C,B");
+			t_counter += 4;
 			LD( reg->c, reg->b );
 			break;
 		case 0x49:
 			printf( "LD C,C" );
+			t_counter += 4;
 			LD( reg->c, reg->c );
 			break;
 		case 0x4A:
 			printf( "LD C,D" );
+			t_counter += 4;
 			LD( reg->c, reg->d );
 			break;
 		case 0x4B:
 			printf( "LD C,E" );
+			t_counter += 4;
 			LD( reg->c, reg->e );
 			break;
 		case 0x4C:
 			printf( "LD C,H" );
+			t_counter += 4;
 			LD( reg->c, reg->h );
 			break;
 		case 0x4D:
 			printf( "LD C,L" );
+			t_counter += 4;
 			LD( reg->c, reg->l );
 			break;
 		case 0x4E:
@@ -463,30 +488,37 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x4F:
 			printf( "LD C,A" );
+			t_counter += 4;
 			LD( reg->c, reg->a );
 			break;
 		case 0x50:
 			printf( "LD D,B" );
+			t_counter += 4;
 			LD( reg->d, reg->b );
 			break;
 		case 0x51:
 			printf( "LD D,C" );
+			t_counter += 4;
 			LD( reg->d, reg->c );
 			break;
 		case 0x52:
 			printf( "LD D,D" );
+			t_counter += 4;
 			LD( reg->d, reg->d );
 			break;
 		case 0x53:
 			printf( "LD D,E" );
+			t_counter += 4;
 			LD( reg->d, reg->e );
 			break;
 		case 0x54:
 			printf( "LD D,H" );
+			t_counter += 4;
 			LD( reg->d, reg->h );
 			break;
 		case 0x55:
 			printf( "LD D,L" );
+			t_counter += 4;
 			LD( reg->d, reg->l );
 			break;
 		case 0x56:
@@ -495,14 +527,17 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x57:
 			printf( "LD D,A" );
+			t_counter += 4;
 			LD( reg->d, reg->a );
 			break;
 		case 0x58:
 			printf( "LD E,B" );
+			t_counter += 4;
 			LD( reg->e, reg->b );
 			break;
 		case 0x59:
 			printf( "LD E,C" );
+			t_counter += 4;
 			LD( reg->e, reg->c );
 			break;
 		case 0x5A:
@@ -539,6 +574,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x62:
 			printf( "LD H,D" );
+			t_counter += 4;
 			LD( reg->h, reg->d );
 			break;
 		case 0x63:
@@ -575,6 +611,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0x6B:
 			printf( "LD L,E");
+			t_counter += 4;
 			LD( reg->l, reg->e );
 			break;
 		case 0x6C:
@@ -814,6 +851,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xA7:
 			printf( "AND A" );
+			t_counter += 4;
 			AND( reg->a, reg->a, reg->f );
 			break;
 		case 0xA8:
@@ -898,6 +936,7 @@ void execute( uint8_t* opcode ){
 			break;
 		case 0xBC:
 			printf( "CP H");
+			t_counter += 4;
 			CP( reg->a, reg->h, reg->f );
 			break;
 		case 0xBD:
@@ -1757,6 +1796,7 @@ void execute( uint8_t* opcode ){
 				break;
 			case 0x52:
 				printf( "SBC HL,DE");
+				t_counter += 15;
 				SBC16( reg->hl, reg->de, reg->f );
 				break;
 			case 0x53:

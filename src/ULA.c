@@ -68,6 +68,6 @@ void readKeys(){
 
 void readVideoRAM( unsigned char* mem ){
 	shouldUpdateScreen = true;
-	//updateScreen();
+	updateScreen();
 
 }

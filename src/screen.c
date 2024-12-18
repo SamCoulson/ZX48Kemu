@@ -199,11 +199,11 @@ void updateScreen(){
 			if(strcmp(breakpoint, "0000") == 0)
 			{
 				// avoid pausing straight away
-				printf("ignoring PC");
+				// printf("ignoring PC");
 			}
 			else
 			{
-				printf("**********Breakpoint %s hit", breakpoint);
+				//printf("**********Breakpoint %s hit", breakpoint);
 				paused = true;
 			}
 		}

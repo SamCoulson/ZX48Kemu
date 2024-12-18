@@ -7,7 +7,7 @@
 
 #define READ 0
 #define WRITE 1
-
+extern int t_counter;
 extern union _AF af;
 extern union _BC bc;
 extern union _DE de;
