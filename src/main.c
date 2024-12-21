@@ -1,15 +1,7 @@
-#define _POSIX_C_SOURCE 199309L
-#include <stdio.h>
-#include "raylib.h"
+#include "../include/main.h"
+
 #define RAYGUI_IMPLEMENTATION
-#include <time.h>
-#include <stdint.h>
 #include "../include/raygui.h"
-#include "../include/romloader.h"
-#include "../include/screen.h"
-#include "../include/cpu.h"
-#include "../include/memory.h"
-#include "../include/16-bit_load_group.h"
 
 bool running = true;
 bool paused = false;
@@ -55,31 +47,37 @@ void run( uint16_t addrs ){
 	// DEBUG
 	*reg->pc = 0x0000;
 
-	uint8_t timeToInterrupt = 200;
+//	uint8_t timeToInterrupt = 200;
 
 	struct timespec start, end;
-int i = 0;
+
+	int i = 0;
+
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
 	//While less than 16k rom
 	while( running )
 	{
+
 		if(WindowShouldClose()){
 			exit(1);
 		}
 
-		if( i == 1000000)
+		if( i == 100000)
 		{
 			readVideoRAM( totalMem ); 
 			updateScreen();
 			i = 0;
 		}
-i++;
+
+		i++;
+
 		if(paused)
 		{
 			updateScreen();
+			clock_gettime(CLOCK_MONOTONIC, &start);
 			continue;
 		}
-
-		printf("t_counter = %d\n", t_counter);
 
 		// Execute the instruction pointed to by pc
 		execute( &totalMem[*reg->pc]  );
@@ -87,7 +85,20 @@ i++;
 		// Progess the PC by 1
 		getNextByte();
 
+		clock_gettime(CLOCK_MONOTONIC, &end);
+
+		uint64_t elapsed_ns = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + (end.tv_nsec - start.tv_nsec);
+
+		double elapsed_s = elapsed_ns / 1e9; // Convert to seconds
+		printf("Elapsed time: %ld4ns (%f seconds)\n", elapsed_ns, elapsed_s);
 		// Do interrupts ( Peripheral service routines )
+		if(elapsed_s > 1.0)
+		{
+			printf("**************************************************************t_counter = %d\n", t_counter);
+
+			clock_gettime(CLOCK_MONOTONIC, &start);
+			exit(1);
+		}
 //		if( timeToInterrupt == 0x00 ){
 //			// Automatically save the current PC location on stack
 //			// Need to accomodate autoincrement of PC on return
@@ -158,20 +169,6 @@ i++;
 //			*reg->hl = 0xFFFF;
 //		}
 		
-		if( *reg->pc == 0x11DA )
-		{
-			clock_gettime(CLOCK_MONOTONIC, &start);
-		}		
-
-		if ( *reg->pc == 0x11DC)
-		{	
-			clock_gettime(CLOCK_MONOTONIC, &end);
-
-			uint64_t elapsed_ns = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + (end.tv_nsec - start.tv_nsec);
-
-			double elapsed_s = elapsed_ns / 1e9; // Convert to seconds
-			printf("Elapsed time: %f seconds\n", elapsed_s);
-		}
 		//	*reg->pc = 0x11EF;
 		      // Set HL to +FFFF fro RAM-TOP
 		//	*reg->hl = 0xFFFF;

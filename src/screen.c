@@ -1,12 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include "raylib.h"
-#include "../include/raygui.h"
 #include "../include/screen.h"
-#include "../include/memory.h"
-#include "../include/cpu.h"
-//#include "../include/ula.h"
-#include "../include/util_bit_operations.h"
 
 #define SCREEN_WIDTH 256
 #define SCRREN_HEIGHT 192
@@ -38,7 +30,6 @@ const int stack_box_h = 360;
 const int font_size = 10;
 
 extern bool paused;
-extern bool shouldUpdateScreen;
 
 typedef struct 
 {

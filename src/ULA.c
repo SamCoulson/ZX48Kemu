@@ -1,10 +1,5 @@
-#include "../include/cpu.h"
 #include "../include/ula.h"
-#include "../include/memory.h"
-#include "../include/screen.h"
-#include "../include/keyboard.h"
-#include <stdio.h>
-
+bool shouldUpdateScreen;
 extern uint8_t ports[256];
 
 extern uint8_t halfRows[8];
