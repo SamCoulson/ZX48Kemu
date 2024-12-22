@@ -127,6 +127,9 @@ static void execute_multi_byte_opcode_CB( uint8_t *opcode );
 static void execute_multi_byte_opcode_DD( uint8_t *opcode );
 static void execute_multi_byte_opcode_ED( uint8_t *opcode );
 static void execute_multi_byte_opcode_FD( uint8_t *opcode );
+static void decode_single_byte_opcode(uint8_t *opcode );
+static const char *singleByteInstructionLookup[];
+
 // Takes a port number and maps a function to it.
 void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) ){
 
@@ -149,13 +152,12 @@ void execute( uint8_t* opcode )
 
 	if( *opcode == 0xCB || *opcode == 0xDD || *opcode == 0xED || *opcode == 0xFD)
 	{
-		printf("opcode is multi-byte opcode\n");
+	//	printf("opcode is multi-byte opcode\n");
 		execute_multi_byte_opcode( opcode );
 	}
 	else if ( *opcode >= 0x00 && *opcode <= 0xFF)
 	{
 		execute_single_byte_opcode( opcode );
-		printf("opcode is single byte opcode\n");
 	}
 
 	assert( *opcode >= 0x00 && *opcode <= 0xFF );
@@ -165,1144 +167,903 @@ void execute_single_byte_opcode( uint8_t *opcode )
 {
 	//printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
 
+	//decode_single_byte_opcode( opcode );
+
 	switch( *opcode )
 	{
+	
+	//	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x47: case 0x48: case 0x49: case 0x4A: case 0x4B: case 0x4C: case 0x4D: case 0x4F:
+	//	case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x57: case 0x58: case 0x59: case 0x5A: case 0x5B: case 0x5C: case 0x5D: case 0x5F: 
+	//	case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x67: case 0x68: case 0x69: case 0x6A: case 0x6B: case 0x6C: case 0x6D: case 0x6F: 
+	//	case 0x78: case 0x79: case 0x7A: case 0x7B: case 0x7C: case 0x7D: case 0x7F:
+		
+		//break;
 		case 0x00:
-			printf( "NOP (Not implemented yet!");
 			NOP();
 			break;
 		case 0x01:
-			printf( "LD BC,+%X", readNextWord() );
 			LD16( reg->bc, getNextWord() );
 			break;
 		case 0x02:
-			printf( "LD(BC),A" );
 			LD( getByteAt( *reg->bc ) ,reg->a );
 			break;
 		case 0x03:
-			printf( "INC BC" );
 			INC16( reg->bc );
 			break;
 		case 0x04:
-			printf( "INC B" );
 			INC( reg->b, reg->f );
 			break;
 		case 0x05:
-			printf( "DEC B" );
 			DEC( reg->b, reg->f );
 			break;
 		case 0x06:
-			printf( "LD B,+%X", readNextByte() );
 			LD( reg->b, getNextByte() );
 			break;
 		case 0x07:
-			printf( "RLCA" );
 			RLCA( reg->a, reg->f );
 			break;
 		case 0x08:
-			printf( "EX AF,AF'" );
 			EX( reg->af, reg->altaf );
 			break;
 		case 0x09:
-			printf("ADD HL,BC");
 			ADD16( reg->hl, reg->bc, reg->f );
 			break;
 		case 0x0A:
-			printf( "LD A,(BC)" );
 			t_counter += 7;
 			LD( reg->a, getByteAt( *reg->bc ) );
 			break;
 		case 0x0B:
-			printf( "DEC BC" );
 			DEC16( reg->bc );
 			break;
 		case 0x0C:
-			printf( "INC C" );
 			INC( reg->c, reg->f );
 			break;
 		case 0x0D:
-			printf( "DEC C" );
 			DEC( reg->c, reg->f );
 			break;
 		case 0x0E:
-			printf( "LD C,+%X", readNextByte() );
 			LD( reg->c, getNextByte() );
 			break;
 		case 0x0F:
-			printf( "RRCA" );
 			RRCA( reg->a, reg->f );
 			break;
 		case 0x10:
-			printf( "DJNZ %d", (int8_t)readNextByte() );
 			DJNZ( getNextByte(), reg->b, reg->pc );
 			break;
 		case 0x11:
-			printf( "LD DE,+%X", readNextWord() );
 			LD16( reg->de, getNextWord() );
 			break;
 		case 0x12:
-			printf( "LD(DE),A");
 			LD( getByteAt( *reg->de ) ,reg->a );
 			break;
 		case 0x13:
-			printf( "INC DE" );
 			INC16( reg->de );
 			break;
 		case 0x14:
-			printf( "INC D" );
 			INC( reg->d, reg->f );
 			break;
 		case 0x15:
-			printf( "DEC D" );
 			DEC( reg->d, reg->f );
 			break;
 		case 0x16:
-			printf( "LD D,+%X", readNextByte() );
 			LD( reg->d, getNextByte() );
 			break;
 		case 0x17:
-			printf( "RLA" );
 			RLA( reg->a, reg->f );
 			break;
 		case 0x18:
-			printf( "JR %X", readNextByte() );
 			JR( getNextByte(), reg->pc );
 			break;
 		case 0x19:
-			printf("ADD HL,DE");
 			t_counter += 11;
 			ADD16( reg->hl, reg->de, reg->f );
 			break;
 		case 0x1A:
-			printf( "LD A,(DE)" );
 			LD( reg->a, getByteAt( *reg->de ) );
 			break;
 		case 0x1B:
-			printf( "DEC DE" );
 			DEC16( reg->de );
 			break;
 		case 0x1C:
-			printf( "INC E" );
 			INC( reg->e, reg->f );
 			break;
 		case 0x1D:
-			printf( "DEC E" );
 			DEC( reg->e, reg->f );
 			break;
 		case 0x1E:
-			printf( "LD E,+%X", readNextByte() );
 			LD( reg->e, getNextByte() );
 			break;
 		case 0x1F:
-			printf( "RRA" );
 			RRA( reg->a, reg->f );
 			break;
 		case 0x20:
-			printf( "JR NZ,%d", (int8_t)readNextByte() );
 			t_counter += 7;
 			JRNZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x21:
-			printf( "LD HL,+%X", readNextWord() );
 			t_counter += 16;
 			LD16( reg->hl, getNextWord() );
 			break;
 		case 0x22:
-			printf( "LD (%X),HL", readNextWord() );
 			LD16( getWordAt( getNextWord() ), reg->hl );
 			break;
 		case 0x23:
-			printf( "INC HL" );
 			t_counter += 6;
 			INC16( reg->hl );
 			break;
 		case 0x24:
-			printf( "INC H" );
 			INC( reg->h, reg->f );
 			break;
 		case 0x25:
-			printf( "DEC H" );
 			DEC( reg->h, reg->f );
 			break;
 		case 0x26:
-			printf( "LD H,+%X", readNextByte() );
 			LD( reg->h, getNextByte() );
 			break;/*
 		case 0x27:
-			printf( "DAA" );
 			break;*/
 		case 0x28:
-			printf( "JR Z,+%X", readNextByte() );
 			t_counter += 12;
 			JRZ( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x29:
-			printf("ADD HL,HL");
 			ADD16( reg->hl, reg->hl, reg->f );
 			break;
 		case 0x2A:
-			printf( "LD HL,(%X)", readNextWord() );
 			LD16( reg->hl, getWordAt( getNextWord() ) );
 			break;
 		case 0x2B:
-			printf( "DEC HL");
 			t_counter += 6;
 			DEC16( reg->hl );
 			break;
 		case 0x2C:
-			printf( "INC L" );
 			INC( reg->l, reg->f );
 			break;
 		case 0x2D:
-			printf( "DEC L" );
 			DEC( reg->l, reg->f );
 			break;
 		case 0x2E:
-			printf( "LD L,+%X", readNextByte() );
 			LD( reg->l, getNextByte() );
 			break;
 		case 0x2F:
-			printf( "CPL" );
 			CPL( reg->a, reg->f );
 			break;
 		case 0x30:
-			printf("JR NC,%d", readNextByte() );
 			t_counter += 12;
 			JRNC( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x31:
-			printf( "LD SP,+%X", readNextWord() );
 			LD16( reg->hl, getNextWord() );
 			break;
 		case 0x32:
-			printf( "LD (%X),A", readNextWord() );
 			LD( getByteAt( *( getNextWord() ) ) ,reg->a );
 			break;
 		case 0x33:
-			printf( "INC SP" );
 			INC16( reg->sp );
 			break;
 		case 0x34:
-			printf( "INC (HL)" );
 			INC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x35:
-			printf( "DEC (HL)" );
 			t_counter += 6;
 			DEC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x36:
-			printf( "LD (HL),+%X", readNextByte() );
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), getNextByte() );
 			break;
 		case 0x37:
-			printf( "SCF" );
 			SCF( reg->f );
 			break;
 		case 0x38:
-			printf( "JR C,%d", (int8_t)readNextByte() );
 			JRC( reg->pc, getNextByte(), reg->f );
 			break;
 		case 0x39:
-			printf("ADD HL,SP");
 			ADD16( reg->hl, reg->sp, reg->f );
 			break;
 		case 0x3A:
-			printf( "LD A,(%X)", readNextWord() );
 			LD( reg->a, getByteAt( *(getNextWord()) ) );
 			break;
 		case 0x3B:
-			printf("DEC SP");
 			DEC16( reg->sp );
 			break;
 		case 0x3C:
-			printf( "INC A" );
 			INC( reg->a, reg->f );
 			break;
 		case 0x3D:
-			printf( "DEC A" );
 			DEC( reg->a, reg->f );
 			break;
 		case 0x3E:
-			printf( "LD A,+%X", readNextByte() );
 			LD( reg->a, getNextByte() );
 			break;
 		case 0x3F:
-			printf( "CCF" );
 			CCF( reg->f );
 			break;
 		case 0x40:
-			printf( "LD B,B" );
 			t_counter += 4;
 			LD( reg->b, reg->b );
 			break;
 		case 0x41:
-			printf( "LD B,C" );
 			t_counter += 4;
 			LD( reg->b, reg->c );
 			break;
 		case 0x42:
-			printf( "LD B,D" );
 			t_counter += 4;
 			LD( reg->b, reg->d );
 			break;
 		case 0x43:
-			printf( "LD B,E" );
 			t_counter += 4;
 			LD( reg->b, reg->e );
 			break;
 		case 0x44:
-			printf( "LD B,H" );
 			t_counter += 4;
 			LD( reg->b, reg->h );
 			break;
 		case 0x45:
-			printf( "LD B,L" );
 			t_counter += 4;
 			LD( reg->b, reg->l );
 			break;
 		case 0x46:
-			printf( "LD B,(HL)" );
 			t_counter += 4;
 			LD( reg->b, getByteAt( *reg->hl ) );
 			break;
 		case 0x47:
-			printf( "LD B,A");
 			t_counter += 4;
 			LD( reg->b, reg->a );
 			break;
 		case 0x48:
-			printf( "LD C,B");
 			t_counter += 4;
 			LD( reg->c, reg->b );
 			break;
 		case 0x49:
-			printf( "LD C,C" );
 			t_counter += 4;
 			LD( reg->c, reg->c );
 			break;
 		case 0x4A:
-			printf( "LD C,D" );
 			t_counter += 4;
 			LD( reg->c, reg->d );
 			break;
 		case 0x4B:
-			printf( "LD C,E" );
 			t_counter += 4;
 			LD( reg->c, reg->e );
 			break;
 		case 0x4C:
-			printf( "LD C,H" );
 			t_counter += 4;
 			LD( reg->c, reg->h );
 			break;
 		case 0x4D:
-			printf( "LD C,L" );
 			t_counter += 4;
 			LD( reg->c, reg->l );
 			break;
 		case 0x4E:
-			printf( "LD C,(HL)" );
 			t_counter += 7;
 			LD( reg->c, getByteAt( *reg->hl ) );
 			break;
 		case 0x4F:
-			printf( "LD C,A" );
 			t_counter += 4;
 			LD( reg->c, reg->a );
 			break;
 		case 0x50:
-			printf( "LD D,B" );
 			t_counter += 4;
 			LD( reg->d, reg->b );
 			break;
 		case 0x51:
-			printf( "LD D,C" );
 			t_counter += 4;
 			LD( reg->d, reg->c );
 			break;
 		case 0x52:
-			printf( "LD D,D" );
 			t_counter += 4;
 			LD( reg->d, reg->d );
 			break;
 		case 0x53:
-			printf( "LD D,E" );
 			t_counter += 4;
 			LD( reg->d, reg->e );
 			break;
 		case 0x54:
-			printf( "LD D,H" );
 			t_counter += 4;
 			LD( reg->d, reg->h );
 			break;
 		case 0x55:
-			printf( "LD D,L" );
 			t_counter += 4;
 			LD( reg->d, reg->l );
 			break;
 		case 0x56:
-			printf( "LD D,(HL)" );
 			t_counter += 7;
 			LD( reg->d, getByteAt( *reg->hl ) );
 			break;
 		case 0x57:
-			printf( "LD D,A" );
 			t_counter += 4;
 			LD( reg->d, reg->a );
 			break;
 		case 0x58:
-			printf( "LD E,B" );
 			t_counter += 4;
 			LD( reg->e, reg->b );
 			break;
 		case 0x59:
-			printf( "LD E,C" );
 			t_counter += 4;
 			LD( reg->e, reg->c );
 			break;
 		case 0x5A:
-			printf( "LD E,D" );
 			t_counter += 4;
 			LD( reg->e, reg->d );
 			break;
 		case 0x5B:
-			printf( "LD E,E" );
 			t_counter += 4;
 			LD( reg->e, reg->e );
 			break;
 		case 0x5C:
-			printf( "LD E,H" );
 			t_counter += 4;
 			LD( reg->e, reg->h );
 			break;
 		case 0x5D:
-			printf( "LD E,L" );
 			t_counter += 4;
 			LD( reg->e, reg->l );
 			break;
 		case 0x5E:
-			printf( "LD E,(HL)" );
 			LD( reg->e, getByteAt( *reg->hl ) );
 			break;
 		case 0x5F:
-			printf( "LD E,A" );
 			t_counter += 4;
 			LD( reg->e, reg->a );
 			break;
 		case 0x60:
-			printf( "LD H,B" );
 			t_counter += 4;
 			LD( reg->h, reg->b );
 			break;
 		case 0x61:
-			printf( "LD H,C" );
 			t_counter += 4;
 			LD( reg->h, reg->c );
 			break;
 		case 0x62:
-			printf( "LD H,D" );
 			t_counter += 4;
 			LD( reg->h, reg->d );
 			break;
 		case 0x63:
-			printf( "LD H,E" );
 			t_counter += 4;
 			LD( reg->h, reg->e );
 			break;
 		case 0x64:
-			printf( "LD H,H" );
 			t_counter += 4;
 			LD( reg->h, reg->h );
 			break;
 		case 0x65:
-			printf( "LD H,L" );
 			t_counter += 4;
 			LD( reg->h, reg->l );
 			break;
 		case 0x66:
-			printf( "LD H,(HL)" );
 			LD( reg->h, getByteAt( *reg->hl ) );
 			break;
 		case 0x67:
-			printf( "LD H,A" );
 			t_counter += 4;
 			LD( reg->h, reg->a );
 			break;
 		case 0x68:
-			printf( "LD L,B" );
 			t_counter += 4;
 			LD( reg->l, reg->b );
 			break;
 		case 0x69:
-			printf( "LD L,C" );
 			t_counter += 4;
 			LD( reg->l, reg->c );
 			break;
 		case 0x6A:
-			printf( "LD L,D");
 			t_counter += 4;
 			LD( reg->l, reg->d );
 			break;
 		case 0x6B:
-			printf( "LD L,E");
 			t_counter += 4;
 			LD( reg->l, reg->e );
 			break;
 		case 0x6C:
-			printf( "LD L,H" );
 			t_counter += 4;
 			LD( reg->l, reg->h );
 			break;
 		case 0x6D:
-			printf( "LD L,L" );
 			t_counter += 4;
 			LD( reg->l, reg->l );
 			break;
 		case 0x6E:
-			printf( "LD L,(HL)" );
 			LD( reg->l, getByteAt( *reg->hl ) );
 			break;
 		case 0x6F:
-			printf( "LD L,A" );
 			t_counter += 4;
 			LD( reg->l, reg->a );
 			break;
 		case 0x70:
-			printf( "LD (HL),B");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ) ,reg->b );
 			break;
 		case 0x71:
-			printf( "LD (HL),C");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), reg->c );
 			break;
 		case 0x72:
-			printf( "LD (HL),D");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), reg->d );
 			break;
 		case 0x73:
-			printf( "LD (HL),E");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), reg->e );
 			break;
 		case 0x74:
-			printf( "LD (HL),H");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), reg->h );
 			break;
 		case 0x75:
-			printf( "LD (HL),L");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ), reg->l );
 			break;/*
 		case 0x76:
-			printf( "HALT" );
 			break;*/
 		case 0x77:
-			printf( "LD (HL),A");
 			t_counter += 7;
 			LD( getByteAt( *reg->hl ) ,reg->a );
 			break;
 		case 0x78:
-			printf( "LD A,B");
 			t_counter += 4;
 			LD( reg->a, reg->b );
 			break;
 		case 0x79:
-			printf( "LD A,C");
 			t_counter += 4;
 			LD( reg->a, reg->c );
 			break;
 		case 0x7A:
-			printf( "LD A,D" );
 			t_counter += 4;
 			LD( reg->a, reg->d );
 			break;
 		case 0x7B:
-			printf( "LD A,E" );
 			LD( reg->a, reg->e );
 			t_counter += 4;
 			break;
 		case 0x7C:
-			printf( "LD A,H" );
 			LD( reg->a, reg->h );
 			t_counter += 4;
 			break;
 		case 0x7D:
-			printf( "LD A,L" );
 			LD( reg->a, reg->l );
 			t_counter += 4;
 			break;
 		case 0x7E:
-			printf( "LD A,(HL)" );
 			t_counter += 7;
 			LD( reg->a, getByteAt( *reg->hl ) );
 			break;
 		case 0x7F:
-			printf( "LD A,A" );
 			LD( reg->a, reg->a );
 			t_counter += 4;
 			break;
 		case 0x80:
-			printf( "ADD A,B" );
 			ADD( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0x81:
-			printf( "ADD A,C" );
 			ADD( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0x82:
-			printf( "ADD A,D" );
 			ADD( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0x83:
-			printf( "ADD A,E" );
 			t_counter += 4;
 			ADD( reg->a, reg->e, reg->f );
 			break;
 		case 0x84:
-			printf( "ADD A,H" );
 			t_counter += 4;
 			ADD( reg->a, reg->h, reg->f );
 			break;
 		case 0x85:
-			printf( "ADD A,L" );
 			t_counter += 4;
 			ADD( reg->a, reg->l, reg->f );
 			break;
 		case 0x86:
-			printf( "ADD (HL)" );
 			ADD( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x87:
-			printf( "ADD A,A" );
 			ADD( reg->a, reg->a, reg->f );
 			t_counter += 4;
 			break;
 		case 0x88:
-			printf( "ADC A,B" );
 			ADC( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0x89:
-			printf( "ADC A,C" );
 			ADC( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0x8A:
-			printf( "ADC A,D" );
 			ADC( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0x8B:
-			printf( "ADC A,E" );
 			ADC( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0x8C:
-			printf( "ADC A,H" );
 			ADC( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0x8D:
-			printf( "ADC A,L" );
 			ADC( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0x8E:
-			printf( "ADC A,(HL)" );
 			ADC( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x8F:
-			printf( "ADC A,A" );
 			ADC( reg->a, reg->a, reg->f );
 			t_counter += 4;
 			break;
 		case 0x90:
-			printf( "SUB B" );
 			SUB( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0x91:
-			printf( "SUB C" );
 			SUB( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0x92:
-			printf( "SUB D" );
 			SUB( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0x93:
-			printf( "SUB E" );
 			SUB( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0x94:
-			printf( "SUB H" );
 			SUB( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0x95:
-			printf( "SUB L" );
 			SUB( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0x96:
-			printf( "SUB (HL)" );
 			SUB( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x97:
-			printf( "SUB A" );
 			SUB( reg->a, reg->a, reg->f );
 			t_counter += 4;
 			break;
 		case 0x98:
-			printf( "SBC A,B" );
 			SBC( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0x99:
-			printf( "SBC A,C" );
 			SBC( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0x9A:
-			printf( "SBC A,D" );
 			SBC( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0x9B:
-			printf( "SBC A,E" );
 			SBC( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0x9C:
-			printf( "SBC A,H" );
 			SBC( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0x9D:
-			printf( "SBC A,L" );
 			SBC( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0x9E:
-			printf( "SBC A,(HL)" );
 			SBC( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x9F:
-			printf( "SBC A,A" );
 			SBC( reg->a, reg->a, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA0:
-			printf( "AND B" );
 			AND( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA1:
-			printf( "AND C" );
 			AND( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA2:
-			printf( "AND D" );
 			AND( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA3:
-			printf( "AND E" );
 			AND( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA4:
-			printf( "AND H" );
 			AND( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA5:
-			printf( "AND L" );
 			AND( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA6:
-			printf( "AND (HL)" );
 			AND( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0xA7:
-			printf( "AND A" );
 			t_counter += 4;
 			AND( reg->a, reg->a, reg->f );
 			break;
 		case 0xA8:
-			printf( "XOR B" );
 			XOR( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0xA9:
-			printf( "XOR C" );
 			XOR( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0xAA:
-			printf( "XOR D" );
 			XOR( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0xAB:
-			printf( "XOR E" );
 			XOR( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0xAC:
-			printf( "XOR H" );
 			XOR( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0xAD:
-			printf( "XOR L" );
 			XOR( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0xAE:
-			printf( "XOR (HL)" );
 			XOR( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0xAF:
-			printf( "XOR A");
 			XOR( reg->a, reg->a, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB0:
-			printf( "OR B" );
 			OR( reg->a, reg->b, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB1:
-			printf( "OR C" );
 			OR( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB2:
-			printf( "OR D" );
 			OR( reg->a, reg->d, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB3:
-			printf( "OR E" );
 			OR( reg->a, reg->e, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB4:
-			printf( "OR H" );
 			OR( reg->a, reg->h, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB5:
-			printf( "OR L" );
 			OR( reg->a, reg->l, reg->f );
 			t_counter += 4;
 			break;
 		case 0xB6:
-			printf( "OR(HL)" );
 			OR( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0xB7:
-			printf( "OR A" );
 			t_counter += 4;
 			OR( reg->a, reg->a, reg->f );
 			break;
 		case 0xB8:
-			printf( "CP B" );
 			t_counter += 4;
 			CP( reg->a, reg->b, reg->f );
 			break;
 		case 0xB9:
-			printf( "CP C" );
 			CP( reg->a, reg->c, reg->f );
 			t_counter += 4;
 			break;
 		case 0xBA:
-			printf( "CP D" );
 			t_counter += 4;
 			CP( reg->a, reg->d, reg->f );
 			break;
 		case 0xBB:
-			printf( "CP E" );
 			t_counter += 4;
 			CP( reg->a, reg->e, reg->f );
 			break;
 		case 0xBC:
-			printf( "CP H");
 			t_counter += 4;
 			CP( reg->a, reg->h, reg->f );
 			break;
 		case 0xBD:
-			printf( "CP L");
 			t_counter += 4;
 			CP( reg->a, reg->l, reg->f );
 			break;
 		case 0xBE:
-			printf( "CP (HL)" );
 			CP( reg->a, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0xBF:
-			printf( "CP A" );
 			t_counter += 4;
 			CP( reg->a, reg->a, reg->f );
 			break;
 		case 0xC0:
-			printf( "RET NZ" );
 			t_counter += 11;
 			RETNZ( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xC1:
-			printf( "POP BC");
 			t_counter += 10;
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->bc );
 			break;
 		case 0xC2:
-			printf( "JP NZ, %X", readNextWord() );
 			JPNZ( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xC3:
-			printf( "JP %X", readNextWord() );
 			JP( reg->pc, getNextWord() );
 			break;
 		case 0xC4:
-			printf( "CALLNZ %X", readNextWord() );
 			CALLNZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xC5:
-			printf( "PUSH BC");
 			t_counter += 11;
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->bc );
 			break;
 		case 0xC6:
-			printf( "ADD A,%X", readNextByte() );
 			ADD( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xC7:
-			printf( "RST 00H" );
 			RST( 0x00, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xC8:
-			printf( "RET Z" );
 			t_counter += 11;
 			RETZ( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xC9:
-			printf( "RET");
 			t_counter += 10;
 			RET( reg->pc, getWordAt( reg->sp ), reg->sp );
 			break;
 		case 0xCA:
-			printf( "JP Z,%X", readNextWord() );
 			JPZ( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xCB:
 			execute_multi_byte_opcode(opcode);
 			break;
 		case 0xCC:
-			printf( "CALL Z,%X", readNextWord() );
 			CALLZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xCD:
-			printf( "CALL %X", readNextWord() );
 			CALL( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xCE:
-			printf( "ADC A,%X", readNextByte() );
 			ADC( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xCF:
-			printf( "RST 08H" );
 			RST( 0x08, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xD0:
-			printf( "RET NC" );
 			RETNC( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xD1:
-			printf( "POP DE");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->de );
 			break;
 		case 0xD2:
-			printf( "JP NC,%X", readNextWord() );
 			JPNC( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xD3:
-			printf("OUT (+%X),A", readNextByte() );
 			OUTA( &IOport[ *( getNextByte() ) ], reg->a );
 			break;
 		case 0xD4:
-			printf( "CALL NC,%X", readNextWord() );
 			CALLNC( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xD5:
-			printf( "PUSH DE");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->de );
 			break;
 		case 0xD6:
-			printf( "SUB %X", readNextByte() );
 			SUB( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xD7:
-			printf( "RST 10" );
 			RST( 0x10, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xD8:
-			printf( "RET C" );
 			RETC( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xD9:
-			printf( "EXX" );
 			t_counter += 4;
 			EXX( reg->bc, reg->de, reg->hl, reg->altbc, reg->altde, reg->althl );
 			break;
 		case 0xDA:
-			printf( "JP C,%X", readNextWord() );
 			JPC( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xDB:
-			printf( "IN A,(C)" );
 			INA( reg->a, readPort(0x00FE) );
 			break;
 		case 0xDC:
-			printf( "CALL C,%X", readNextWord() );
 			CALLC( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xDD: /* IX registers */
 			execute_multi_byte_opcode_DD( opcode );
 		case 0xDE:
-			printf( "SBC A,%X", readNextByte() );
 			SBC( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xDF:
-			printf( "RST 18H" );
 			RST( 0x18, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xE0:
-			printf( "RET PO,%X***MUST BE CHECKED", readNextWord() );
 			RETPO( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xE1:
-			printf( "POP HL");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->hl );
 			break;
 		case 0xE2:
-			printf( "JP PO,%X ****MUST BE CHECKED", readNextWord() );
 			JPPO( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xE3:
-			printf( "EX (SP),HL" );
 			EX( getWordAt( reg->sp ), reg->hl );
 			break;
 		case 0xE4:
-			printf( "CALL PO,%X***MUST BE CHECKED", readNextWord() );
 			CALLPO( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xE5:
-			printf( "PUSH HL");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->hl );
 			break;
 		case 0xE6:
-			printf("AND %X", readNextByte() );
 			AND( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xE7:
-			printf( "RST 20H" );
 			RST( 0x20, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xE8:
-			printf( "RET PE,%X", readNextWord() );
 			RETPE( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f  );
 			break;
 		case 0xE9:
-			printf( "JP (HL)");
 			JP( reg->pc, reg->hl );
 			break;
 		case 0xEA:
-			printf( "JP PE,%X***Check this", readNextWord() );
 			JPPE( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xEB:
-			printf( "EX DE,HL");
 			EX( reg->de, reg->hl );
 			break;
 		case 0xEC:
-			printf( "CALL PE,%X***Check this", readNextWord() );
 			CALLPE( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xED:
 			execute_multi_byte_opcode_ED( opcode );
 			break;
 		case 0xEE:
-			printf( "XOR %X",readNextByte() );
 			XOR( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xEF:
-			printf( "RST 28H" );
 			RST( 0x28, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xF0:
-			printf( "RET P" );
 			RETP( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f  );
 			break;
 		case 0xF1:
-			printf( "POP AF");
 			POP( getWordAt( reg->sp ) ,reg->sp, reg->af );
 			break;
 		case 0xF2:
-			printf( "JP P,%X", readNextWord() );
 			JPP( reg->pc, getNextWord(), reg->f  );
 			break;
 		case 0xF3:
-			printf( "DI" );
 			DI( reg->iff1, reg->iff2 );
 			break;
 		case 0xF4:
-			printf( "CALL P,%X", readNextWord() );
 			CALLP( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xF5:
-			printf( "PUSH AF");
 			PUSH( getWordAt( reg->sp ), reg->sp, reg->af );
 			break;
 		case 0xF6:
-			printf( "OR %X", readNextByte() );
 			OR( reg->a, getNextByte(), reg->f );
 			break;
 		case 0xF7:
-			printf( "RST 30H" );
 			RST( 0x30, getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xF8:
-			printf( "RET M,%X***CHECK THIS", readNextWord() );
 			RETM( reg->pc, getWordAt( reg->sp ), reg->sp, reg->f );
 			break;
 		case 0xF9:
-			printf( "LD SP,HL");
 			LD16( reg->sp, reg->hl );
 			break;
 		case 0xFA:
-			printf( "JP M,%X", readNextWord() );
 			JPM( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xFB:
-			printf( "EI" );
 			EI( reg->iff1, reg->iff2 );
 			break;
 		case 0xFC:
-			printf( "CALL M,%X***Check this", readNextWord() );
 			CALLM( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f  );
 			break;
 		case 0xFD:
@@ -2079,7 +1840,7 @@ void execute_multi_byte_opcode_ED( uint8_t *opcode )
 			CPD();
 		break;*/
 		case 0xB0:
-			printf( "LDIR");
+			printf( "LDIR\n");
 			LDIR( getWordAt( reg->hl ), getWordAt( reg->de ), reg->hl, reg->de, reg->bc, reg->pc, reg->f );
 			break;/*
 		case 0xB1:
@@ -2492,3 +2253,264 @@ uint8_t readPort(uint16_t portAddrs){
 
 	return 0;
 }
+
+
+void decode_single_byte_opcode( uint8_t *opcode )
+{
+	printf(" %s\n", singleByteInstructionLookup[(uint8_t)*opcode]);
+}
+
+
+
+static const char *singleByteInstructionLookup[] = {	
+	 "NOP (Not implemented yet!",
+	 "LD BC,+%X", 
+	 "LD(BC),A",
+	 "INC BC",
+	 "INC B",
+	 "DEC B",
+	 "LD B,+%X", 
+	 "RLCA",
+	 "EX AF,AF'",
+	 "ADD HL,BC",
+	 "LD A,(BC)",
+	 "DEC BC",
+	 "INC C",
+	 "DEC C",
+	 "LD C,+%X", 
+	 "RRCA",
+	 "DJNZ %d", 
+	 "LD DE,+%X", 
+	 "LD(DE),A",
+	 "INC DE",
+	 "INC D",
+	 "DEC D",
+	 "LD D,+%X", 
+	 "RLA",
+	 "JR %X", 
+	 "ADD HL,DE",
+	 "LD A,(DE)",
+	 "DEC DE",
+	 "INC E",
+	 "DEC E",
+	 "LD E,+%X", 
+	 "RRA",
+	 "JR NZ,%d", 
+	 "LD HL,+%X", 
+	 "LD (%X),HL", 
+	 "INC HL",
+	 "INC H",
+	 "DEC H",
+	 "LD H,+%X", 
+	 "DAA",
+	 "JR Z,+%X", 
+	 "ADD HL,HL",
+	 "LD HL,(%X)", 
+	 "DEC HL",
+	 "INC L",
+	 "DEC L",
+	 "LD L,+%X", 
+	 "CPL",
+	 "JR NC,%d", 
+	 "LD SP,+%X", 
+	 "LD (%X),A", 
+	 "INC SP",
+	 "INC (HL)",
+	 "DEC (HL)",
+	 "LD (HL),+%X", 
+	 "SCF",
+	 "JR C,%d", 
+	 "ADD HL,SP",
+	 "LD A,(%X)", 
+	 "DEC SP",
+	 "INC A",
+	 "DEC A",
+	 "LD A,+%X", 
+	 "CCF",
+	 "LD B,B",
+	 "LD B,C",
+	 "LD B,D",
+	 "LD B,E",
+	 "LD B,H",
+	 "LD B,L",
+	 "LD B,(HL)",
+	 "LD B,A",
+	 "LD C,B",
+	 "LD C,C",
+	 "LD C,D",
+	 "LD C,E",
+	 "LD C,H",
+	 "LD C,L",
+	 "LD C,(HL)",
+	 "LD C,A",
+	 "LD D,B",
+	 "LD D,C",
+	 "LD D,D",
+	 "LD D,E",
+	 "LD D,H",
+	 "LD D,L",
+	 "LD D,(HL)",
+	 "LD D,A",
+	 "LD E,B",
+	 "LD E,C",
+	 "LD E,D",
+	 "LD E,E",
+	 "LD E,H",
+	 "LD E,L",
+	 "LD E,(HL)",
+	 "LD E,A",
+	 "LD H,B",
+	 "LD H,C",
+	 "LD H,D",
+	 "LD H,E",
+	 "LD H,H",
+	 "LD H,L",
+	 "LD H,(HL)",
+	 "LD H,A",
+	 "LD L,B",
+	 "LD L,C",
+	 "LD L,D",
+	 "LD L,E",
+	 "LD L,H",
+	 "LD L,L",
+	 "LD L,(HL)",
+	 "LD L,A",
+	 "LD (HL),B",
+	 "LD (HL),C",
+	 "LD (HL),D",
+	 "LD (HL),E",
+	 "LD (HL),H",
+	 "LD (HL),L",
+	 "HALT",
+	 "LD (HL),A",
+	 "LD A,B",
+	 "LD A,C",
+	 "LD A,D",
+	 "LD A,E",
+	 "LD A,H",
+	 "LD A,L",
+	 "LD A,(HL)",
+	 "LD A,A",
+	 "ADD A,B",
+	 "ADD A,C",
+	 "ADD A,D",
+	 "ADD A,E",
+	 "ADD A,H",
+	 "ADD A,L",
+	 "ADD (HL)",
+	 "ADD A,A",
+	 "ADC A,B",
+	 "ADC A,C",
+	 "ADC A,D",
+	 "ADC A,E",
+	 "ADC A,H",
+	 "ADC A,L",
+	 "ADC A,(HL)",
+	 "ADC A,A",
+	 "SUB B",
+	 "SUB C",
+	 "SUB D",
+	 "SUB E",
+	 "SUB H",
+	 "SUB L",
+	 "SUB (HL)",
+	 "SUB A",
+	 "SBC A,B",
+	 "SBC A,C",
+	 "SBC A,D",
+	 "SBC A,E",
+	 "SBC A,H",
+	 "SBC A,L",
+	 "SBC A,(HL)",
+	 "SBC A,A",
+	 "AND B",
+	 "AND C",
+	 "AND D",
+	 "AND E",
+	 "AND H",
+	 "AND L",
+	 "AND (HL)",
+	 "AND A",
+	 "XOR B",
+	 "XOR C",
+	 "XOR D",
+	 "XOR E",
+	 "XOR H",
+	 "XOR L",
+	 "XOR (HL)",
+	 "XOR A",
+	 "OR B",
+	 "OR C",
+	 "OR D",
+	 "OR E",
+	 "OR H",
+	 "OR L",
+	 "OR(HL)",
+	 "OR A",
+	 "CP B",
+	 "CP C",
+	 "CP D",
+	 "CP E",
+	 "CP H",
+	 "CP L",
+	 "CP (HL)",
+	 "CP A",
+	 "RET NZ",
+	 "POP BC",
+	 "JP NZ, %X", 
+	 "JP %X", 
+	 "CALLNZ %X", 
+	 "PUSH BC",
+	 "ADD A,%X", 
+	 "RST 00H",
+	 "RET Z",
+	 "RET",
+	 "JP Z,%X", 
+	 "CALL Z,%X", 
+	 "CALL %X", 
+	 "ADC A,%X", 
+	 "RST 08H",
+	 "RET NC",
+	 "POP DE",
+	 "JP NC,%X", 
+	"OUT (+%X),A", 
+	 "CALL NC,%X", 
+	 "PUSH DE",
+	 "SUB %X", 
+	 "RST 10",
+	 "RET C",
+	 "EXX",
+	 "JP C,%X", 
+	 "IN A,(C)",
+	 "CALL C,%X", 
+	 "SBC A,%X", 
+	 "RST 18H",
+	 "RET PO,%X", 
+	 "POP HL",
+	 "JP PO,%X ", 
+	 "EX (SP),HL",
+	 "CALL PO,%X", 
+	 "PUSH HL",
+	"AND %X", 
+	 "RST 20H",
+	 "RET PE,%X", 
+	 "JP (HL)",
+	 "JP PE,%X", 
+	 "EX DE,HL",
+	 "CALL PE,%X", 
+	 "XOR %X",
+	 "RST 28H",
+	 "RET P",
+	 "POP AF",
+	 "JP P,%X", 
+	 "DI",
+	 "CALL P,%X", 
+	 "PUSH AF",
+	 "OR %X", 
+	 "RST 30H",
+	 "RET M,%X", 
+	 "LD SP,HL",
+	 "JP M,%X", 
+	 "EI",
+	 "CALL M,%X", 
+};

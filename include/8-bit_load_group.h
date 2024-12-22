@@ -2,6 +2,7 @@
 #define INC_8BITLOADGROUP_H 
 
 #include <stdint.h>
+#include "../include/util_bit_operations.h"
 
 // LOAD data methods for 8-bit groups
 

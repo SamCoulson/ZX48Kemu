@@ -52,6 +52,7 @@ void run( uint16_t addrs ){
 	struct timespec start, end;
 
 	int i = 0;
+	int screenUpdatedCount = 0;
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
@@ -63,11 +64,12 @@ void run( uint16_t addrs ){
 			exit(1);
 		}
 
-		if( i == 100000)
+		if( i == 5000)
 		{
 			readVideoRAM( totalMem ); 
 			updateScreen();
 			i = 0;
+			screenUpdatedCount++;
 		}
 
 		i++;
@@ -90,12 +92,12 @@ void run( uint16_t addrs ){
 		uint64_t elapsed_ns = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + (end.tv_nsec - start.tv_nsec);
 
 		double elapsed_s = elapsed_ns / 1e9; // Convert to seconds
-		printf("Elapsed time: %ld4ns (%f seconds)\n", elapsed_ns, elapsed_s);
 		// Do interrupts ( Peripheral service routines )
 		if(elapsed_s > 1.0)
 		{
+			printf("Elapsed time: %ld4ns (%f seconds)\n", elapsed_ns, elapsed_s);
 			printf("**************************************************************t_counter = %d\n", t_counter);
-
+			printf("screen udpated : %d\n", screenUpdatedCount );
 			clock_gettime(CLOCK_MONOTONIC, &start);
 			exit(1);
 		}
