@@ -1,11 +1,12 @@
 #include "../include/screen.h"
+#include <stdio.h>
 
 #define SCREEN_WIDTH 256
 #define SCRREN_HEIGHT 192
 #define SCREEN_X_START 20
 #define SCREEN_Y_START 20
 
-#define TOTAL_SCREEN_BYTES_SIZE 49152
+#define TOTAL_SCREEN_PIXELS 49152
 
 #define REGISTERS_BOX_X 350
 #define REGISTERS_BOX_y 20
@@ -35,10 +36,68 @@ typedef struct
 {
 	int x;
 	int y;
+	uint16_t index;
 	Color color;
 }PixelValue;
 
-PixelValue pixel_values[TOTAL_SCREEN_BYTES_SIZE]; 
+PixelValue pixel_values[TOTAL_SCREEN_PIXELS]; 
+
+void build_video_mem_map()
+{
+	int index = 0;
+	int x = SCREEN_X_START, y = SCREEN_Y_START; // Pixel coords
+
+	uint16_t vidStart = 0x4000;
+	uint16_t vidBufLoc = vidStart; // Current address into memory buffer	
+	
+	int bit = 0;
+
+	// Set the whole screen to what ever border colour is
+
+	// Loop through the thirds
+	for( int i = 0; i < 3; i++ ){
+		// Loop through the 8 lines of each row of this third
+		for( int j = 0; j < 8; j++){	
+			vidBufLoc = vidStart;
+			//printf("\nvidStart = %X\n", vidStart);
+
+			// Loop through the 8 rows
+			for( int k = 0; k < 8; k++ ){
+				x = SCREEN_X_START;	
+				//printf("\nvidBufLoc = %X\n", vidBufLoc);
+				for( int l = 0; l < 32; l++ ){
+					// Read spec video mem buffer and get pixel status + determine color
+					uint8_t pixel = totalMem[vidBufLoc];
+
+					for( bit = 7; bit > -1; bit-- )
+					{
+						pixel_values[index].x = x; 
+						pixel_values[index].y = y; 
+
+						// Set on pixel to forground color
+						if( pixel & (1 << (bit) ) ){
+							pixel_values[index].color = BLACK;
+						}else{
+							pixel_values[index].color = WHITE; 
+						}
+
+						pixel_values[index].index = vidBufLoc;
+
+						index++;
+						x++;
+					}
+					vidBufLoc++;		
+				}
+				vidBufLoc+=224; // Advance to next set of bytes for next row 
+				y++;
+	
+			}
+			vidStart += 32; // Advance start offset by 32 bytes for next pixel line
+			
+		}
+		vidStart += 1792; // Move pointer forwards to start of the next set of bytes for the next third 
+	}
+}
 
 int initWindow(){
 
@@ -50,6 +109,8 @@ int initWindow(){
 	BeginDrawing();
 		ClearBackground(RAYWHITE);
 	EndDrawing();                     
+	
+	build_video_mem_map();
 
 	return 0;
 }
@@ -64,70 +125,32 @@ void updateScreen(){
 
 		ClearBackground(RAYWHITE);
 
-		if (shouldUpdateScreen)
-		{
-			int index = 0;
-			int x = SCREEN_X_START, y = SCREEN_Y_START; // Pixel coords
+//		if (shouldUpdateScreen)
+//		{
+//			shouldUpdateScreen = false;
+		
+			for (int i = 0; i < TOTAL_SCREEN_PIXELS - 1; i++)
+			{
+	//			printf("%d %d %d\n", pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
 
-			uint16_t vidStart = 0x4000;
-			uint16_t vidBufLoc = vidStart; // Current address into memory buffer	
-			
-			int bit = 0;
+				uint8_t pixel = totalMem[pixel_values[i].index];
 
-			// Set the whole screen to what ever border colour is
-
-			// Loop through the thirds
-			for( int i = 0; i < 3; i++ ){
-				// Loop through the 8 lines of each row of this third
-				for( int j = 0; j < 8; j++){	
-					vidBufLoc = vidStart;
-					//printf("\nvidStart = %X\n", vidStart);
-
-					// Loop through the 8 rows
-					for( int k = 0; k < 8; k++ ){
-						x = SCREEN_X_START;	
-						//printf("\nvidBufLoc = %X\n", vidBufLoc);
-						for( int l = 0; l < 32; l++ ){
-							// Read spec video mem buffer and get pixel status + determine color
-							uint8_t pixel = totalMem[vidBufLoc];
-
-							for( bit = 7; bit > -1; bit-- ){
-								// Set on pixel to forground color
-								if( pixel & (1 << (bit) ) ){
-									//DrawPixel(x, y, BLACK);
-									pixel_values[index].x = x; 
-									pixel_values[index].y = y; 
-									pixel_values[index].color = BLACK;
-								}else{
-									pixel_values[index].x = x; 
-									pixel_values[index].y = y; 
-									pixel_values[index].color = WHITE; 
-									//DrawPixel(x, y, WHITE);
-								}
-								index++;
-								x++;
-							}
-							vidBufLoc++;		
-						}
-						vidBufLoc+=224; // Advance to next set of bytes for next row 
-						y++;
-			
+				for( int bit = 7; bit > -1; bit-- )
+				{
+					// Set on pixel to forground color
+					if( pixel & (1 << (bit) ) ){
+						pixel_values[i].color = BLACK;
+					}else{
+						pixel_values[i].color = WHITE; 
 					}
-					vidStart += 32; // Advance start offset by 32 bytes for next pixel line
-					
+
+					DrawPixel(pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
+					//printf("x = %d, Y = %d", pixel_values[i].x, pixel_values[i].y);	
+					i++;
 				}
-				vidStart += 1792; // Move pointer forwards to start of the next set of bytes for the next third 
+				
 			}
-			shouldUpdateScreen = false;
-		}
-
-		for (int i = 0; i < TOTAL_SCREEN_BYTES_SIZE; i++)
-		{
-//			printf("%d %d %d\n", pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
-			
-			DrawPixel(pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
-		}
-
+//		}
 
 		GuiGroupBox((Rectangle){ REGISTERS_BOX_X, REGISTERS_BOX_y, REGISTERS_BOX_W, REGISTERS_BOX_H }, "REGISTERS");
 

@@ -16,6 +16,7 @@
 #include "../include/EBTS_group.h"
 //#include "../include/ula.h"
 #include "../include/memory.h"
+#include "../include/disassembler.h"
 
 #define BUF_SIZE 5
 
@@ -127,8 +128,6 @@ static void execute_multi_byte_opcode_CB( uint8_t *opcode );
 static void execute_multi_byte_opcode_DD( uint8_t *opcode );
 static void execute_multi_byte_opcode_ED( uint8_t *opcode );
 static void execute_multi_byte_opcode_FD( uint8_t *opcode );
-static void decode_single_byte_opcode(uint8_t *opcode );
-static const char *singleByteInstructionLookup[];
 
 // Takes a port number and maps a function to it.
 void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) ){
@@ -148,15 +147,19 @@ void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) ){
 
 void execute( uint8_t* opcode )
 {
+	//printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
+	
 	++*reg->r;
 
 	if( *opcode == 0xCB || *opcode == 0xDD || *opcode == 0xED || *opcode == 0xFD)
 	{
-	//	printf("opcode is multi-byte opcode\n");
+		decode_multi_byte_opcode( opcode );
 		execute_multi_byte_opcode( opcode );
+
 	}
 	else if ( *opcode >= 0x00 && *opcode <= 0xFF)
 	{
+		decode_single_byte_opcode( opcode );
 		execute_single_byte_opcode( opcode );
 	}
 
@@ -165,10 +168,6 @@ void execute( uint8_t* opcode )
 
 void execute_single_byte_opcode( uint8_t *opcode )
 {
-	//printf("0x%04X\t%02X\t", *reg->pc, totalMem[*reg->pc] );
-
-	//decode_single_byte_opcode( opcode );
-
 	switch( *opcode )
 	{
 	
@@ -375,6 +374,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			break;
 		case 0x3E:
 			LD( reg->a, getNextByte() );
+			t_counter += 13;
 			break;
 		case 0x3F:
 			CCF( reg->f );
@@ -500,6 +500,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			LD( reg->e, reg->l );
 			break;
 		case 0x5E:
+			t_counter += 7;
 			LD( reg->e, getByteAt( *reg->hl ) );
 			break;
 		case 0x5F:
@@ -532,6 +533,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			break;
 		case 0x66:
 			LD( reg->h, getByteAt( *reg->hl ) );
+			t_counter += 7;
 			break;
 		case 0x67:
 			t_counter += 4;
@@ -563,6 +565,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			break;
 		case 0x6E:
 			LD( reg->l, getByteAt( *reg->hl ) );
+			t_counter += 7;
 			break;
 		case 0x6F:
 			t_counter += 4;
@@ -593,6 +596,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			LD( getByteAt( *reg->hl ), reg->l );
 			break;/*
 		case 0x76:
+			HALT
 			break;*/
 		case 0x77:
 			t_counter += 7;
@@ -656,6 +660,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			break;
 		case 0x86:
 			ADD( reg->a, getByteAt( *reg->hl ), reg->f );
+			t_counter += 4;
 			break;
 		case 0x87:
 			ADD( reg->a, reg->a, reg->f );
@@ -1097,35 +1102,27 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 	switch( *( getNextByte() ) )
 	{
 		case 0x00:
-			printf( "RLC B" );
 			RLC( reg->b, reg->f );
 			break;
 		case 0x01:
-			printf( "RLC C" );
 			RLC( reg->c, reg->f );
 			break;
 		case 0x02:
-			printf( "RLC D" );
 			RLC( reg->d, reg->f );
 			break;
 		case 0x03:
-			printf( "RLC E" );
 			RLC( reg->e, reg->f );
 			break;
 		case 0x04:
-			printf( "RLC H" );
 			RLC( reg->h, reg->f );
 			break;
 		case 0x05:
-			printf( "RLC L" );
 			RLC( reg->l, reg->f );
 			break;
 		case 0x06:
-			printf( "RLC (HL)" );
 			RLC( getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x07:
-			printf( "RLC A" );
 			RLC( reg->a, reg->f );
 			break;
 		case 0x08:
@@ -1233,11 +1230,9 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x3B:
 			break;
 		case 0x3C:
-			printf("SRL H");
 			SRL( reg->h, reg->f );
 			break;
 		case 0x3D:
-			printf("SRL L");
 			SRL( reg->l, reg->f );
 			break;
 		case 0x3E:
@@ -1245,7 +1240,6 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x3F:
 			break;
 		case 0x40:
-			printf( "BIT 0" );
 			BIT( 0, reg->b, reg->f );
 			break;
 		case 0x41:
@@ -1259,7 +1253,6 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x45:
 			break;
 		case 0x46:
-			printf( "BIT 0" );
 			BIT( 0, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x47:
@@ -1277,7 +1270,6 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x4D:
 			break;
 		case 0x4E:
-			printf( "BIT 1" );
 			BIT( 1, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x4F:
@@ -1295,7 +1287,6 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x55:
 			break;
 		case 0x56:
-			printf( "BIT 2" );
 			BIT( 2, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x57:
@@ -1305,7 +1296,6 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x59:
 			break;
 		case 0x5A:
-			printf( "BIT 3,D" );
 			BIT( 3, reg->d, reg->f );
 			break;
 		case 0x5B:
@@ -1315,125 +1305,95 @@ void execute_multi_byte_opcode_CB( uint8_t *opcode )
 		case 0x5D:
 			break;
 		case 0x5E:
-			printf( "BIT 3" );
 			BIT( 3, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x5F:
 			break;
 		case 0x60:
-			printf( "BIT 4" );
 			BIT( 4, reg->b, reg->f );
 			break;
 		case 0x61:
-			printf( "BIT 4" );
 			BIT( 4, reg->c, reg->f );
 			break;
 		case 0x62:
-			printf( "BIT 4" );
 			BIT( 4, reg->d, reg->f );
 			break;
 		case 0x63:
-			printf( "BIT 4" );
 			BIT( 4, reg->e, reg->f );
 			break;
 		case 0x64:
-			printf( "BIT 4" );
 			BIT( 4, reg->h, reg->f );
 			break;
 		case 0x65:
-			printf( "BIT 4" );
 			BIT( 4, reg->l, reg->f );
 			break;
 		case 0x66:
-			printf( "BIT 4" );
 			BIT( 4, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x67:
-			printf( "BIT 4" );
 			BIT( 4, reg->a, reg->f );
 			break;
 		case 0x6E:
-			printf( "BIT 5, (HL)" );
 			BIT( 5, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x76:
-			printf( "BIT 6, (HL)" );
 			BIT( 6, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x7E:
-			printf( "BIT 7, (HL)" );
 			BIT( 7, getByteAt( *reg->hl ), reg->f );
 			break;
 		case 0x86:
-			printf( "RES 0, (HL)" );
 			RES( 0, getByteAt( *reg->hl ) );
 			break;
 		case 0x8E:
-			printf( "RES 1, (HL)" );
 			RES( 1, getByteAt( *reg->hl ) );
 			break;
 		case 0x96:
-			printf( "RES 2, (HL)" );
 			RES( 2, getByteAt( *reg->hl ) );
 			break;
 		case 0x9E:
-			printf( "RES 3, (HL)" );
 			RES( 3, getByteAt( *reg->hl ) );
 			break;
 		case 0xA6:
-			printf( "RES 4, (HL)" );
 			RES( 4, getByteAt( *reg->hl ) );
 			break;
 		case 0xAE:
-			printf( "RES 5, (HL)" );
 			RES( 5, getByteAt( *reg->hl ) );
 			break;
 		case 0xB6:
-			printf( "RES 6, (HL)" );
 			RES( 6, getByteAt( *reg->hl ) );
 			break;
 		case 0xBC:
-			printf( "RES 7, H" );
 			RES( 7, reg->h );
 			break;
 		case 0xBE:
-			printf( "RES 7, (HL)" );
 			RES( 7, getByteAt( *reg->hl ) );
 			break;
 		case 0xC6:
-			printf( "SET 0, (HL)" );
 			SET( 0, getByteAt( *reg->hl ) );
 			break;
 		case 0xCE:
-			printf( "SET 1, (HL)" );
 			SET( 1, getByteAt( *reg->hl ) );
 			break;
 		case 0xD6:
-			printf( "SET 2, (HL)" );
 			SET( 2, getByteAt( *reg->hl ) );
 			break;
 		case 0xDE:
-			printf( "SET 3, (HL)" );
 			SET( 3, getByteAt( *reg->hl ) );
 			break;
 		case 0xE6:
-			printf( "SET 4, (HL)" );
 			SET( 4, getByteAt( *reg->hl ) );
 			break;
 		case 0xEE:
-			printf( "SET 5, (HL)" );
 			SET( 5, getByteAt( *reg->hl ) );
 			break;
 		case 0xF6:
-			printf( "SET 6, (HL)" );
 			SET( 6, getByteAt( *reg->hl ) );
 			break;
 		case 0xFD:
-			printf( "SET 7, L" );
 			SET( 7, reg->l );
 			break;
 		case 0xFE:
-			printf( "SET 7, (HL)" );
 			SET( 7, getByteAt( *reg->hl ) );
 			break;
 		default:
@@ -1840,7 +1800,7 @@ void execute_multi_byte_opcode_ED( uint8_t *opcode )
 			CPD();
 		break;*/
 		case 0xB0:
-			printf( "LDIR\n");
+			printf( "LDIR");
 			LDIR( getWordAt( reg->hl ), getWordAt( reg->de ), reg->hl, reg->de, reg->bc, reg->pc, reg->f );
 			break;/*
 		case 0xB1:
@@ -2253,264 +2213,3 @@ uint8_t readPort(uint16_t portAddrs){
 
 	return 0;
 }
-
-
-void decode_single_byte_opcode( uint8_t *opcode )
-{
-	printf(" %s\n", singleByteInstructionLookup[(uint8_t)*opcode]);
-}
-
-
-
-static const char *singleByteInstructionLookup[] = {	
-	 "NOP (Not implemented yet!",
-	 "LD BC,+%X", 
-	 "LD(BC),A",
-	 "INC BC",
-	 "INC B",
-	 "DEC B",
-	 "LD B,+%X", 
-	 "RLCA",
-	 "EX AF,AF'",
-	 "ADD HL,BC",
-	 "LD A,(BC)",
-	 "DEC BC",
-	 "INC C",
-	 "DEC C",
-	 "LD C,+%X", 
-	 "RRCA",
-	 "DJNZ %d", 
-	 "LD DE,+%X", 
-	 "LD(DE),A",
-	 "INC DE",
-	 "INC D",
-	 "DEC D",
-	 "LD D,+%X", 
-	 "RLA",
-	 "JR %X", 
-	 "ADD HL,DE",
-	 "LD A,(DE)",
-	 "DEC DE",
-	 "INC E",
-	 "DEC E",
-	 "LD E,+%X", 
-	 "RRA",
-	 "JR NZ,%d", 
-	 "LD HL,+%X", 
-	 "LD (%X),HL", 
-	 "INC HL",
-	 "INC H",
-	 "DEC H",
-	 "LD H,+%X", 
-	 "DAA",
-	 "JR Z,+%X", 
-	 "ADD HL,HL",
-	 "LD HL,(%X)", 
-	 "DEC HL",
-	 "INC L",
-	 "DEC L",
-	 "LD L,+%X", 
-	 "CPL",
-	 "JR NC,%d", 
-	 "LD SP,+%X", 
-	 "LD (%X),A", 
-	 "INC SP",
-	 "INC (HL)",
-	 "DEC (HL)",
-	 "LD (HL),+%X", 
-	 "SCF",
-	 "JR C,%d", 
-	 "ADD HL,SP",
-	 "LD A,(%X)", 
-	 "DEC SP",
-	 "INC A",
-	 "DEC A",
-	 "LD A,+%X", 
-	 "CCF",
-	 "LD B,B",
-	 "LD B,C",
-	 "LD B,D",
-	 "LD B,E",
-	 "LD B,H",
-	 "LD B,L",
-	 "LD B,(HL)",
-	 "LD B,A",
-	 "LD C,B",
-	 "LD C,C",
-	 "LD C,D",
-	 "LD C,E",
-	 "LD C,H",
-	 "LD C,L",
-	 "LD C,(HL)",
-	 "LD C,A",
-	 "LD D,B",
-	 "LD D,C",
-	 "LD D,D",
-	 "LD D,E",
-	 "LD D,H",
-	 "LD D,L",
-	 "LD D,(HL)",
-	 "LD D,A",
-	 "LD E,B",
-	 "LD E,C",
-	 "LD E,D",
-	 "LD E,E",
-	 "LD E,H",
-	 "LD E,L",
-	 "LD E,(HL)",
-	 "LD E,A",
-	 "LD H,B",
-	 "LD H,C",
-	 "LD H,D",
-	 "LD H,E",
-	 "LD H,H",
-	 "LD H,L",
-	 "LD H,(HL)",
-	 "LD H,A",
-	 "LD L,B",
-	 "LD L,C",
-	 "LD L,D",
-	 "LD L,E",
-	 "LD L,H",
-	 "LD L,L",
-	 "LD L,(HL)",
-	 "LD L,A",
-	 "LD (HL),B",
-	 "LD (HL),C",
-	 "LD (HL),D",
-	 "LD (HL),E",
-	 "LD (HL),H",
-	 "LD (HL),L",
-	 "HALT",
-	 "LD (HL),A",
-	 "LD A,B",
-	 "LD A,C",
-	 "LD A,D",
-	 "LD A,E",
-	 "LD A,H",
-	 "LD A,L",
-	 "LD A,(HL)",
-	 "LD A,A",
-	 "ADD A,B",
-	 "ADD A,C",
-	 "ADD A,D",
-	 "ADD A,E",
-	 "ADD A,H",
-	 "ADD A,L",
-	 "ADD (HL)",
-	 "ADD A,A",
-	 "ADC A,B",
-	 "ADC A,C",
-	 "ADC A,D",
-	 "ADC A,E",
-	 "ADC A,H",
-	 "ADC A,L",
-	 "ADC A,(HL)",
-	 "ADC A,A",
-	 "SUB B",
-	 "SUB C",
-	 "SUB D",
-	 "SUB E",
-	 "SUB H",
-	 "SUB L",
-	 "SUB (HL)",
-	 "SUB A",
-	 "SBC A,B",
-	 "SBC A,C",
-	 "SBC A,D",
-	 "SBC A,E",
-	 "SBC A,H",
-	 "SBC A,L",
-	 "SBC A,(HL)",
-	 "SBC A,A",
-	 "AND B",
-	 "AND C",
-	 "AND D",
-	 "AND E",
-	 "AND H",
-	 "AND L",
-	 "AND (HL)",
-	 "AND A",
-	 "XOR B",
-	 "XOR C",
-	 "XOR D",
-	 "XOR E",
-	 "XOR H",
-	 "XOR L",
-	 "XOR (HL)",
-	 "XOR A",
-	 "OR B",
-	 "OR C",
-	 "OR D",
-	 "OR E",
-	 "OR H",
-	 "OR L",
-	 "OR(HL)",
-	 "OR A",
-	 "CP B",
-	 "CP C",
-	 "CP D",
-	 "CP E",
-	 "CP H",
-	 "CP L",
-	 "CP (HL)",
-	 "CP A",
-	 "RET NZ",
-	 "POP BC",
-	 "JP NZ, %X", 
-	 "JP %X", 
-	 "CALLNZ %X", 
-	 "PUSH BC",
-	 "ADD A,%X", 
-	 "RST 00H",
-	 "RET Z",
-	 "RET",
-	 "JP Z,%X", 
-	 "CALL Z,%X", 
-	 "CALL %X", 
-	 "ADC A,%X", 
-	 "RST 08H",
-	 "RET NC",
-	 "POP DE",
-	 "JP NC,%X", 
-	"OUT (+%X),A", 
-	 "CALL NC,%X", 
-	 "PUSH DE",
-	 "SUB %X", 
-	 "RST 10",
-	 "RET C",
-	 "EXX",
-	 "JP C,%X", 
-	 "IN A,(C)",
-	 "CALL C,%X", 
-	 "SBC A,%X", 
-	 "RST 18H",
-	 "RET PO,%X", 
-	 "POP HL",
-	 "JP PO,%X ", 
-	 "EX (SP),HL",
-	 "CALL PO,%X", 
-	 "PUSH HL",
-	"AND %X", 
-	 "RST 20H",
-	 "RET PE,%X", 
-	 "JP (HL)",
-	 "JP PE,%X", 
-	 "EX DE,HL",
-	 "CALL PE,%X", 
-	 "XOR %X",
-	 "RST 28H",
-	 "RET P",
-	 "POP AF",
-	 "JP P,%X", 
-	 "DI",
-	 "CALL P,%X", 
-	 "PUSH AF",
-	 "OR %X", 
-	 "RST 30H",
-	 "RET M,%X", 
-	 "LD SP,HL",
-	 "JP M,%X", 
-	 "EI",
-	 "CALL M,%X", 
-};

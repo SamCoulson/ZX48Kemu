@@ -99,7 +99,8 @@ void run( uint16_t addrs ){
 			printf("**************************************************************t_counter = %d\n", t_counter);
 			printf("screen udpated : %d\n", screenUpdatedCount );
 			clock_gettime(CLOCK_MONOTONIC, &start);
-			exit(1);
+			t_counter = 0;
+//			exit(1);
 		}
 //		if( timeToInterrupt == 0x00 ){
 //			// Automatically save the current PC location on stack

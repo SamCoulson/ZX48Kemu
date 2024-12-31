@@ -1,5 +1,4 @@
 #include "../include/8-bit_load_group.h"
-#include "../include/util_bit_operations.h"
 // LOAD data methods for 8-bit groups
 
 // *** 8-BIT LOAD GROUP ***
@@ -30,7 +29,6 @@
 // LD (HL), r
 // Copy value of 8-bit register to address in HL
 // OpCodes: 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77
-
 
 // LD (IY+d),r
 // Copy value from 8-bit register to address in IY+d

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-//#include "memory.h"
+// #include "memory.h"
 
 #define READ 0
 #define WRITE 1
@@ -23,7 +23,7 @@ extern union _IR ir;
 extern uint16_t ix;
 extern uint16_t iy;
 
-// 16-Bit stack pointer and program counter 
+// 16-Bit stack pointer and program counter
 extern uint16_t sp;
 extern uint16_t pc; // AKA Instruction pointer
 
@@ -35,88 +35,88 @@ extern int iff2;
 extern int mode;
 
 // Structure to hold pointers to all register union
-typedef struct _REGISTERS{
+typedef struct _REGISTERS {
 
-	// Pointers to main registers
-	uint8_t* const a;
-	uint8_t* const f; 
-	uint16_t* const af;
+  // Pointers to main registers
+  uint8_t *const a;
+  uint8_t *const f;
+  uint16_t *const af;
 
-	uint8_t* b;
-	uint8_t* c;
-	uint16_t* bc;
+  uint8_t *b;
+  uint8_t *c;
+  uint16_t *bc;
 
-	uint8_t* d;
-	uint8_t* e;
-	uint16_t* de;
+  uint8_t *d;
+  uint8_t *e;
+  uint16_t *de;
 
-	uint8_t* h;
-	uint8_t* l;
-	uint16_t* hl;
-	
-	// Pointers alternative general purpose registers
-	uint8_t* alta;
-	uint8_t* altf; 
-	uint16_t* altaf;
+  uint8_t *h;
+  uint8_t *l;
+  uint16_t *hl;
 
-	uint8_t* altb;
-	uint8_t* altc;
-	uint16_t* altbc;
+  // Pointers alternative general purpose registers
+  uint8_t *alta;
+  uint8_t *altf;
+  uint16_t *altaf;
 
-	uint8_t* altd;
-	uint8_t* alte;
-	uint16_t* altde;
+  uint8_t *altb;
+  uint8_t *altc;
+  uint16_t *altbc;
 
-	uint8_t* alth;
-	uint8_t* altl;
-	uint16_t* althl;	
-	
-	// 8-Bit special registers - Interrupt vector
-	uint8_t* i;
-	uint8_t* r;
-	uint16_t* ir;
+  uint8_t *altd;
+  uint8_t *alte;
+  uint16_t *altde;
 
-	// 16-Bit index registers
-	uint16_t* ix;
-	uint16_t* iy;
+  uint8_t *alth;
+  uint8_t *altl;
+  uint16_t *althl;
 
-	// 16-Bit stack pointer and program counter 
-	uint16_t* sp;
-	uint16_t* pc; // AKA Instruction pointer
+  // 8-Bit special registers - Interrupt vector
+  uint8_t *i;
+  uint8_t *r;
+  uint16_t *ir;
 
-	// IFFI (Interrupt enabled flip-flop)
-	int* const iff1;
-	int* const iff2;
+  // 16-Bit index registers
+  uint16_t *ix;
+  uint16_t *iy;
 
-	// CPU Mode
-	int* const mode;
+  // 16-Bit stack pointer and program counter
+  uint16_t *sp;
+  uint16_t *pc; // AKA Instruction pointer
 
-}Registers;
+  // IFFI (Interrupt enabled flip-flop)
+  int *const iff1;
+  int *const iff2;
 
-extern Registers* reg;
+  // CPU Mode
+  int *const mode;
 
-//uint8_t ports[256];
+} Registers;
+
+extern Registers *reg;
+
+// uint8_t ports[256];
 
 // Start the CPU running
-extern void run( uint16_t addrs );
+extern void run(uint16_t addrs);
 
 int initCPU();
 
 // Execute instructions
-void execute(uint8_t* opcode);
+void execute(uint8_t *opcode);
 
 // Utility functions
 
 // Port handing
-void mapPort( unsigned int port, uint8_t(*func)(int, uint8_t) );
+void mapPort(unsigned int port, uint8_t (*func)(int, uint8_t));
 
 // Memory handling
 
-// Get next byte along in memory, will progress the PC by 1 
-uint8_t* getNextByte();
+// Get next byte along in memory, will progress the PC by 1
+uint8_t *getNextByte();
 
 // Get next word from next two locations in memory, will progress the PC by 2
-uint16_t* getNextWord();
+uint16_t *getNextWord();
 
 // Read the next byte along, does not progress pc
 uint8_t readNextByte();
@@ -125,19 +125,19 @@ uint8_t readNextByte();
 uint16_t readNextWord();
 
 // Get the byte specified memory location
-uint8_t* getByteAt( uint16_t addrs );
+uint8_t *getByteAt(uint16_t addrs);
 
 // Get the word at the specified location
-uint16_t* getWordAt( uint16_t *addrs );
+uint16_t *getWordAt(uint16_t *addrs);
 
 // Read word at memory location
-uint16_t readWordAt( uint16_t *addrs );
+uint16_t readWordAt(uint16_t *addrs);
 
 // Read byte at memory location
-uint16_t readByteAt( uint16_t addrs );
+uint16_t readByteAt(uint16_t addrs);
 
 // Write byte to memory given 16-bit address
-void writeByte( uint16_t addrs, uint8_t val );
+void writeByte(uint16_t addrs, uint8_t val);
 
 // But first byte in to HO byte, and second byte in to LO byte of a word
 uint16_t byteToWord(uint8_t *byte1, uint8_t *byte2);

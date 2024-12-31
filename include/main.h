@@ -12,5 +12,6 @@
 #include "../include/memory.h"
 #include "../include/16-bit_load_group.h"
 #include "../include/ula.h"
+#include "../include/disassembler.h"
 
 #endif // INC_MAIN_H
