@@ -153,13 +153,14 @@ void execute( uint8_t* opcode )
 
 	if( *opcode == 0xCB || *opcode == 0xDD || *opcode == 0xED || *opcode == 0xFD)
 	{
-		decode_multi_byte_opcode( opcode );
+
+		//disassemble_multi_byte_opcode( opcode );
 		execute_multi_byte_opcode( opcode );
 
 	}
 	else if ( *opcode >= 0x00 && *opcode <= 0xFF)
 	{
-		decode_single_byte_opcode( opcode );
+		//disassemble_single_byte_opcode( opcode );
 		execute_single_byte_opcode( opcode );
 	}
 

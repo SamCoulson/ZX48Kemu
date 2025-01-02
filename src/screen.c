@@ -42,8 +42,14 @@ typedef struct
 
 PixelValue pixel_values[TOTAL_SCREEN_PIXELS]; 
 
+void test_video();
+// this methiod should live in ULA.c
 void build_video_mem_map()
 {
+	// Memory divided in to three blocks of 64 rows each, each block has 8 row groups.
+	// The screen is 32x24 grid.
+
+
 	int index = 0;
 	int x = SCREEN_X_START, y = SCREEN_Y_START; // Pixel coords
 
@@ -56,19 +62,21 @@ void build_video_mem_map()
 
 	// Loop through the thirds
 	for( int i = 0; i < 3; i++ ){
-		// Loop through the 8 lines of each row of this third
+		// Loop through the 8 lines of each row of this third, each line is 8 pixels high
 		for( int j = 0; j < 8; j++){	
 			vidBufLoc = vidStart;
 			//printf("\nvidStart = %X\n", vidStart);
 
-			// Loop through the 8 rows
+			// Loop through the 8 pixel lines of the current row
 			for( int k = 0; k < 8; k++ ){
 				x = SCREEN_X_START;	
 				//printf("\nvidBufLoc = %X\n", vidBufLoc);
+				//32 blocks of 8 bits per row.
 				for( int l = 0; l < 32; l++ ){
 					// Read spec video mem buffer and get pixel status + determine color
 					uint8_t pixel = totalMem[vidBufLoc];
 
+					// loop through each bit in the byte (bit 7 MSB is left most pixel and bit 0 LSD right most pixel)
 					for( bit = 7; bit > -1; bit-- )
 					{
 						pixel_values[index].x = x; 
@@ -76,9 +84,11 @@ void build_video_mem_map()
 
 						// Set on pixel to forground color
 						if( pixel & (1 << (bit) ) ){
-							pixel_values[index].color = BLACK;
+					//		pixel_values[index].color = BLACK;
+							DrawPixel(x, y, BLACK);
 						}else{
-							pixel_values[index].color = WHITE; 
+					//		pixel_values[index].color = WHITE; 
+							DrawPixel(x, y, WHITE);
 						}
 
 						pixel_values[index].index = vidBufLoc;
@@ -124,33 +134,36 @@ void updateScreen(){
 	BeginDrawing();
 
 		ClearBackground(RAYWHITE);
-
-//		if (shouldUpdateScreen)
-//		{
-//			shouldUpdateScreen = false;
 		
-			for (int i = 0; i < TOTAL_SCREEN_PIXELS - 1; i++)
-			{
-	//			printf("%d %d %d\n", pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
+		test_video();	
+//	//	if (shouldUpdateScreen)
+//	//	{
+//	//		shouldUpdateScreen = false;
+	//	
+	//		for (int i = 0; i < TOTAL_SCREEN_PIXELS - 1; i++)
+	//		{
+	////			printf("%d %d %d\n", pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
 
-				uint8_t pixel = totalMem[pixel_values[i].index];
+	//			uint8_t pixel = totalMem[pixel_values[i].index];
 
-				for( int bit = 7; bit > -1; bit-- )
-				{
-					// Set on pixel to forground color
-					if( pixel & (1 << (bit) ) ){
-						pixel_values[i].color = BLACK;
-					}else{
-						pixel_values[i].color = WHITE; 
-					}
+	//			for( int bit = 7; bit > -1; bit-- )
+	//			{
+	//				// Set on pixel to forground color
+	//				if( pixel & (1 << (bit) ) ){
+	//					pixel_values[i].color = BLACK;
+	//				}else{
+	//					pixel_values[i].color = WHITE; 
+	//				}
 
-					DrawPixel(pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
-					//printf("x = %d, Y = %d", pixel_values[i].x, pixel_values[i].y);	
-					i++;
-				}
-				
-			}
-//		}
+	//				DrawPixel(pixel_values[i].x, pixel_values[i].y, pixel_values[i].color);
+	//				//printf("x = %d, Y = %d", pixel_values[i].x, pixel_values[i].y);	
+	//				
+	//			}
+	//			
+	//		}
+//	//	}
+
+		build_video_mem_map();
 
 		GuiGroupBox((Rectangle){ REGISTERS_BOX_X, REGISTERS_BOX_y, REGISTERS_BOX_W, REGISTERS_BOX_H }, "REGISTERS");
 

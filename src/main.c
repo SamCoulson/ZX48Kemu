@@ -64,15 +64,12 @@ void run( uint16_t addrs ){
 			exit(1);
 		}
 
-		if( i == 5000)
+		if( t_counter > 70000)
 		{
-			readVideoRAM( totalMem ); 
-			updateScreen();
-			i = 0;
+		        readVideoRAM( totalMem ); 
+		        updateScreen();
 			screenUpdatedCount++;
 		}
-
-		i++;
 
 		if(paused)
 		{

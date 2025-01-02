@@ -1,14 +1,15 @@
-#include "../include/cpu.h"
+#include <stdio.h>
 #include "../include/disassembler.h"
+
 
 const char *singleByteInstructionLookup[];
 const char *multiByteInstructionLookup[];
 
-void decode_single_byte_opcode(uint8_t *opcode) {
+void disassemble_single_byte_opcode(uint8_t *opcode) {
   printf(" %s\n", singleByteInstructionLookup[(uint8_t)*opcode]);
 }
 
-void decode_multi_byte_opcode(uint8_t *opcode) {
+void disassemble_multi_byte_opcode(uint8_t *opcode) {
   printf(" %s\n", multiByteInstructionLookup[(uint8_t)*opcode]);
 }
 
