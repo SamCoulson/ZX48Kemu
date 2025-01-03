@@ -1,10 +1,9 @@
 #include "../include/main.h"
-
 #define RAYGUI_IMPLEMENTATION
 #include "../include/raygui.h"
+#include "../include/debugger.h"
 
 bool running = true;
-bool paused = false;
 
 int main(){
 
@@ -38,6 +37,7 @@ int main(){
 
 	return 0;
 }
+
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs ){
 
@@ -51,14 +51,14 @@ void run( uint16_t addrs ){
 
 	struct timespec start, end;
 
-	int i = 0;
-	int screenUpdatedCount = 0;
+	int screenUpdateCount = 0;
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	//While less than 16k rom
 	while( running )
 	{
+		checkBreakPointHit(*reg->pc);
 
 		if(WindowShouldClose()){
 			exit(1);
@@ -68,7 +68,7 @@ void run( uint16_t addrs ){
 		{
 		        readVideoRAM( totalMem ); 
 		        updateScreen();
-			screenUpdatedCount++;
+			screenUpdateCount++;
 		}
 
 		if(paused)
@@ -94,9 +94,10 @@ void run( uint16_t addrs ){
 		{
 			printf("Elapsed time: %ld4ns (%f seconds)\n", elapsed_ns, elapsed_s);
 			printf("**************************************************************t_counter = %d\n", t_counter);
-			printf("screen udpated : %d\n", screenUpdatedCount );
+			printf("screen udpated : %d\n", screenUpdateCount );
 			clock_gettime(CLOCK_MONOTONIC, &start);
 			t_counter = 0;
+			screenUpdateCount = 0;
 //			exit(1);
 		}
 //		if( timeToInterrupt == 0x00 ){
@@ -137,14 +138,12 @@ void run( uint16_t addrs ){
 //			// Read video RAM
 //			readVideoRAM( totalMem );
 //
-//	//	updateScreen();
 //			// Reset for next interrupt period
 //			timeToInterrupt = 10000;
 //
 //			// After accepting a maskable interrupt both IFFs are reset
 //			*reg->iff1 = 0;
 //			*reg->iff2 = 0;
-//
 //		}
 //		else
 //		{
@@ -161,17 +160,5 @@ void run( uint16_t addrs ){
 		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
 		// ***** wrap in timer ***
 		// - Remove console debug printfs first as these also calling other functions
-//	
-//		if( *reg->pc == 0x11DA ){
-//		
-//			*reg->pc = 0x11EF;
-//		      // Set HL to +FFFF fro RAM-TOP
-//			*reg->hl = 0xFFFF;
-//		}
-		
-		//	*reg->pc = 0x11EF;
-		      // Set HL to +FFFF fro RAM-TOP
-		//	*reg->hl = 0xFFFF;
-		//}
 	}
 }

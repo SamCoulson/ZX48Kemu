@@ -7,7 +7,6 @@
 #include "../include/raygui.h"
 #include "../include/memory.h"
 #include "../include/cpu.h"
-#include "../include/ula.h"
 #include "../include/util_bit_operations.h"
 
 int initWindow();

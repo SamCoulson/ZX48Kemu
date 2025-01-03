@@ -1,4 +1,5 @@
 #include "../include/screen.h"
+#include "../include/debugger.h"
 #include <stdio.h>
 
 #define SCREEN_WIDTH 256
@@ -29,8 +30,6 @@ const int stack_box_h = 360;
 #define BREAKPOINTS_BOX_H 130
 
 const int font_size = 10;
-
-extern bool paused;
 
 typedef struct 
 {
@@ -124,7 +123,6 @@ int initWindow(){
 
 	return 0;
 }
-char breakpoint[5] = "0000";
 bool textBoxEditMode = false;
 
 char *buttonText = "Pause";
@@ -216,23 +214,6 @@ void updateScreen(){
 		{
 			textBoxEditMode = !textBoxEditMode;
 			printf("*******************************breakpoint set to %s and PC is %04X\n", breakpoint, *reg->pc);
-		}
-
-		char programCounterAddr[5];
-		sprintf(programCounterAddr, "%04X", *reg->pc);
-
-		if (strcmp(breakpoint, programCounterAddr) == 0)
-		{
-			if(strcmp(breakpoint, "0000") == 0)
-			{
-				// avoid pausing straight away
-				// printf("ignoring PC");
-			}
-			else
-			{
-				//printf("**********Breakpoint %s hit", breakpoint);
-				paused = true;
-			}
 		}
 
 		GuiSetState(STATE_NORMAL);
