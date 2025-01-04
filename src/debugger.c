@@ -5,6 +5,7 @@
 
 bool paused = false;
 char breakpoint[5] = "0000";
+bool stepping = false;
 
 void checkBreakPointHit( uint16_t pc )
 {

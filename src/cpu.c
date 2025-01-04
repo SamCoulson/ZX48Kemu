@@ -920,6 +920,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			RET( reg->pc, getWordAt( reg->sp ), reg->sp );
 			break;
 		case 0xCA:
+			t_counter += 12;
 			JPZ( reg->pc, getNextWord(), reg->f );
 			break;
 		case 0xCB:
@@ -929,6 +930,7 @@ void execute_single_byte_opcode( uint8_t *opcode )
 			CALLZ( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc, reg->f );
 			break;
 		case 0xCD:
+			t_counter += 17;
 			CALL( getNextWord(), getWordAt( reg->sp ), reg->sp, reg->pc );
 			break;
 		case 0xCE:

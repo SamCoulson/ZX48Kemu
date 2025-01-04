@@ -227,11 +227,22 @@ void updateScreen(){
 		}
 
 		GuiSetState(STATE_NORMAL);
+		if (GuiButton((Rectangle){ 420, 400, 60, 30}, "Step"))
+		{
+			// only allow stepping from paused or start
+			if(paused || (paused && *reg->pc == 0000))
+			{
+				stepping = true;	
+			}
+		}
+
+		GuiSetState(STATE_NORMAL);
 		if (GuiButton((Rectangle){ 350, 440, 60, 30}, "Reset"))
 		{
 			// TODO also reset registers
 			*reg->pc = 0000;
 		}
+
 
 		if(paused)
 		{

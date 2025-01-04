@@ -5,10 +5,8 @@
 
 bool running = true;
 
-int main(){
-
-	// Re-direct output to console as SDL will disable it *Windows only*
-	//freopen( "CON" ,"w", stdout);
+int main()
+{
 
 	printf( "Output to console enabled\n");
  	
@@ -29,8 +27,7 @@ int main(){
 	// so why not have say -10 and +10 instructions from the current instuction being executed shown in a list
 	// all I would need do is decode or translate 20 instuctions, I could then step the instructions and havbe then decoded as 
 	// they flow into view.
-	paused = true; // start in paused mode
-	// Begin executing code from 0x00
+	
 	run( 0x0000 );
 
 	CloseWindow();
@@ -39,15 +36,13 @@ int main(){
 }
 
 //  Set the PC to point to a location in memory
-void run( uint16_t addrs ){
-
+void run( uint16_t addrs )
+{
 	// Begin executing from 0x0000
 	*reg->pc = addrs;
 
 	// DEBUG
 	*reg->pc = 0x0000;
-
-//	uint8_t timeToInterrupt = 200;
 
 	struct timespec start, end;
 
@@ -55,27 +50,26 @@ void run( uint16_t addrs ){
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
-	//While less than 16k rom
-	while( running )
-	{
+	while( !WindowShouldClose() )
+	{	
 		checkBreakPointHit(*reg->pc);
 
-		if(WindowShouldClose()){
-			exit(1);
+		if(paused)
+		{
+			clock_gettime(CLOCK_MONOTONIC, &start);
+			updateScreen();
+
+			if(!stepping)
+			{
+				continue;
+			}
 		}
 
 		if( t_counter > 70000)
 		{
 		        readVideoRAM( totalMem ); 
-		        updateScreen();
-			screenUpdateCount++;
-		}
-
-		if(paused)
-		{
 			updateScreen();
-			clock_gettime(CLOCK_MONOTONIC, &start);
-			continue;
+			screenUpdateCount++;
 		}
 
 		// Execute the instruction pointed to by pc
@@ -89,17 +83,24 @@ void run( uint16_t addrs ){
 		uint64_t elapsed_ns = (uint64_t)(end.tv_sec - start.tv_sec) * 1000000000ULL + (end.tv_nsec - start.tv_nsec);
 
 		double elapsed_s = elapsed_ns / 1e9; // Convert to seconds
-		// Do interrupts ( Peripheral service routines )
+		
 		if(elapsed_s > 1.0)
 		{
 			printf("Elapsed time: %ld4ns (%f seconds)\n", elapsed_ns, elapsed_s);
-			printf("**************************************************************t_counter = %d\n", t_counter);
+			printf("********************t_counter = %d\n", t_counter);
 			printf("screen udpated : %d\n", screenUpdateCount );
 			clock_gettime(CLOCK_MONOTONIC, &start);
 			t_counter = 0;
 			screenUpdateCount = 0;
-//			exit(1);
 		}
+
+		stepping = false;
+	}
+}
+
+// Do interrupts ( Peripheral service routines )
+void doInterrupt()
+{
 //		if( timeToInterrupt == 0x00 ){
 //			// Automatically save the current PC location on stack
 //			// Need to accomodate autoincrement of PC on return
@@ -156,9 +157,4 @@ void run( uint16_t addrs ){
 		// while waiting for a NMI or interrupt request ( only is IIF is enabled )
 		// R Register should be implemented, 7-bits are incremented after each instruction fetch
 		// Computer memory becasue the capacitors holding 1/0 state loose charge and so need to be refreshed
-
-		// Skip RAM-TEST - make PC skip to avoid the unnecassry check
-		// ***** wrap in timer ***
-		// - Remove console debug printfs first as these also calling other functions
-	}
 }

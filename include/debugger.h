@@ -7,6 +7,9 @@
 extern bool paused;
 
 extern char breakpoint[5];
+
+extern bool stepping;
+
 void checkBreakPointHit(uint16_t pc);
 
 #endif
