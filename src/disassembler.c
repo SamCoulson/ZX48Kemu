@@ -1,12 +1,26 @@
 #include <stdio.h>
 #include "../include/disassembler.h"
 
+#define DISASS_INSTRUCT_BUFFER_SIZE 30
+
+char* disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
 
 const char *singleByteInstructionLookup[];
 const char *multiByteInstructionLookup[];
 
-void disassemble_single_byte_opcode(uint8_t *opcode) {
-  printf(" %s\n", singleByteInstructionLookup[(uint8_t)*opcode]);
+void initDisassInstructionsBuffer()
+{
+  char* default_value = "???";
+
+  for( int i = 0; i < sizeof(disass_instructions) / sizeof(char*); i++)
+  {
+    disass_instructions[i] = default_value;
+  }
+}
+
+const char* disassemble_single_byte_opcode(uint8_t *opcode)
+{
+  return singleByteInstructionLookup[(uint8_t)*opcode];
 }
 
 void disassemble_multi_byte_opcode(uint8_t *opcode) {

@@ -1,5 +1,7 @@
 #include "../include/screen.h"
 #include "../include/debugger.h"
+#include "../include/disassembler.h"
+#include <stdint.h>
 #include <stdio.h>
 
 #define SCREEN_WIDTH 256
@@ -213,6 +215,14 @@ void updateScreen(){
 		}
 
 		GuiGroupBox((Rectangle){ instructions_box_x, instructions_box_y, instructions_box_w, instructions_box_h }, "INSTRUCTIONS");
+		int instruction_v_spacing = 30;
+		for( int i = 0; i < sizeof(disass_instructions) / sizeof(char*); i++)
+		{
+			DrawText(TextFormat("%s", disass_instructions[i]), instructions_box_x+10, instruction_v_spacing, 10, BLACK);
+			// need to add arrow to show where the sp is currently pointing too
+			instruction_v_spacing+=10;
+		}
+
 
 		GuiGroupBox((Rectangle){ breakpoints_box_x, breakpoints_box_y, breakpoints_box_w, breakpoints_box_h}, "BREAKPOINTS");
 
@@ -228,8 +238,19 @@ void updateScreen(){
 		{
 			if(paused == true){
 				paused = false;
+
+				initDisassInstructionsBuffer();
 			}else{
 				paused = true;
+
+				uint16_t prev_instruct_start = *reg->pc - DISASS_INSTRUCT_BUFFER_SIZE;
+
+				for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
+				{
+					//printf("%04X\n", totalMem[prev_instruct_start]);
+					disass_instructions[i] = disassemble_single_byte_opcode(&totalMem[prev_instruct_start]);
+					prev_instruct_start++;
+				}
 			}
 		}
 

@@ -3,8 +3,6 @@
 #include "../include/raygui.h"
 #include "../include/debugger.h"
 
-bool running = true;
-
 int main()
 {
 
@@ -18,6 +16,7 @@ int main()
 	// Copy loaded system ROM data into system memory
 	loadROM( romMemPtr, romFileSize );
 
+	initDisassInstructionsBuffer();
 	// Start at address 0x00
 	//initCPU();
 	initULA();
