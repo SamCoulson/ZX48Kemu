@@ -9,25 +9,30 @@
 
 #define TOTAL_SCREEN_PIXELS 49152
 
-#define REGISTERS_BOX_X 350
-#define REGISTERS_BOX_y 20
-#define REGISTERS_BOX_W 175
-#define REGISTERS_BOX_H 160
+const int registers_box_x = 300;
+const int registers_box_y = 20;
+const int registers_box_w = 175;
+const int registers_box_h = 160;
 
-const int flags_box_x = 350; 
+const int flags_box_x = 300; 
 const int flags_box_y = 200;
 const int flags_box_w = 175;
 const int flags_box_h = 30;
 
-const int stack_box_x = 535;
+const int stack_box_x = 485;
 const int stack_box_y = 20;
 const int stack_box_w = 70;
 const int stack_box_h = 360;
 
-#define BREAKPOINTS_BOX_X 350
-#define BREAKPOINTS_BOX_Y 250
-#define BREAKPOINTS_BOX_W 175
-#define BREAKPOINTS_BOX_H 130
+const int instructions_box_x = 565;
+const int instructions_box_y = 20;
+const int instructions_box_w = 110;
+const int instructions_box_h = 360;
+
+const int breakpoints_box_x = 300;
+const int breakpoints_box_y = 250;
+const int breakpoints_box_w = 175;
+const int breakpoints_box_h = 130;
 
 const int font_size = 10;
 
@@ -110,7 +115,7 @@ void build_video_mem_map()
 
 int initWindow(){
 
-	const int screenWidth = 640;
+	const int screenWidth = 685;
 	const int screenHeight = 480;
 
 	//initSDL();
@@ -163,29 +168,29 @@ void updateScreen(){
 
 		build_video_mem_map();
 
-		GuiGroupBox((Rectangle){ REGISTERS_BOX_X, REGISTERS_BOX_y, REGISTERS_BOX_W, REGISTERS_BOX_H }, "REGISTERS");
+		GuiGroupBox((Rectangle){ registers_box_x, registers_box_y, registers_box_w, registers_box_h }, "REGISTERS");
 
-		DrawText(TextFormat("AF: %02X %02X", *reg->a, *reg->f), REGISTERS_BOX_X+10, 30, font_size, BLACK);
-		DrawText(TextFormat("AF': %02X %02X", *reg->alta, *reg->altf), REGISTERS_BOX_X+75, 30, font_size, BLACK);
-		DrawText(TextFormat("BC: %02X %02X", *reg->b, *reg->c), REGISTERS_BOX_X+10, 40, font_size, BLACK);
-		DrawText(TextFormat("BC': %02X %02X", *reg->altb, *reg->altc), REGISTERS_BOX_X+75, 40, font_size, BLACK);
-		DrawText(TextFormat("DE: %02X %02X", *reg->d, *reg->e), REGISTERS_BOX_X+10, 50, font_size, BLACK);
-		DrawText(TextFormat("DE': %02X %02X", *reg->altd, *reg->alte), REGISTERS_BOX_X+75, 50, font_size, BLACK);
+		DrawText(TextFormat("AF: %02X %02X", *reg->a, *reg->f), registers_box_x+10, 30, font_size, BLACK);
+		DrawText(TextFormat("AF': %02X %02X", *reg->alta, *reg->altf), registers_box_x+75, 30, font_size, BLACK);
+		DrawText(TextFormat("BC: %02X %02X", *reg->b, *reg->c), registers_box_x+10, 40, font_size, BLACK);
+		DrawText(TextFormat("BC': %02X %02X", *reg->altb, *reg->altc), registers_box_x+75, 40, font_size, BLACK);
+		DrawText(TextFormat("DE: %02X %02X", *reg->d, *reg->e), registers_box_x+10, 50, font_size, BLACK);
+		DrawText(TextFormat("DE': %02X %02X", *reg->altd, *reg->alte), registers_box_x+75, 50, font_size, BLACK);
 
-		DrawText(TextFormat("HL: %02X %02X", *reg->h, *reg->l), REGISTERS_BOX_X+10, 70, 10, BLACK);
-		DrawText(TextFormat("HL': %02X %02X", *reg->alth, *reg->altl), REGISTERS_BOX_X+75, 70, 10, BLACK);
+		DrawText(TextFormat("HL: %02X %02X", *reg->h, *reg->l), registers_box_x+10, 70, 10, BLACK);
+		DrawText(TextFormat("HL': %02X %02X", *reg->alth, *reg->altl), registers_box_x+75, 70, 10, BLACK);
 
-		DrawText(TextFormat("SP: %04X", *reg->sp), REGISTERS_BOX_X+10, 90, 10, BLACK);
-		DrawText(TextFormat("PC: %04X", *reg->pc), REGISTERS_BOX_X+75, 90, 10, BLACK);
+		DrawText(TextFormat("SP: %04X", *reg->sp), registers_box_x+10, 90, 10, BLACK);
+		DrawText(TextFormat("PC: %04X", *reg->pc), registers_box_x+75, 90, 10, BLACK);
 
-		DrawText(TextFormat("IX: %04X", *reg->ix), REGISTERS_BOX_X+10, 110, 10, BLACK);
-		DrawText(TextFormat("IY: %04X", *reg->ix), REGISTERS_BOX_X+75, 110, 10, BLACK);
+		DrawText(TextFormat("IX: %04X", *reg->ix), registers_box_x+10, 110, 10, BLACK);
+		DrawText(TextFormat("IY: %04X", *reg->ix), registers_box_x+75, 110, 10, BLACK);
 
-		DrawText(TextFormat("I: %02X", *reg->i), REGISTERS_BOX_X+10, 130, 10, BLACK);
-		DrawText(TextFormat("R: %02X", *reg->r), REGISTERS_BOX_X+75, 130, 10, BLACK);
+		DrawText(TextFormat("I: %02X", *reg->i), registers_box_x+10, 130, 10, BLACK);
+		DrawText(TextFormat("R: %02X", *reg->r), registers_box_x+75, 130, 10, BLACK);
 
-		DrawText(TextFormat("EFF 1: %d", *reg->iff1), REGISTERS_BOX_X+10, 150, 10, BLACK);
-		DrawText(TextFormat("EFF 2: %d", *reg->iff2), REGISTERS_BOX_X+75, 150, 10, BLACK);
+		DrawText(TextFormat("EFF 1: %d", *reg->iff1), registers_box_x+10, 150, 10, BLACK);
+		DrawText(TextFormat("EFF 2: %d", *reg->iff2), registers_box_x+75, 150, 10, BLACK);
 
 		GuiGroupBox((Rectangle){ flags_box_x, flags_box_y, flags_box_w, flags_box_h }, "FLAGS");
 
@@ -200,24 +205,26 @@ void updateScreen(){
 				getBit( reg->f, 0 ) ), flags_box_x+10, flags_box_y+10, 10, BLACK);
 
 		GuiGroupBox((Rectangle){ stack_box_x, stack_box_y, stack_box_w, stack_box_h }, "STACK");
-
 		int k = 30;
 		for( int i = 0xFF56; i > 0xFF35; i-- ){
 			DrawText(TextFormat("%04X %02X", i, totalMem[i]), stack_box_x+10, k, 10, BLACK);
+			// need to add arrow to show where the sp is currently pointing too
 			k+=10;
 		}
 
-		GuiGroupBox((Rectangle){ BREAKPOINTS_BOX_X, BREAKPOINTS_BOX_Y, BREAKPOINTS_BOX_W, BREAKPOINTS_BOX_H}, "BREAKPOINTS");
+		GuiGroupBox((Rectangle){ instructions_box_x, instructions_box_y, instructions_box_w, instructions_box_h }, "INSTRUCTIONS");
 
-		GuiLabel((Rectangle){BREAKPOINTS_BOX_X+10, BREAKPOINTS_BOX_Y+5, 30, 30 }, "1. 0x");
-		if (GuiTextBox((Rectangle){ BREAKPOINTS_BOX_X+35, BREAKPOINTS_BOX_Y+10, 50, 20 }, breakpoint, 64, textBoxEditMode)) 
+		GuiGroupBox((Rectangle){ breakpoints_box_x, breakpoints_box_y, breakpoints_box_w, breakpoints_box_h}, "BREAKPOINTS");
+
+		GuiLabel((Rectangle){breakpoints_box_x+10, breakpoints_box_y+5, 30, 30 }, "1. 0x");
+		if (GuiTextBox((Rectangle){ breakpoints_box_x+35, breakpoints_box_y+10, 50, 20 }, breakpoint, 64, textBoxEditMode)) 
 		{
 			textBoxEditMode = !textBoxEditMode;
 			printf("*******************************breakpoint set to %s and PC is %04X\n", breakpoint, *reg->pc);
 		}
-
+		
 		GuiSetState(STATE_NORMAL);
-		if (GuiButton((Rectangle){ 350, 400, 60, 30}, buttonText))
+		if (GuiButton((Rectangle){ 300, 400, 60, 30}, buttonText))
 		{
 			if(paused == true){
 				paused = false;
@@ -237,7 +244,7 @@ void updateScreen(){
 		}
 
 		GuiSetState(STATE_NORMAL);
-		if (GuiButton((Rectangle){ 350, 440, 60, 30}, "Reset"))
+		if (GuiButton((Rectangle){ 300, 440, 60, 30}, "Reset"))
 		{
 			// TODO also reset registers
 			*reg->pc = 0000;
