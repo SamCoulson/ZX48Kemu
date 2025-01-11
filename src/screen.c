@@ -28,7 +28,7 @@ const int stack_box_h = 360;
 
 const int instructions_box_x = 565;
 const int instructions_box_y = 20;
-const int instructions_box_w = 110;
+const int instructions_box_w = 140;
 const int instructions_box_h = 360;
 
 const int breakpoints_box_x = 300;
@@ -117,7 +117,7 @@ void build_video_mem_map()
 
 int initWindow(){
 
-	const int screenWidth = 685;
+	const int screenWidth = 700;
 	const int screenHeight = 480;
 
 	//initSDL();
@@ -206,6 +206,8 @@ void updateScreen(){
 				getBit( reg->f, 1 ),
 				getBit( reg->f, 0 ) ), flags_box_x+10, flags_box_y+10, 10, BLACK);
 
+
+		// Draw stack box
 		GuiGroupBox((Rectangle){ stack_box_x, stack_box_y, stack_box_w, stack_box_h }, "STACK");
 		int k = 30;
 		for( int i = 0xFF56; i > 0xFF35; i-- ){
@@ -214,15 +216,17 @@ void updateScreen(){
 			k+=10;
 		}
 
+		// Draw instructions box
 		GuiGroupBox((Rectangle){ instructions_box_x, instructions_box_y, instructions_box_w, instructions_box_h }, "INSTRUCTIONS");
 		int instruction_v_spacing = 30;
-		for( int i = 0; i < sizeof(disass_instructions) / sizeof(char*); i++)
+		for( int i = 0; i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
 		{
-			DrawText(TextFormat("%s", disass_instructions[i]), instructions_box_x+10, instruction_v_spacing, 10, BLACK);
+            printf("%s\n", disass_instructions[i].addr);
+			DrawText(TextFormat("%s", disass_instructions[i].addr), instructions_box_x+10, instruction_v_spacing, 10, BLACK);
+			DrawText(TextFormat("%s", disass_instructions[i].instr), instructions_box_x+50, instruction_v_spacing, 10, BLACK);
 			// need to add arrow to show where the sp is currently pointing too
 			instruction_v_spacing+=10;
 		}
-
 
 		GuiGroupBox((Rectangle){ breakpoints_box_x, breakpoints_box_y, breakpoints_box_w, breakpoints_box_h}, "BREAKPOINTS");
 
@@ -242,15 +246,7 @@ void updateScreen(){
 				initDisassInstructionsBuffer();
 			}else{
 				paused = true;
-
-				uint16_t prev_instruct_start = *reg->pc - DISASS_INSTRUCT_BUFFER_SIZE;
-
-				for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
-				{
-					//printf("%04X\n", totalMem[prev_instruct_start]);
-					disass_instructions[i] = disassemble_single_byte_opcode(&totalMem[prev_instruct_start]);
-					prev_instruct_start++;
-				}
+				populateInstructionsBuffer();	
 			}
 		}
 

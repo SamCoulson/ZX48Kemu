@@ -49,6 +49,8 @@ void run( uint16_t addrs )
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
+	paused = true;
+
 	while( !WindowShouldClose() )
 	{	
 		checkBreakPointHit(*reg->pc);

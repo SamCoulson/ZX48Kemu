@@ -1,21 +1,51 @@
+#include <stdint.h>
 #include <stdio.h>
 #include "../include/disassembler.h"
+#include "../include/cpu.h"
+#include "../include/memory.h"
 
 #define DISASS_INSTRUCT_BUFFER_SIZE 30
 
-char* disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
+disass_instruction disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
 
 const char *singleByteInstructionLookup[];
 const char *multiByteInstructionLookup[];
 
 void initDisassInstructionsBuffer()
 {
-  char* default_value = "???";
+  char* default_value = "????";
 
-  for( int i = 0; i < sizeof(disass_instructions) / sizeof(char*); i++)
+  for( int i = 0; i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
   {
-    disass_instructions[i] = default_value;
+    //disass_instructions[i].addr = default_value;
+    disass_instructions[i].instr = default_value;
   }
+}
+
+void populateInstructionsBuffer()
+{
+    uint16_t prev_instruct = *reg->pc - DISASS_INSTRUCT_BUFFER_SIZE;
+
+    for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
+    {
+            uint8_t *opcode = &totalMem[prev_instruct];
+            
+            char addrStr[6];
+            sprintf(addrStr, "%04X", prev_instruct);
+            strcpy(disass_instructions[i].addr, addrStr);
+
+            if( *opcode == 0xcb || *opcode == 0xdd || *opcode == 0xed || *opcode == 0xfd)
+            {
+                    /*disass_instructions[i] = disassemble_multi_byte_opcode( opcode );*/
+                    disass_instructions[i].instr = "mutli-opcode";
+            }
+            else if ( *opcode >= 0x00 && *opcode <= 0xff)
+            {
+                    disass_instructions[i].instr = disassemble_single_byte_opcode( opcode );
+            }
+
+            prev_instruct++;
+    }
 }
 
 const char* disassemble_single_byte_opcode(uint8_t *opcode)
