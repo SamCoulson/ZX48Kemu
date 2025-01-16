@@ -1,6 +1,5 @@
 #include "../include/memory.h"
 
-
 unsigned char totalMem[65536];
 
 // Copy the ROM file data into sysyem memory

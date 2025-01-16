@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include "../include/disassembler.h"
 #include "../include/cpu.h"
 #include "../include/memory.h"
@@ -8,23 +9,24 @@
 
 disass_instruction disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
 
-const char *singleByteInstructionLookup[];
 const char *multiByteInstructionLookup[];
 
 void initDisassInstructionsBuffer()
 {
+  printf("clearing dissasembly buffer\n");
   char* default_value = "????";
 
   for( int i = 0; i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
   {
-    //disass_instructions[i].addr = default_value;
+    strcpy(disass_instructions[i].addr, "???");
     disass_instructions[i].instr = default_value;
   }
 }
 
 void populateInstructionsBuffer()
 {
-    uint16_t prev_instruct = *reg->pc - DISASS_INSTRUCT_BUFFER_SIZE;
+    // simply subtracting from the PC wont work because the number substrated might end up in the middle of a multi-byte instruction.
+    uint16_t prev_instruct = *z80->pc - DISASS_INSTRUCT_BUFFER_SIZE;
 
     for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
     {
@@ -36,8 +38,7 @@ void populateInstructionsBuffer()
 
             if( *opcode == 0xcb || *opcode == 0xdd || *opcode == 0xed || *opcode == 0xfd)
             {
-                    /*disass_instructions[i] = disassemble_multi_byte_opcode( opcode );*/
-                    disass_instructions[i].instr = "mutli-opcode";
+                    disass_instructions[i].instr = disassemble_multi_byte_opcode( opcode );
             }
             else if ( *opcode >= 0x00 && *opcode <= 0xff)
             {
@@ -50,266 +51,13 @@ void populateInstructionsBuffer()
 
 const char* disassemble_single_byte_opcode(uint8_t *opcode)
 {
-  return singleByteInstructionLookup[(uint8_t)*opcode];
+  return singleByteInstructionLookup[(uint8_t)*opcode].name;
 }
 
-void disassemble_multi_byte_opcode(uint8_t *opcode) {
-  printf(" %s\n", multiByteInstructionLookup[(uint8_t)*opcode]);
+const char* disassemble_multi_byte_opcode(uint8_t *opcode) 
+{
+  return multiByteInstructionLookup[(uint8_t)*opcode];
 }
-
-
-const char *singleByteInstructionLookup[] = {
-    "NOP (Not implemented yet!",
-    "LD BC,+%X",
-    "LD(BC),A",
-    "INC BC",
-    "INC B",
-    "DEC B",
-    "LD B,+%X",
-    "RLCA",
-    "EX AF,AF'",
-    "ADD HL,BC",
-    "LD A,(BC)",
-    "DEC BC",
-    "INC C",
-    "DEC C",
-    "LD C,+%X",
-    "RRCA",
-    "DJNZ %d",
-    "LD DE,+%X",
-    "LD(DE),A",
-    "INC DE",
-    "INC D",
-    "DEC D",
-    "LD D,+%X",
-    "RLA",
-    "JR %X",
-    "ADD HL,DE",
-    "LD A,(DE)",
-    "DEC DE",
-    "INC E",
-    "DEC E",
-    "LD E,+%X",
-    "RRA",
-    "JR NZ,%d",
-    "LD HL,+%X",
-    "LD (%X),HL",
-    "INC HL",
-    "INC H",
-    "DEC H",
-    "LD H,+%X",
-    "DAA",
-    "JR Z,+%X",
-    "ADD HL,HL",
-    "LD HL,(%X)",
-    "DEC HL",
-    "INC L",
-    "DEC L",
-    "LD L,+%X",
-    "CPL",
-    "JR NC,%d",
-    "LD SP,+%X",
-    "LD (%X),A",
-    "INC SP",
-    "INC (HL)",
-    "DEC (HL)",
-    "LD (HL),+%X",
-    "SCF",
-    "JR C,%d",
-    "ADD HL,SP",
-    "LD A,(%X)",
-    "DEC SP",
-    "INC A",
-    "DEC A",
-    "LD A,+%X",
-    "CCF",
-    "LD B,B",
-    "LD B,C",
-    "LD B,D",
-    "LD B,E",
-    "LD B,H",
-    "LD B,L",
-    "LD B,(HL)",
-    "LD B,A",
-    "LD C,B",
-    "LD C,C",
-    "LD C,D",
-    "LD C,E",
-    "LD C,H",
-    "LD C,L",
-    "LD C,(HL)",
-    "LD C,A",
-    "LD D,B",
-    "LD D,C",
-    "LD D,D",
-    "LD D,E",
-    "LD D,H",
-    "LD D,L",
-    "LD D,(HL)",
-    "LD D,A",
-    "LD E,B",
-    "LD E,C",
-    "LD E,D",
-    "LD E,E",
-    "LD E,H",
-    "LD E,L",
-    "LD E,(HL)",
-    "LD E,A",
-    "LD H,B",
-    "LD H,C",
-    "LD H,D",
-    "LD H,E",
-    "LD H,H",
-    "LD H,L",
-    "LD H,(HL)",
-    "LD H,A",
-    "LD L,B",
-    "LD L,C",
-    "LD L,D",
-    "LD L,E",
-    "LD L,H",
-    "LD L,L",
-    "LD L,(HL)",
-    "LD L,A",
-    "LD (HL),B",
-    "LD (HL),C",
-    "LD (HL),D",
-    "LD (HL),E",
-    "LD (HL),H",
-    "LD (HL),L",
-    "HALT",
-    "LD (HL),A",
-    "LD A,B",
-    "LD A,C",
-    "LD A,D",
-    "LD A,E",
-    "LD A,H",
-    "LD A,L",
-    "LD A,(HL)",
-    "LD A,A",
-    "ADD A,B",
-    "ADD A,C",
-    "ADD A,D",
-    "ADD A,E",
-    "ADD A,H",
-    "ADD A,L",
-    "ADD (HL)",
-    "ADD A,A",
-    "ADC A,B",
-    "ADC A,C",
-    "ADC A,D",
-    "ADC A,E",
-    "ADC A,H",
-    "ADC A,L",
-    "ADC A,(HL)",
-    "ADC A,A",
-    "SUB B",
-    "SUB C",
-    "SUB D",
-    "SUB E",
-    "SUB H",
-    "SUB L",
-    "SUB (HL)",
-    "SUB A",
-    "SBC A,B",
-    "SBC A,C",
-    "SBC A,D",
-    "SBC A,E",
-    "SBC A,H",
-    "SBC A,L",
-    "SBC A,(HL)",
-    "SBC A,A",
-    "AND B",
-    "AND C",
-    "AND D",
-    "AND E",
-    "AND H",
-    "AND L",
-    "AND (HL)",
-    "AND A",
-    "XOR B",
-    "XOR C",
-    "XOR D",
-    "XOR E",
-    "XOR H",
-    "XOR L",
-    "XOR (HL)",
-    "XOR A",
-    "OR B",
-    "OR C",
-    "OR D",
-    "OR E",
-    "OR H",
-    "OR L",
-    "OR(HL)",
-    "OR A",
-    "CP B",
-    "CP C",
-    "CP D",
-    "CP E",
-    "CP H",
-    "CP L",
-    "CP (HL)",
-    "CP A",
-    "RET NZ",
-    "POP BC",
-    "JP NZ, %X",
-    "JP %X",
-    "CALLNZ %X",
-    "PUSH BC",
-    "ADD A,%X",
-    "RST 00H",
-    "RET Z",
-    "RET",
-    "JP Z,%X",
-    "CALL Z,%X",
-    "CALL %X",
-    "ADC A,%X",
-    "RST 08H",
-    "RET NC",
-    "POP DE",
-    "JP NC,%X",
-    "OUT (+%X),A",
-    "CALL NC,%X",
-    "PUSH DE",
-    "SUB %X",
-    "RST 10",
-    "RET C",
-    "EXX",
-    "JP C,%X",
-    "IN A,(C)",
-    "CALL C,%X",
-    "SBC A,%X",
-    "RST 18H",
-    "RET PO,%X",
-    "POP HL",
-    "JP PO,%X ",
-    "EX (SP),HL",
-    "CALL PO,%X",
-    "PUSH HL",
-    "AND %X",
-    "RST 20H",
-    "RET PE,%X",
-    "JP (HL)",
-    "JP PE,%X",
-    "EX DE,HL",
-    "CALL PE,%X",
-    "XOR %X",
-    "RST 28H",
-    "RET P",
-    "POP AF",
-    "JP P,%X",
-    "DI",
-    "CALL P,%X",
-    "PUSH AF",
-    "OR %X",
-    "RST 30H",
-    "RET M,%X",
-    "LD SP,HL",
-    "JP M,%X",
-    "EI",
-    "CALL M,%X",
-};
 
 const char *multiByteInstructionLookup[] = {
     "RLC B",       /*0x00*/

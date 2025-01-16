@@ -1,4 +1,6 @@
 #include "../include/main.h"
+#include <stdint.h>
+#include <stdio.h>
 #define RAYGUI_IMPLEMENTATION
 #include "../include/raygui.h"
 #include "../include/debugger.h"
@@ -26,7 +28,8 @@ int main()
 	// so why not have say -10 and +10 instructions from the current instuction being executed shown in a list
 	// all I would need do is decode or translate 20 instuctions, I could then step the instructions and havbe then decoded as 
 	// they flow into view.
-	
+	printf("about to run\n");	
+
 	run( 0x0000 );
 
 	CloseWindow();
@@ -37,11 +40,13 @@ int main()
 //  Set the PC to point to a location in memory
 void run( uint16_t addrs )
 {
-	// Begin executing from 0x0000
-	*reg->pc = addrs;
+	printf("Entered run\n");
 
+	// Begin executing from 0x0000
+	*z80->pc = addrs;
+	printf("address = %04X, byte at %02X\n", *z80->pc, totalMem[*z80->pc]);
 	// DEBUG
-	*reg->pc = 0x0000;
+	*z80->pc = 0x0000;
 
 	struct timespec start, end;
 
@@ -53,7 +58,8 @@ void run( uint16_t addrs )
 
 	while( !WindowShouldClose() )
 	{	
-		checkBreakPointHit(*reg->pc);
+/*printf("inside while");*/
+		checkBreakPointHit(*z80->pc);
 
 		if(paused)
 		{
@@ -73,8 +79,13 @@ void run( uint16_t addrs )
 			screenUpdateCount++;
 		}
 
+		printf("just about to execute\n");
+
 		// Execute the instruction pointed to by pc
-		execute( &totalMem[*reg->pc]  );
+		uint8_t* val = &totalMem[*z80->pc];
+		printf("mem val %0x\n", *val);
+		/*execute( &totalMem[*z80->pc]  );*/
+		execute( val );
 
 		// Progess the PC by 1
 		getNextByte();

@@ -2,6 +2,7 @@
 #define INC_GPAANDCPUCONTGROP_H 
 
 #include <stdint.h>
+#include "../include/cpu.h"
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 // ***General-Purpose Arithmetic and CPU Control Group***
@@ -32,7 +33,7 @@ void SCF( uint8_t* fReg );
 // NOP
 // Perform no operation during the machine cycle
 // OpCodes: 0x00
-void NOP();
+void NOP(Z80* z80);
 
 // HALT
 // Suspend CPU operation until an interupt is received

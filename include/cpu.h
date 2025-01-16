@@ -35,7 +35,7 @@ extern int iff2;
 extern int mode;
 
 // Structure to hold pointers to all register union
-typedef struct _REGISTERS {
+typedef struct {
 
   // Pointers to main registers
   uint8_t *const a;
@@ -91,14 +91,24 @@ typedef struct _REGISTERS {
   // CPU Mode
   int *const mode;
 
-} Registers;
+} Z80;
 
-extern Registers *reg;
+extern Z80 *z80;
+
+typedef void (*InstrFunc)(Z80* z80);
+
+typedef struct _CPU_INSTRUCTION {
+  char* name;
+  uint8_t pc_skip_amount;
+  InstrFunc func;
+} z80_instruction;
 
 // uint8_t ports[256];
 
 // Start the CPU running
 extern void run(uint16_t addrs);
+
+extern z80_instruction singleByteInstructionLookup[];
 
 int initCPU();
 

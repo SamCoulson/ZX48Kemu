@@ -53,8 +53,10 @@ void SCF( uint8_t* fReg ){
 // NOP
 // Perform no operation during the machine cycle
 // OpCodes: 0x00
-void NOP(){
+void NOP(Z80* z80)
+{
 	// Suposed to wait 6 T-cycles
+	printf("Doing NOP");
 }
 
 // HALT
