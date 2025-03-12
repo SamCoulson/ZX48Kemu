@@ -117,7 +117,7 @@ void build_video_mem_map()
 
 int initWindow(){
 
-	const int screenWidth = 700;
+	const int screenWidth = 720;
 	const int screenHeight = 480;
 
 	//initSDL();
@@ -221,9 +221,10 @@ void updateScreen(){
 		int instruction_v_spacing = 30;
 		for( int i = 0; i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
 		{
-            /*printf("%s\n", disass_instructions[i].addr);*/
+            //printf("%s\n", disass_instructions[i].addr);
 			DrawText(TextFormat("%s", disass_instructions[i].addr), instructions_box_x+10, instruction_v_spacing, 10, BLACK);
-			DrawText(TextFormat("%s", disass_instructions[i].instr), instructions_box_x+50, instruction_v_spacing, 10, BLACK);
+			DrawText(TextFormat("%02X", disass_instructions[i].value), instructions_box_x+30, instruction_v_spacing, 10, BLACK);
+			DrawText(TextFormat("%s", disass_instructions[i].instr), instructions_box_x+70, instruction_v_spacing, 10, BLACK);
 			// need to add arrow to show where the sp is currently pointing too
 			instruction_v_spacing+=10;
 		}
@@ -242,11 +243,20 @@ void updateScreen(){
 		{
 			if(paused == true){
 				paused = false;
-
 				initDisassInstructionsBuffer();
 			}else{
 				paused = true;
 				populateInstructionsBuffer();	
+			}
+
+			if(paused)
+			{
+		
+				buttonText = "Resume";
+			}
+			else
+			{
+				buttonText = "Pause";
 			}
 		}
 
@@ -256,9 +266,11 @@ void updateScreen(){
 			// only allow stepping from paused or start
 			if(paused || (paused && *z80->pc == 0000))
 			{
+				printf("Doing step\n");
 				stepping = true;	
 				populateInstructionsBuffer();
 			}
+		printf("leaving Step GUI\n");
 		}
 
 		GuiSetState(STATE_NORMAL);
@@ -266,17 +278,6 @@ void updateScreen(){
 		{
 			// TODO also reset registers
 			*z80->pc = 0000;
-		}
-
-
-		if(paused)
-		{
-	
-			buttonText = "Resume";
-		}
-		else
-		{
-			buttonText = "Pause";
 		}
 
 	EndDrawing();

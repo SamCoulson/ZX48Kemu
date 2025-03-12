@@ -5,8 +5,6 @@
 #include "../include/cpu.h"
 #include "../include/memory.h"
 
-#define DISASS_INSTRUCT_BUFFER_SIZE 30
-
 disass_instruction disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
 
 const char *multiByteInstructionLookup[];
@@ -26,32 +24,35 @@ void initDisassInstructionsBuffer()
 void populateInstructionsBuffer()
 {
     // simply subtracting from the PC wont work because the number substrated might end up in the middle of a multi-byte instruction.
-    uint16_t prev_instruct = *z80->pc - DISASS_INSTRUCT_BUFFER_SIZE;
+    uint16_t next_instruct_addr = *z80->pc;
 
     for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
     {
-            uint8_t *opcode = &totalMem[prev_instruct];
-            
+            uint8_t *opcode = &totalMem[next_instruct_addr];
+
             char addrStr[6];
-            sprintf(addrStr, "%04X", prev_instruct);
+            sprintf(addrStr, "%04X", next_instruct_addr);
             strcpy(disass_instructions[i].addr, addrStr);
 
             if( *opcode == 0xcb || *opcode == 0xdd || *opcode == 0xed || *opcode == 0xfd)
             {
                     disass_instructions[i].instr = disassemble_multi_byte_opcode( opcode );
+                    next_instruct_addr++;
             }
             else if ( *opcode >= 0x00 && *opcode <= 0xff)
             {
-                    disass_instructions[i].instr = disassemble_single_byte_opcode( opcode );
-            }
+                    z80_instruction instr = disassemble_single_byte_opcode( opcode );
 
-            prev_instruct++;
+                    disass_instructions[i].instr = instr.name;
+                    disass_instructions[i].value = *opcode;
+                    next_instruct_addr += instr.pc_skip_amount;
+            }
     }
 }
 
-const char* disassemble_single_byte_opcode(uint8_t *opcode)
+z80_instruction disassemble_single_byte_opcode(uint8_t *opcode)
 {
-  return singleByteInstructionLookup[(uint8_t)*opcode].name;
+  return singleByteInstructionLookup[*opcode];
 }
 
 const char* disassemble_multi_byte_opcode(uint8_t *opcode) 

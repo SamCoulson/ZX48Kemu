@@ -42,7 +42,7 @@ void NOP(Z80* z80);
 // DI
 // Diable the maskable interupts IFF1 and IFF2 by resetting enable interupt flip-flop
 // OpCodes: 0xF3
-void DI( int* iff1, int* iff2 );
+void DI( Z80* z80 );
 
 // EI
 // Enable interupt instruction sets, sets both IFF1 and IFF2.

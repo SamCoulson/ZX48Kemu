@@ -56,7 +56,6 @@ void SCF( uint8_t* fReg ){
 void NOP(Z80* z80)
 {
 	// Suposed to wait 6 T-cycles
-	printf("Doing NOP");
 }
 
 // HALT
@@ -66,10 +65,10 @@ void NOP(Z80* z80)
 // DI
 // Disable the maskable interrupts IFF1 and IFF2 by resetting enable interupt flip-flop
 // OpCodes: 0xF3
-void DI( int* iff1, int* iff2 ){
-	// Disable maskable interrupt so that maskable interrupt requests are ignored` 
-	*iff1 = 0;
-	*iff2 = 0;	
+void DI( Z80* z80 )
+{	// Disable maskable interrupt so that maskable interrupt requests are ignored` 
+	*z80->iff1 = 0;
+	*z80->iff2 = 0;	
 }
 
 // EI

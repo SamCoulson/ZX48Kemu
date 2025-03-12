@@ -58,34 +58,30 @@ void run( uint16_t addrs )
 
 	while( !WindowShouldClose() )
 	{	
-/*printf("inside while");*/
 		checkBreakPointHit(*z80->pc);
 
 		if(paused)
 		{
 			clock_gettime(CLOCK_MONOTONIC, &start);
 			updateScreen();
-
 			if(!stepping)
 			{
 				continue;
 			}
 		}
 
-		if( t_counter > 70000)
-		{
+		/*if( t_counter > 70000)*/
+		/*{*/
 		        readVideoRAM( totalMem ); 
 			updateScreen();
+			printf("out of updatescreen\n");
 			screenUpdateCount++;
-		}
+///		}
 
 		printf("just about to execute\n");
 
 		// Execute the instruction pointed to by pc
-		uint8_t* val = &totalMem[*z80->pc];
-		printf("mem val %0x\n", *val);
-		/*execute( &totalMem[*z80->pc]  );*/
-		execute( val );
+		execute( &totalMem[*z80->pc]  );
 
 		// Progess the PC by 1
 		getNextByte();
