@@ -28,3 +28,6 @@
 # ROM files
 *.rom
 *.z80
+
+compile_commands.json
+.cache/
