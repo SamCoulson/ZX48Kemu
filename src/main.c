@@ -6,7 +6,6 @@
 #include "../include/raygui.h"
 
 int main() {
-
   printf("Output to console enabled\n");
 
   initWindow();
@@ -38,11 +37,11 @@ int main() {
 }
 
 //  Set the PC to point to a location in memory
-void run(uint16_t addrs) {
+void run(uint16_t start_addrs) {
   printf("Entered run\n");
 
   // Begin executing from 0x0000
-  *z80->pc = addrs;
+  *z80->pc = start_addrs;
   printf("address = %04X, byte at %02X\n", *z80->pc, totalMem[*z80->pc]);
   // DEBUG
   *z80->pc = 0x0000;
@@ -66,13 +65,12 @@ void run(uint16_t addrs) {
       }
     }
 
-    /*if( t_counter > 70000)*/
-    /*{*/
+    // if (t_counter > 70000) {
     readVideoRAM(totalMem);
     updateScreen();
     printf("out of updatescreen\n");
     screenUpdateCount++;
-    ///		}
+    // }
 
     printf("just about to execute\n");
 

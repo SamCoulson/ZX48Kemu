@@ -243,7 +243,7 @@ void updateScreen() {
     DrawText(TextFormat("%s", disass_instructions[i].addr),
              instructions_box_x + 10, instruction_v_spacing, 10, BLACK);
     DrawText(TextFormat("%02X", disass_instructions[i].value),
-             instructions_box_x + 30, instruction_v_spacing, 10, BLACK);
+             instructions_box_x + 40, instruction_v_spacing, 10, BLACK);
     DrawText(TextFormat("%s", disass_instructions[i].instr),
              instructions_box_x + 70, instruction_v_spacing, 10, BLACK);
     // need to add arrow to show where the sp is currently pointing too

@@ -1,4 +1,5 @@
 #include "../include/memory.h"
+#include <stdio.h>
 
 unsigned char totalMem[65536];
 
