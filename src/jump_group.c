@@ -173,6 +173,7 @@ uint8_t JRNZ(Z80 *z80)
     {
         printf("number of bytes %d\n", (int8_t)readNextByte());
         *z80->pc += (int8_t)readNextByte();
+        *z80->pc += 2;
         return 12;
     }
 
