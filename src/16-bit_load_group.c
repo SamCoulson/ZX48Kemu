@@ -1,13 +1,20 @@
 #include "../include/16-bit_load_group.h"
+#include "../include/cpu.h"
 #include <stdio.h> // Debug output
 // LOAD data methods for 16-bit groups
 
 // *** 16-BIT LOAD GROUP ***
 
 // LD dd,nn
-// Copy 2-byte integer value into 16-bit register 
+// Copy 2-byte integer value into 16-bit register
 // OpCodes: 0x01, 0x11, 0x21, 0x31
 
+uint8_t LD_DE_16(Z80 *z80)
+{
+    *z80->de = readNextWord();
+    *z80->pc += 3;
+    return 10;
+}
 // LD IX,nn
 // Copy 2-byte integer value into IX 16-bit register
 // OpCodes: 0xDD21
@@ -17,12 +24,12 @@
 // OpCodes: 0xFD21
 
 // LD HL,(nn)
-// Copy value into 16-bit HL register at the 16-bit integer address 
+// Copy value into 16-bit HL register at the 16-bit integer address
 // OpCodes: 0x2A
 
 // LD dd,(nn)
 // Copy value at 16-bit integer address to 16-bit register
-// OpCodes: 0xED4B 
+// OpCodes: 0xED4B
 
 // LD IX,(nn)
 // Copy value into 16-bit HL IX register at the 16-bit integer address
@@ -33,7 +40,7 @@
 // OpCodes: 0xFD2A
 
 // LD(nn),HL
-// Copy 16-bit HL register value into 16-bit integer address 
+// Copy 16-bit HL register value into 16-bit integer address
 // OpCodes: 0x22
 
 // LD(nn),dd
@@ -60,9 +67,7 @@
 // Copy 16-bit IY register value into SP 16-bit register
 // OpCodes: 0xFDF9
 
-void LD16( uint16_t* dst, uint16_t* src){
-	*dst = *src;			
-}
+void LD16(uint16_t *dst, uint16_t *src) { *dst = *src; }
 
 // PUSH qq
 // Copy 16-bit register value onto the top of the stack
@@ -76,16 +81,17 @@ void LD16( uint16_t* dst, uint16_t* src){
 // Copy 16-bit IY register value onto the top of the stack
 // OpCodes: 0xFDE5
 
-void PUSH( uint16_t* spAddrs, uint16_t* sp, uint16_t* srcVal ){
-	
-	// Decrement the stack pointer
-	--*sp;
+void PUSH(uint16_t *spAddrs, uint16_t *sp, uint16_t *srcVal)
+{
 
-	// Write the value into the address specified by SP
-	*(spAddrs-1) = *srcVal;
+    // Decrement the stack pointer
+    --*sp;
 
-	// Decrement stack pointer again
-	--*sp;	
+    // Write the value into the address specified by SP
+    *(spAddrs - 1) = *srcVal;
+
+    // Decrement stack pointer again
+    --*sp;
 }
 
 // POP qq
@@ -100,14 +106,16 @@ void PUSH( uint16_t* spAddrs, uint16_t* sp, uint16_t* srcVal ){
 // Copy 2-bytes from top of stack in a 16-bit IY register
 // OpCodes: 0xFDE1
 
-void POP( uint16_t* spAddrs, uint16_t* sp, uint16_t* dstVal ){
-	
-	// Increment the stack pointer
-	++*sp;
+void POP(uint16_t *spAddrs, uint16_t *sp, uint16_t *dstVal)
+{
 
-	// Write the value into the address specified by dst value either a register or ix or iy
-	*dstVal = *spAddrs;
+    // Increment the stack pointer
+    ++*sp;
 
-	// Increment stack pointer again
-	++*sp;
-}	
+    // Write the value into the address specified by dst value either a register
+    // or ix or iy
+    *dstVal = *spAddrs;
+
+    // Increment stack pointer again
+    ++*sp;
+}

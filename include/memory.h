@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // Loads the system ROM data into memory
-extern int loadROM(uint8_t *src, unsigned int noBytes);
+extern int loadROMintoMemory(uint8_t *src, unsigned int noBytes);
 
 // Output the ROM file contents to a text file
 void memDump();
@@ -18,6 +18,6 @@ uint16_t *getWord(uint16_t addrs);
 void setByte(uint16_t loc, uint8_t val);
 
 // Total 64K Spectrum memory
-extern unsigned char totalMem[65536];
+extern unsigned char memory[65536];
 
 #endif // INC_MEMORY_H

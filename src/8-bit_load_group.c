@@ -1,19 +1,49 @@
 #include "../include/8-bit_load_group.h"
+#include "../include/cpu.h"
+#include "../include/memory.h"
+#include <stdint.h>
 // LOAD data methods for 8-bit groups
 
 // *** 8-BIT LOAD GROUP ***
 //
 // LD r,r'
 // Copy 8-bit register value to 8-bit register
-// OpCodes: 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4F, 
-//	    0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5F, 
-//	    0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6F, 
-// 						      0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7F 	
+// OpCodes: 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47, 0x48, 0x49, 0x4A, 0x4B,
+// 0x4C, 0x4D, 0x4F,
+//	    0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x57, 0x58, 0x59, 0x5A, 0x5B,
+// 0x5C, 0x5D, 0x5F, 	    0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67, 0x68,
+// 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6F,
+// 						      0x78, 0x79, 0x7A, 0x7B,
+// 0x7C, 0x7D, 0x7F
+uint8_t LD_B_A(Z80 *z80)
+{
+    *z80->b = *z80->a;
+    *z80->pc += 1;
+    return 4;
+}
 
+uint8_t LD_H_D(Z80 *z80)
+{
+    *z80->h = *z80->d;
+    *z80->pc += 1;
+    return 4;
+}
+
+uint8_t LD_L_E(Z80 *z80)
+{
+    *z80->l = *z80->e;
+    *z80->pc += 1;
+    return 4;
+}
 // LD r,n
 // Copy 8-bit constant value to 8-bit register
 // OpCodes: 0x0E, 0x1E, 0x2E, 0x3E, 0x06, 0x16, 0x26
-
+uint8_t LD_A_N(Z80 *z80)
+{
+    *z80->a = readNextByte();
+    *z80->pc += 2;
+    return 7;
+}
 // LD r,(HL)
 // Copy value from address in HL to 8-bit register
 // OpCodes: 0x4E, 0x5E, 0x6E, 0x7E, 0x46, 0x56, 0x66
@@ -35,19 +65,26 @@
 // OpCodes: 0xFD70, 0xFD71, 0xFD72, 0xFD73, 0xFD74, 0xFD75, 0xFD77
 
 // LD (IX+d),r
-// Copy value from 8-bit register to address in IX+d 
+// Copy value from 8-bit register to address in IX+d
 // OpCodes: 0xDD70, 0xDD71, 0xDD72, 0xDD73, 0xDD74, 0xDD75, 0xDD77
 
 // LD (HL),n
-// Copy integer value in 8-bit register into address at HL 
+// Copy integer value in 8-bit register into address at HL
 // OpCodes: 0x36
+uint8_t LD_ADDR_AT_HL_N(Z80 *z80)
+{
+    memory[*z80->hl] = readNextByte();
+    printf("memory = %X", memory[*z80->hl]);
+    *z80->pc += 2;
+    return 10;
+}
 
 // LD (IX+d),n
 // Copy integer value in 8-bit register to address in IX+d
 // OpCodes: 0xDD36
 
 // LD (IY+d),n
-// Copy integer value in 8-bit register to address in IY+d 
+// Copy integer value in 8-bit register to address in IY+d
 // OpCodes: 0xFD36
 
 // LD A,(BC)
@@ -71,7 +108,7 @@
 // OpCodes: 0x12
 
 // LD (nn),A
-// Copy 16-bit integer value at 16-bit register address to 8-bit register 
+// Copy 16-bit integer value at 16-bit register address to 8-bit register
 // OpCodes: 0x32
 
 // LD I,A
@@ -82,12 +119,9 @@
 // Copy value in 8-bit register R to 8-bit register A
 // OpCodes: 0xED4F
 
-void LD( uint8_t* dst, uint8_t* src ){
-	*dst = *src;	
-}
+void LD(uint8_t *dst, uint8_t *src) { *dst = *src; }
 
-
-// LD A,I 
+// LD A,I
 // Copy value in 8-bit register I to 8-bit register A, and alter flags
 // OpCodes: 0xED57
 
@@ -95,36 +129,42 @@ void LD( uint8_t* dst, uint8_t* src ){
 // Copy value in 8-bit register R to 8-bit register A, and alter flags
 // OpCodes: 0xED5F
 
-void LDAIR( uint8_t* aReg, uint8_t* specReg, uint8_t* fReg, int *iff2 ){
+void LDAIR(uint8_t *aReg, uint8_t *specReg, uint8_t *fReg, int *iff2)
+{
 
-	// Load in interrupt vector/memory refresh register
-	aReg = specReg;
+    // Load in interrupt vector/memory refresh register
+    aReg = specReg;
 
-	// *** NEED TO SET FLAGS HERE *** NEEDS TESTING
+    // *** NEED TO SET FLAGS HERE *** NEEDS TESTING
 
-	// Set S flag to 1 if value in I register is negative else set to 0 if positive 
-	if( (int8_t)*(specReg) < 0 ){
-		setBit( fReg, 7, 1);
-	}else{
-		setBit( fReg, 7, 0);
-	}
+    // Set S flag to 1 if value in I register is negative else set to 0 if
+    // positive
+    if ((int8_t)*(specReg) < 0)
+    {
+        setBit(fReg, 7, 1);
+    }
+    else
+    {
+        setBit(fReg, 7, 0);
+    }
 
-	// Check special register is 0 if zero, Z is 1 else 0
-	if( specReg == 0x00 ){
-		setBit( fReg, 6, 1);
-	}else{
-		setBit( fReg, 6, 0);
-	}
+    // Check special register is 0 if zero, Z is 1 else 0
+    if (specReg == 0x00)
+    {
+        setBit(fReg, 6, 1);
+    }
+    else
+    {
+        setBit(fReg, 6, 0);
+    }
 
-	// H is always set to 0
-	setBit( fReg, 3, 0);
+    // H is always set to 0
+    setBit(fReg, 3, 0);
 
-	// Set P/V to IFF2 **Set to 0 if interrupt happends during execution of instruction**
-	setBit( fReg, 2, *iff2);
+    // Set P/V to IFF2 **Set to 0 if interrupt happends during execution of
+    // instruction**
+    setBit(fReg, 2, *iff2);
 
-	// N is set to 0
-	setBit( fReg, 1, 0);
-
+    // N is set to 0
+    setBit(fReg, 1, 0);
 }
-
-

@@ -35,75 +35,76 @@ extern int iff2;
 extern int mode;
 
 // Structure to hold pointers to all register union
-typedef struct {
+typedef struct
+{
 
-  // Pointers to main registers
-  uint8_t *const a;
-  uint8_t *const f;
-  uint16_t *const af;
+    // Pointers to main registers
+    uint8_t *const a;
+    uint8_t *const f;
+    uint16_t *const af;
 
-  uint8_t *b;
-  uint8_t *c;
-  uint16_t *bc;
+    uint8_t *b;
+    uint8_t *c;
+    uint16_t *bc;
 
-  uint8_t *d;
-  uint8_t *e;
-  uint16_t *de;
+    uint8_t *d;
+    uint8_t *e;
+    uint16_t *de;
 
-  uint8_t *h;
-  uint8_t *l;
-  uint16_t *hl;
+    uint8_t *h;
+    uint8_t *l;
+    uint16_t *hl;
 
-  // Pointers alternative general purpose registers
-  uint8_t *alta;
-  uint8_t *altf;
-  uint16_t *altaf;
+    // Pointers alternative general purpose registers
+    uint8_t *alta;
+    uint8_t *altf;
+    uint16_t *altaf;
 
-  uint8_t *altb;
-  uint8_t *altc;
-  uint16_t *altbc;
+    uint8_t *altb;
+    uint8_t *altc;
+    uint16_t *altbc;
 
-  uint8_t *altd;
-  uint8_t *alte;
-  uint16_t *altde;
+    uint8_t *altd;
+    uint8_t *alte;
+    uint16_t *altde;
 
-  uint8_t *alth;
-  uint8_t *altl;
-  uint16_t *althl;
+    uint8_t *alth;
+    uint8_t *altl;
+    uint16_t *althl;
 
-  // 8-Bit special registers - Interrupt vector
-  uint8_t *i;
-  uint8_t *r;
-  uint16_t *ir;
+    // 8-Bit special registers - Interrupt vector
+    uint8_t *i;
+    uint8_t *r;
+    uint16_t *ir;
 
-  // 16-Bit index registers
-  uint16_t *ix;
-  uint16_t *iy;
+    // 16-Bit index registers
+    uint16_t *ix;
+    uint16_t *iy;
 
-  // 16-Bit stack pointer and program counter
-  uint16_t *sp;
-  uint16_t *pc; // AKA Instruction pointer
+    // 16-Bit stack pointer and program counter
+    uint16_t *sp;
+    uint16_t *pc; // AKA Instruction pointer
 
-  // IFFI (Interrupt enabled flip-flop)
-  int *const iff1;
-  int *const iff2;
+    // IFFI (Interrupt enabled flip-flop)
+    int *const iff1;
+    int *const iff2;
 
-  // CPU Mode
-  int *const mode;
+    // CPU Mode
+    int *const mode;
 
 } Z80;
 
 extern Z80 *z80;
 
-typedef void (*InstrFunc)(Z80* z80);
+typedef uint8_t (*instr_func)(Z80 *z80);
 
-typedef struct _CPU_INSTRUCTION {
-  char* name;
-  uint8_t pc_skip_amount;
-  InstrFunc func;
+typedef struct _CPU_INSTRUCTION
+{
+    char *name;
+    instr_func func;
 } z80_instruction;
 
-// uint8_t ports[256];
+extern uint8_t ports[256];
 
 // Start the CPU running
 extern void run(uint16_t addrs);

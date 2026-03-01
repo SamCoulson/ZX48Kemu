@@ -1,9 +1,9 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 #include "../include/disassembler.h"
 #include "../include/cpu.h"
 #include "../include/memory.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 disass_instruction disass_instructions[DISASS_INSTRUCT_BUFFER_SIZE];
 
@@ -11,53 +11,56 @@ const char *multiByteInstructionLookup[];
 
 void initDisassInstructionsBuffer()
 {
-  printf("clearing dissasembly buffer\n");
-  char* default_value = "????";
+    printf("clearing dissasembly buffer\n");
+    char *default_value = "????";
 
-  for( int i = 0; i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
-  {
-    strcpy(disass_instructions[i].addr, "???");
-    disass_instructions[i].instr = default_value;
-  }
+    for (int i = 0;
+         i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
+    {
+        strcpy(disass_instructions[i].addr, "???");
+        disass_instructions[i].instr = default_value;
+    }
 }
 
 void populateInstructionsBuffer()
 {
-    // simply subtracting from the PC wont work because the number substrated might end up in the middle of a multi-byte instruction.
+    // simply subtracting from the PC wont work because the number substrated
+    // might end up in the middle of a multi-byte instruction.
     uint16_t next_instruct_addr = *z80->pc;
 
-    for(int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
+    for (int i = 0; i < DISASS_INSTRUCT_BUFFER_SIZE; i++)
     {
-            uint8_t *opcode = &totalMem[next_instruct_addr];
+        uint8_t *opcode = &memory[next_instruct_addr];
 
-            char addrStr[6];
-            sprintf(addrStr, "%04X", next_instruct_addr);
-            strcpy(disass_instructions[i].addr, addrStr);
+        char addrStr[6];
+        sprintf(addrStr, "%04X", next_instruct_addr);
+        strcpy(disass_instructions[i].addr, addrStr);
 
-            if( *opcode == 0xcb || *opcode == 0xdd || *opcode == 0xed || *opcode == 0xfd)
-            {
-                    disass_instructions[i].instr = disassemble_multi_byte_opcode( opcode );
-                    next_instruct_addr++;
-            }
-            else if ( *opcode >= 0x00 && *opcode <= 0xff)
-            {
-                    z80_instruction instr = disassemble_single_byte_opcode( opcode );
+        if (*opcode == 0xcb || *opcode == 0xdd || *opcode == 0xed ||
+            *opcode == 0xfd)
+        {
+            disass_instructions[i].instr =
+                disassemble_multi_byte_opcode(opcode);
+            next_instruct_addr++;
+        }
+        else if (*opcode >= 0x00 && *opcode <= 0xff)
+        {
+            z80_instruction instr = disassemble_single_byte_opcode(opcode);
 
-                    disass_instructions[i].instr = instr.name;
-                    disass_instructions[i].value = *opcode;
-                    next_instruct_addr += instr.pc_skip_amount;
-            }
+            disass_instructions[i].instr = instr.name;
+            disass_instructions[i].value = *opcode;
+        }
     }
 }
 
 z80_instruction disassemble_single_byte_opcode(uint8_t *opcode)
 {
-  return singleByteInstructionLookup[*opcode];
+    return singleByteInstructionLookup[*opcode];
 }
 
-const char* disassemble_multi_byte_opcode(uint8_t *opcode) 
+const char *disassemble_multi_byte_opcode(uint8_t *opcode)
 {
-  return multiByteInstructionLookup[(uint8_t)*opcode];
+    return multiByteInstructionLookup[(uint8_t)*opcode];
 }
 
 const char *multiByteInstructionLookup[] = {
