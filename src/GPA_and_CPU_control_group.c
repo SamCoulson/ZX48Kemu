@@ -62,7 +62,7 @@ void SCF(uint8_t *fReg)
 uint8_t NOP(Z80 *z80)
 {
     *z80->pc += 1;
-    return 6; // Suposed to wait 6 T-cycles
+    return 6;
 }
 
 // HALT

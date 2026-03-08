@@ -24,6 +24,7 @@ void initDisassInstructionsBuffer()
 
 void populateInstructionsBuffer()
 {
+    printf("populating instruction buffeer\n");
     // simply subtracting from the PC wont work because the number substrated
     // might end up in the middle of a multi-byte instruction.
     uint16_t next_instruct_addr = *z80->pc;
@@ -49,6 +50,9 @@ void populateInstructionsBuffer()
 
             disass_instructions[i].instr = instr.name;
             disass_instructions[i].value = *opcode;
+
+            next_instruct_addr = next_instruct_addr + instr.byte_length;
+            printf("pc points at %04X\n", next_instruct_addr);
         }
     }
 }

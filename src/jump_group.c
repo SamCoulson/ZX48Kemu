@@ -171,7 +171,7 @@ uint8_t JRNZ(Z80 *z80)
     // IF Z is 0 jump
     if (getBit(z80->f, 6) == 0x00)
     {
-        printf("number of bytes %d\n", (int8_t)readNextByte());
+        // printf("number of bytes %d\n", (int8_t)readNextByte());
         *z80->pc += (int8_t)readNextByte();
         *z80->pc += 2;
         return 12;

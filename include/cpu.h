@@ -101,6 +101,7 @@ typedef uint8_t (*instr_func)(Z80 *z80);
 typedef struct _CPU_INSTRUCTION
 {
     char *name;
+    uint8_t byte_length;
     instr_func func;
 } z80_instruction;
 

@@ -74,7 +74,6 @@ uint8_t LD_A_N(Z80 *z80)
 uint8_t LD_ADDR_AT_HL_N(Z80 *z80)
 {
     memory[*z80->hl] = readNextByte();
-    printf("memory = %X", memory[*z80->hl]);
     *z80->pc += 2;
     return 10;
 }

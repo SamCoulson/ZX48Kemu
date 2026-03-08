@@ -71,20 +71,19 @@ void run(uint16_t start_addrs)
             }
         }
 
-        // if (t_counter > 70000) {
-        readVideoRAM(memory);
-        updateScreen();
-        printf("out of updatescreen\n");
+        if (screenUpdateCount > 100)
+        {
+            readVideoRAM(memory);
+            updateScreen();
+            screenUpdateCount = 0;
+            // printf("out of updatescreen\n");
+        }
         screenUpdateCount++;
-        // }
 
-        printf("just about to execute\n");
+        // printf("just about to execute\n");
 
         // Execute the instruction pointed to by pc
         execute(&memory[*z80->pc]);
-
-        // Progess the PC by 1
-        // getNextByte();
 
         clock_gettime(CLOCK_MONOTONIC, &end);
 
