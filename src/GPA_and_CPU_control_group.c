@@ -65,6 +65,11 @@ uint8_t NOP(Z80 *z80)
     return 6;
 }
 
+uint8_t NI(Z80 *z80)
+{
+    printf("%X %XNot yet implemented\n!", *z80->pc, *getNextByte());
+    exit(1);
+}
 // HALT
 // Suspend CPU operation until an interupt is received
 // OpCodes: 0x76

@@ -12,6 +12,8 @@
 // ADD HL,ss
 // Any of the register pairs BC, DE, HL or SP are added to the contents
 // of the HL register
+
+uint8_t ADD_HL_DE(Z80 *z80);
 // OpCodes: 0x09, 0x19, 0x29, 0x39
 void ADD16(uint16_t *dstReg, uint16_t *srcReg, uint8_t *fReg);
 /*

@@ -3,6 +3,7 @@
 
 #include "../include/cpu.h"
 #include <stdint.h>
+#include <stdlib.h>
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 // ***General-Purpose Arithmetic and CPU Control Group***
@@ -34,6 +35,9 @@ void SCF(uint8_t *fReg);
 // Perform no operation during the machine cycle
 // OpCodes: 0x00
 uint8_t NOP(Z80 *z80);
+
+// NI
+uint8_t NI(Z80 *z80);
 
 // HALT
 // Suspend CPU operation until an interupt is received

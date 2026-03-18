@@ -52,7 +52,6 @@ void populateInstructionsBuffer()
             disass_instructions[i].value = *opcode;
 
             next_instruct_addr = next_instruct_addr + instr.byte_length;
-            printf("pc points at %04X\n", next_instruct_addr);
         }
     }
 }

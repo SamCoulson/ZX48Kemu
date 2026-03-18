@@ -10,6 +10,12 @@
 // Any of the register pairs BC, DE, HL or SP are added to the contents
 // of the HL register
 // OpCodes: 0x09, 0x19, 0x29, 0x39
+uint8_t ADD_HL_DE(Z80 *z80)
+{
+    ADD16(z80->hl, z80->de, z80->f);
+    *z80->pc += 1;
+    return 11;
+}
 
 // ADD IX,pp
 // Any of the register pairs BC, DE, HL or SP are added to the contents

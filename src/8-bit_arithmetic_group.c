@@ -260,7 +260,14 @@ void SBC(uint8_t *aReg, uint8_t *val, uint8_t *fReg)
 // Logical AND an a 8-bit value with the accumulater
 // AND A,r
 // OpCodes: 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA7
-// AND A,n
+
+uint8_t AND_A(Z80 *z80)
+{
+    AND(z80->a, z80->a, z80->f);
+    *z80->pc += 1;
+    return 4;
+}
+// // AND A,n
 // Logical AND an 8-bit integer with register A
 // OpCodes: 0xE6
 // AND A,(HL)
