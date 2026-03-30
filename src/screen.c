@@ -14,10 +14,10 @@
 const int registers_box_x = 300;
 const int registers_box_y = 20;
 const int registers_box_w = 350;
-const int registers_box_h = 300;
+const int registers_box_h = 275;
 
 const int flags_box_x = 300;
-const int flags_box_y = 350;
+const int flags_box_y = 325;
 const int flags_box_w = 350;
 const int flags_box_h = 60;
 
@@ -28,7 +28,7 @@ const int stack_box_h = 680;
 
 const int instructions_box_x = 865;
 const int instructions_box_y = 20;
-const int instructions_box_w = 260;
+const int instructions_box_w = 290;
 const int instructions_box_h = 680;
 
 const int breakpoints_box_x = 300;
@@ -192,38 +192,38 @@ void updateScreen()
     DrawText(TextFormat("AF: %02X %02X", *z80->a, *z80->f),
              registers_box_x + 10, 40, font_size, BLACK);
     DrawText(TextFormat("AF': %02X %02X", *z80->alta, *z80->altf),
-             registers_box_x + 120, 40, font_size, BLACK);
+             registers_box_x + 140, 40, font_size, BLACK);
     DrawText(TextFormat("BC: %02X %02X", *z80->b, *z80->c),
              registers_box_x + 10, 60, font_size, BLACK);
     DrawText(TextFormat("BC': %02X %02X", *z80->altb, *z80->altc),
-             registers_box_x + 120, 60, font_size, BLACK);
+             registers_box_x + 140, 60, font_size, BLACK);
     DrawText(TextFormat("DE: %02X %02X", *z80->d, *z80->e),
              registers_box_x + 10, 80, font_size, BLACK);
     DrawText(TextFormat("DE': %02X %02X", *z80->altd, *z80->alte),
-             registers_box_x + 120, 80, font_size, BLACK);
+             registers_box_x + 140, 80, font_size, BLACK);
     DrawText(TextFormat("HL: %02X %02X", *z80->h, *z80->l),
              registers_box_x + 10, 100, font_size, BLACK);
     DrawText(TextFormat("HL': %02X %02X", *z80->alth, *z80->altl),
-             registers_box_x + 120, 100, font_size, BLACK);
+             registers_box_x + 140, 100, font_size, BLACK);
 
     DrawText(TextFormat("SP: %04X", *z80->sp), registers_box_x + 10, 140,
              font_size, BLACK);
-    DrawText(TextFormat("PC: %04X", *z80->pc), registers_box_x + 120, 140,
+    DrawText(TextFormat("PC: %04X", *z80->pc), registers_box_x + 140, 140,
              font_size, BLACK);
 
     DrawText(TextFormat("IX: %04X", *z80->ix), registers_box_x + 10, 180,
              font_size, BLACK);
-    DrawText(TextFormat("IY: %04X", *z80->ix), registers_box_x + 120, 180,
+    DrawText(TextFormat("IY: %04X", *z80->ix), registers_box_x + 140, 180,
              font_size, BLACK);
 
     DrawText(TextFormat("I: %02X", *z80->i), registers_box_x + 10, 220,
              font_size, BLACK);
-    DrawText(TextFormat("R: %02X", *z80->r), registers_box_x + 120, 220,
+    DrawText(TextFormat("R: %02X", *z80->r), registers_box_x + 140, 220,
              font_size, BLACK);
 
     DrawText(TextFormat("EFF 1: %d", *z80->iff1), registers_box_x + 10, 260,
              font_size, BLACK);
-    DrawText(TextFormat("EFF 2: %d", *z80->iff2), registers_box_x + 120, 260,
+    DrawText(TextFormat("EFF 2: %d", *z80->iff2), registers_box_x + 140, 260,
              font_size, BLACK);
 
     GuiGroupBox((Rectangle){flags_box_x, flags_box_y, flags_box_w, flags_box_h},
@@ -233,16 +233,17 @@ void updateScreen()
                         getBit(z80->f, 7), getBit(z80->f, 6), getBit(z80->f, 5),
                         getBit(z80->f, 4), getBit(z80->f, 3), getBit(z80->f, 2),
                         getBit(z80->f, 1), getBit(z80->f, 0)),
-             flags_box_x + 10, flags_box_y + 10, font_size, BLACK);
+             flags_box_x + 10, flags_box_y + 20, font_size, BLACK);
 
     // Draw stack box
     GuiGroupBox((Rectangle){stack_box_x, stack_box_y, stack_box_w, stack_box_h},
                 "STACK");
-    int k = 30;
+    int k = 35;
     for (int i = 0xFF56; i > 0xFF35; i--)
     {
-        DrawText(TextFormat("%04X %02X", i, memory[i]), stack_box_x + 10, k,
-                 font_size, BLACK);
+        DrawText(TextFormat("%04X", i), stack_box_x + 10, k, font_size, BLACK);
+        DrawText(TextFormat("%02X", memory[i]), stack_box_x + 80, k, font_size,
+                 BLACK);
         // need to add arrow to show where the sp is currently pointing too
         k += 20;
     }
@@ -252,19 +253,19 @@ void updateScreen()
                             instructions_box_w, instructions_box_h},
                 "INSTRUCTIONS");
 
-    int instruction_v_spacing = 30;
+    int instruction_v_spacing = 35;
     for (int i = 0;
          i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
     {
         // printf("%s\n", disass_instructions[i].addr);
         DrawText(TextFormat("%s", disass_instructions[i].addr),
-                 instructions_box_x + 10, instruction_v_spacing, font_size,
+                 instructions_box_x + 20, instruction_v_spacing, font_size,
                  BLACK);
         DrawText(TextFormat("%02X", disass_instructions[i].value),
-                 instructions_box_x + 60, instruction_v_spacing, font_size,
+                 instructions_box_x + 80, instruction_v_spacing, font_size,
                  BLACK);
         DrawText(TextFormat("%s", disass_instructions[i].instr),
-                 instructions_box_x + 120, instruction_v_spacing, font_size,
+                 instructions_box_x + 160, instruction_v_spacing, font_size,
                  BLACK);
         // need to add arrow to show where the sp is currently pointing too
         instruction_v_spacing += 20;
