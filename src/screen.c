@@ -13,30 +13,30 @@
 
 const int registers_box_x = 300;
 const int registers_box_y = 20;
-const int registers_box_w = 175;
-const int registers_box_h = 160;
+const int registers_box_w = 350;
+const int registers_box_h = 300;
 
 const int flags_box_x = 300;
-const int flags_box_y = 200;
-const int flags_box_w = 175;
-const int flags_box_h = 30;
+const int flags_box_y = 350;
+const int flags_box_w = 350;
+const int flags_box_h = 60;
 
-const int stack_box_x = 485;
+const int stack_box_x = 690;
 const int stack_box_y = 20;
-const int stack_box_w = 70;
-const int stack_box_h = 360;
+const int stack_box_w = 120;
+const int stack_box_h = 680;
 
-const int instructions_box_x = 565;
+const int instructions_box_x = 865;
 const int instructions_box_y = 20;
-const int instructions_box_w = 140;
-const int instructions_box_h = 360;
+const int instructions_box_w = 260;
+const int instructions_box_h = 680;
 
 const int breakpoints_box_x = 300;
-const int breakpoints_box_y = 250;
-const int breakpoints_box_w = 175;
+const int breakpoints_box_y = 450;
+const int breakpoints_box_w = 350;
 const int breakpoints_box_h = 130;
 
-const int font_size = 10;
+const int font_size = 20;
 
 typedef struct
 {
@@ -48,7 +48,7 @@ typedef struct
 
 PixelValue pixel_values[TOTAL_SCREEN_PIXELS];
 
-void test_video();
+// void test_video();
 // this methiod should live in ULA.c
 void build_video_mem_map()
 {
@@ -127,8 +127,8 @@ void build_video_mem_map()
 int initWindow()
 {
 
-    const int screenWidth = 720;
-    const int screenHeight = 480;
+    const int screenWidth = 1440;
+    const int screenHeight = 960;
 
     // initSDL();
     InitWindow(screenWidth, screenHeight, "ZX Spectrum emulator");
@@ -151,7 +151,7 @@ void updateScreen()
 
     ClearBackground(RAYWHITE);
 
-    test_video();
+    // test_video();
     //	//	if (shouldUpdateScreen)
     //	//	{
     //	//		shouldUpdateScreen = false;
@@ -184,47 +184,47 @@ void updateScreen()
 
     build_video_mem_map();
 
+    GuiSetStyle(DEFAULT, TEXT_SIZE, GuiGetFont().baseSize * 2);
     GuiGroupBox((Rectangle){registers_box_x, registers_box_y, registers_box_w,
                             registers_box_h},
                 "REGISTERS");
 
     DrawText(TextFormat("AF: %02X %02X", *z80->a, *z80->f),
-             registers_box_x + 10, 30, font_size, BLACK);
-    DrawText(TextFormat("AF': %02X %02X", *z80->alta, *z80->altf),
-             registers_box_x + 75, 30, font_size, BLACK);
-    DrawText(TextFormat("BC: %02X %02X", *z80->b, *z80->c),
              registers_box_x + 10, 40, font_size, BLACK);
+    DrawText(TextFormat("AF': %02X %02X", *z80->alta, *z80->altf),
+             registers_box_x + 120, 40, font_size, BLACK);
+    DrawText(TextFormat("BC: %02X %02X", *z80->b, *z80->c),
+             registers_box_x + 10, 60, font_size, BLACK);
     DrawText(TextFormat("BC': %02X %02X", *z80->altb, *z80->altc),
-             registers_box_x + 75, 40, font_size, BLACK);
+             registers_box_x + 120, 60, font_size, BLACK);
     DrawText(TextFormat("DE: %02X %02X", *z80->d, *z80->e),
-             registers_box_x + 10, 50, font_size, BLACK);
+             registers_box_x + 10, 80, font_size, BLACK);
     DrawText(TextFormat("DE': %02X %02X", *z80->altd, *z80->alte),
-             registers_box_x + 75, 50, font_size, BLACK);
-
+             registers_box_x + 120, 80, font_size, BLACK);
     DrawText(TextFormat("HL: %02X %02X", *z80->h, *z80->l),
-             registers_box_x + 10, 70, 10, BLACK);
+             registers_box_x + 10, 100, font_size, BLACK);
     DrawText(TextFormat("HL': %02X %02X", *z80->alth, *z80->altl),
-             registers_box_x + 75, 70, 10, BLACK);
+             registers_box_x + 120, 100, font_size, BLACK);
 
-    DrawText(TextFormat("SP: %04X", *z80->sp), registers_box_x + 10, 90, 10,
-             BLACK);
-    DrawText(TextFormat("PC: %04X", *z80->pc), registers_box_x + 75, 90, 10,
-             BLACK);
+    DrawText(TextFormat("SP: %04X", *z80->sp), registers_box_x + 10, 140,
+             font_size, BLACK);
+    DrawText(TextFormat("PC: %04X", *z80->pc), registers_box_x + 120, 140,
+             font_size, BLACK);
 
-    DrawText(TextFormat("IX: %04X", *z80->ix), registers_box_x + 10, 110, 10,
-             BLACK);
-    DrawText(TextFormat("IY: %04X", *z80->ix), registers_box_x + 75, 110, 10,
-             BLACK);
+    DrawText(TextFormat("IX: %04X", *z80->ix), registers_box_x + 10, 180,
+             font_size, BLACK);
+    DrawText(TextFormat("IY: %04X", *z80->ix), registers_box_x + 120, 180,
+             font_size, BLACK);
 
-    DrawText(TextFormat("I: %02X", *z80->i), registers_box_x + 10, 130, 10,
-             BLACK);
-    DrawText(TextFormat("R: %02X", *z80->r), registers_box_x + 75, 130, 10,
-             BLACK);
+    DrawText(TextFormat("I: %02X", *z80->i), registers_box_x + 10, 220,
+             font_size, BLACK);
+    DrawText(TextFormat("R: %02X", *z80->r), registers_box_x + 120, 220,
+             font_size, BLACK);
 
-    DrawText(TextFormat("EFF 1: %d", *z80->iff1), registers_box_x + 10, 150, 10,
-             BLACK);
-    DrawText(TextFormat("EFF 2: %d", *z80->iff2), registers_box_x + 75, 150, 10,
-             BLACK);
+    DrawText(TextFormat("EFF 1: %d", *z80->iff1), registers_box_x + 10, 260,
+             font_size, BLACK);
+    DrawText(TextFormat("EFF 2: %d", *z80->iff2), registers_box_x + 120, 260,
+             font_size, BLACK);
 
     GuiGroupBox((Rectangle){flags_box_x, flags_box_y, flags_box_w, flags_box_h},
                 "FLAGS");
@@ -233,7 +233,7 @@ void updateScreen()
                         getBit(z80->f, 7), getBit(z80->f, 6), getBit(z80->f, 5),
                         getBit(z80->f, 4), getBit(z80->f, 3), getBit(z80->f, 2),
                         getBit(z80->f, 1), getBit(z80->f, 0)),
-             flags_box_x + 10, flags_box_y + 10, 10, BLACK);
+             flags_box_x + 10, flags_box_y + 10, font_size, BLACK);
 
     // Draw stack box
     GuiGroupBox((Rectangle){stack_box_x, stack_box_y, stack_box_w, stack_box_h},
@@ -241,59 +241,60 @@ void updateScreen()
     int k = 30;
     for (int i = 0xFF56; i > 0xFF35; i--)
     {
-        DrawText(TextFormat("%04X %02X", i, memory[i]), stack_box_x + 10, k, 10,
-                 BLACK);
+        DrawText(TextFormat("%04X %02X", i, memory[i]), stack_box_x + 10, k,
+                 font_size, BLACK);
         // need to add arrow to show where the sp is currently pointing too
-        k += 10;
+        k += 20;
     }
 
     // Draw instructions box
     GuiGroupBox((Rectangle){instructions_box_x, instructions_box_y,
                             instructions_box_w, instructions_box_h},
                 "INSTRUCTIONS");
+
     int instruction_v_spacing = 30;
     for (int i = 0;
          i < sizeof(disass_instructions) / sizeof(disass_instruction); i++)
     {
         // printf("%s\n", disass_instructions[i].addr);
         DrawText(TextFormat("%s", disass_instructions[i].addr),
-                 instructions_box_x + 10, instruction_v_spacing, 10, BLACK);
+                 instructions_box_x + 10, instruction_v_spacing, font_size,
+                 BLACK);
         DrawText(TextFormat("%02X", disass_instructions[i].value),
-                 instructions_box_x + 40, instruction_v_spacing, 10, BLACK);
+                 instructions_box_x + 60, instruction_v_spacing, font_size,
+                 BLACK);
         DrawText(TextFormat("%s", disass_instructions[i].instr),
-                 instructions_box_x + 70, instruction_v_spacing, 10, BLACK);
+                 instructions_box_x + 120, instruction_v_spacing, font_size,
+                 BLACK);
         // need to add arrow to show where the sp is currently pointing too
-        instruction_v_spacing += 10;
+        instruction_v_spacing += 20;
     }
 
     GuiGroupBox((Rectangle){breakpoints_box_x, breakpoints_box_y,
                             breakpoints_box_w, breakpoints_box_h},
                 "BREAKPOINTS");
 
-    GuiLabel((Rectangle){breakpoints_box_x + 10, breakpoints_box_y + 5, 30, 30},
+    GuiLabel((Rectangle){breakpoints_box_x + 10, breakpoints_box_y + 5, 40, 40},
              "1. 0x");
     if (GuiTextBox(
-            (Rectangle){breakpoints_box_x + 35, breakpoints_box_y + 10, 50, 20},
+            (Rectangle){breakpoints_box_x + 50, breakpoints_box_y + 15, 60, 20},
             breakpoint, 64, textBoxEditMode))
     {
         textBoxEditMode = !textBoxEditMode;
-        printf("*******************************breakpoint set to %s and PC is "
-               "%04X\n",
-               breakpoint, *z80->pc);
     }
 
     GuiSetState(STATE_NORMAL);
-    if (GuiButton((Rectangle){300, 400, 60, 30}, buttonText))
+    if (GuiButton((Rectangle){300, 600, 80, 30}, buttonText))
     {
         if (paused == true)
         {
             paused = false;
-            initDisassInstructionsBuffer();
+            init_disass_instruction_buffer();
         }
         else
         {
             paused = true;
-            populateInstructionsBuffer();
+            populate_next_instructions_buffer();
         }
 
         if (paused)
@@ -308,20 +309,20 @@ void updateScreen()
     }
 
     GuiSetState(STATE_NORMAL);
-    if (GuiButton((Rectangle){420, 400, 60, 30}, "Step"))
+    if (GuiButton((Rectangle){420, 600, 60, 30}, "Step"))
     {
         // only allow stepping from paused or start
         if (paused || (paused && *z80->pc == 0000))
         {
             printf("Doing step\n");
             stepping = true;
-            populateInstructionsBuffer();
+            populate_next_instructions_buffer();
         }
         printf("leaving Step GUI\n");
     }
 
     GuiSetState(STATE_NORMAL);
-    if (GuiButton((Rectangle){300, 440, 60, 30}, "Reset"))
+    if (GuiButton((Rectangle){300, 640, 70, 30}, "Reset"))
     {
         // TODO also reset registers
         *z80->pc = 0000;

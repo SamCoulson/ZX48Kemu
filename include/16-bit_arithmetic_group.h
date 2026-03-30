@@ -12,9 +12,9 @@
 // ADD HL,ss
 // Any of the register pairs BC, DE, HL or SP are added to the contents
 // of the HL register
-
-uint8_t ADD_HL_DE(Z80 *z80);
 // OpCodes: 0x09, 0x19, 0x29, 0x39
+uint8_t ADD_HL_DE(Z80 *z80);
+
 void ADD16(uint16_t *dstReg, uint16_t *srcReg, uint8_t *fReg);
 /*
 // ADC HL,ss
@@ -23,10 +23,13 @@ void ADD16(uint16_t *dstReg, uint16_t *srcReg, uint8_t *fReg);
 // OpCodes: 0xED4A, 0xED5A, 0xED6A, 0x0xED7A
 void ADC16BitRegToHL( uint8_t &HOreg, uint8_t &LOreg );
 */
-// SBC HL,ss
+
+// SBC(Subtraction with Carry) HL,ss
 // Any of the register pairs BC, DE, HL or SP with the Carry flag
 // are subtracted to the contents of the HL register
 // OpCodes: 0xED42, 0xED52, 0xED62, 0xED72
+uint8_t SBC_HL_DE(Z80 *z80);
+
 void SBC16(uint16_t *dstReg, uint16_t *srcReg, uint8_t *fReg);
 
 /*
@@ -45,6 +48,7 @@ void ADD16BitRegToIY( uint8_t &HOreg, uint8_t &LOreg );
 // INC ss
 // Any of the register pairs BC, DE, HL or SP are incremented
 // OpCodes: 0x03, 0x13, 0x23, 0x33
+uint8_t INC_HL(Z80 *z80);
 // void INC16BitReg( uint8_t &HOreg, uint8_t &LOreg );
 
 // INC IX

@@ -50,6 +50,15 @@ void memDump()
 
 uint8_t *getByte(uint16_t addrs) { return &memory[addrs]; }
 
+uint16_t read_word(uint16_t addrs)
+{
+    // lo first [addrs +]
+    // hi second [addrs]
+    // bit shift hi to the left 8 places
+    // OR 16-bit word with lo
+    return ((uint16_t)memory[addrs + 1] | ((uint16_t)memory[addrs] << 8));
+}
+
 uint16_t *getWord(uint16_t addrs)
 {
     // Cast the address of the first byte referenced by addrs to a unint16_t to

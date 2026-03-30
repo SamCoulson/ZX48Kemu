@@ -151,7 +151,7 @@ uint8_t CP_H(Z80 *z80);
 // CP A,(IY+d)
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
-void CP(uint8_t *reg, uint8_t *val, uint8_t *fReg);
+void CP(uint8_t reg, uint8_t val, uint8_t *fReg);
 
 // INC r
 // Increment an 8-Bit register
@@ -171,6 +171,7 @@ void INC(uint8_t *val, uint8_t *fReg);
 // Decrement an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,
 // DEC(HL)
+uint8_t DEC_AT_ADDR_HL(Z80 *z80);
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
 // DEC(IX+d)

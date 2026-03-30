@@ -110,7 +110,11 @@ extern uint8_t ports[256];
 // Start the CPU running
 extern void run(uint16_t addrs);
 
-extern z80_instruction singleByteInstructionLookup[];
+extern z80_instruction single_byte_instruction_lookup[];
+extern z80_instruction ed_multi_byte_instruction_lookup[];
+extern z80_instruction fd_multi_byte_instruction_lookup[];
+extern z80_instruction cb_multi_byte_instruction_lookup[];
+extern z80_instruction dd_multi_byte_instruction_lookup[];
 
 int initCPU();
 
@@ -129,6 +133,8 @@ uint8_t *getNextByte();
 
 // Get next word from next two locations in memory, will progress the PC by 2
 uint16_t *getNextWord();
+
+uint16_t read_word_at(uint16_t addrs);
 
 // Read the next byte along, does not progress pc
 uint8_t readNextByte();

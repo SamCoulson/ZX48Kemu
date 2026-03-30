@@ -1,6 +1,7 @@
 #include "../include/jump_group.h"
 #include "../include/cpu.h"
 #include "../include/util_bit_operations.h"
+#include <stdio.h>
 
 // *** Jump group ***
 
@@ -137,6 +138,21 @@ void JRC(uint16_t *pc, uint8_t *val, uint8_t *fReg)
 // JR NC,e
 // Jump relative when C is 0
 // OpCodes: 0x30
+uint8_t JR_NC_n(Z80 *z80)
+{
+    // If C flag is 0 jump relative by the value of n
+    if (getBit(z80->f, 0) == 0x00)
+    {
+        // Add value to pc
+        *z80->pc += (int8_t)*getNextByte();
+        return 7;
+    }
+    // else go to next instruction
+    ++*z80->pc;
+    ++*z80->pc;
+    return 12;
+}
+
 void JRNC(uint16_t *pc, uint8_t *val, uint8_t *fReg)
 {
     // If C flag is 0 jump relative to val
@@ -151,16 +167,18 @@ void JRNC(uint16_t *pc, uint8_t *val, uint8_t *fReg)
 // JR Z, e
 // Jump relative when z flag is 1
 // OpCodes: 0x28
-void JRZ(uint16_t *pc, uint8_t *val, uint8_t *fReg)
+uint8_t JRZ(Z80 *z80)
 {
-
-    // If Z flag is 0 jump relative to val
-    if (getBit(fReg, 6) == 0x01)
+    // If Z flag is 1 jump relative to val
+    if (getBit(z80->f, 6) == 0x01)
     {
         // Add value to pc
-        *pc += (int8_t)*val;
+        *z80->pc += (int8_t)readNextByte();
+        return 12;
     }
     // Else do nothing and move to next instruction
+    *z80->pc += 2;
+    return 7;
 }
 
 // JR NZ, e
@@ -168,7 +186,7 @@ void JRZ(uint16_t *pc, uint8_t *val, uint8_t *fReg)
 // OpCodes: 0x20
 uint8_t JRNZ(Z80 *z80)
 {
-    // IF Z is 0 jump
+    // If Z is 0 jump
     if (getBit(z80->f, 6) == 0x00)
     {
         // printf("number of bytes %d\n", (int8_t)readNextByte());

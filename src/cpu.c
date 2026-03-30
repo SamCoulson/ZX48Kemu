@@ -8,7 +8,6 @@
 #include "../include/GPA_and_CPU_control_group.h"
 #include "../include/IO_group.h"
 #include "../include/call_and_return_group.h"
-#include "../include/disassembler.h"
 #include "../include/jump_group.h"
 #include "../include/memory.h"
 #include "../include/rotate_and_shift_group.h"
@@ -141,7 +140,7 @@ Z80 *z80 = &_z80;
 // external modules
 
 uint8_t ports[256] = {0};
-static uint8_t *IOport = ports;
+// static uint8_t *IOport = ports;
 
 // List of function pointers for each of the 256 ports
 // Each function (port) takes a IO status i.e. READ or WRITE and an optional
@@ -184,15 +183,12 @@ void execute(uint8_t *opcode)
     if (*opcode == 0xCB || *opcode == 0xDD || *opcode == 0xED ||
         *opcode == 0xFD)
     {
-        printf("executing multi byte opcode %X\n", *opcode);
-        // disassemble_multi_byte_opcode(opcode);
+        // printf("executing multi byte opcode %X\n", *opcode);
         execute_multi_byte_opcode(opcode);
     }
     else if (*opcode >= 0x00 && *opcode <= 0xFF)
     {
         // printf("executing single byte opcode\n");
-
-        disassemble_single_byte_opcode(opcode);
 
         execute_single_byte_opcode(opcode);
 
@@ -206,7 +202,7 @@ void execute_single_byte_opcode(uint8_t *opcode)
 {
     // printf("running instr 0x%X\n", *opcode);
 
-    z80_instruction instruction = singleByteInstructionLookup[*opcode];
+    z80_instruction instruction = single_byte_instruction_lookup[*opcode];
 
     uint8_t t_cycles = instruction.func(z80);
 
@@ -1150,7 +1146,14 @@ void execute_multi_byte_opcode(uint8_t *opcode)
         execute_multi_byte_opcode_DD(opcode);
         break;
     case 0xED:
-        execute_multi_byte_opcode_ED(opcode);
+        uint8_t op = *getNextByte();
+        // printf("executing instruction %X\n", op);
+        z80_instruction instruction = ed_multi_byte_instruction_lookup[op];
+        uint8_t t_cycles = instruction.func(z80);
+        // execute_multi_byte_opcode_ED(opcode);
+        break;
+    case 0xFD:
+        execute_multi_byte_opcode_FD(opcode);
         break;
     default:
         break;
@@ -1583,7 +1586,7 @@ void execute_multi_byte_opcode_DD(uint8_t *opcode)
         break;
     case 0xBE:
         printf("CP (IX+%X)", (int8_t)readNextByte());
-        CP(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
+        CP(*z80->a, *getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xCB:
         uint8_t offset = *(getNextByte());
@@ -1766,7 +1769,6 @@ void execute_multi_byte_opcode_DD(uint8_t *opcode)
 
 void execute_multi_byte_opcode_ED(uint8_t *opcode)
 {
-
     switch (*(getNextByte()))
     {
     case 0x42:
@@ -1796,10 +1798,10 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
         LD(z80->r, z80->a);
         break;
     case 0x52:
-        printf("SBC HL,DE");
+        printf("SBC HL,DE\n");
         t_counter += 15;
         SBC16(z80->hl, z80->de, z80->f);
-        z80->pc += 1;
+        ++*z80->pc;
         break;
     case 0x53:
         printf("LD (%X),DE", readNextWord());
@@ -2008,7 +2010,7 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
         break;
     case 0xBE:
         printf("CP (IY+%X)", (int8_t)readNextByte());
-        CP(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
+        CP(*z80->a, *getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xCB:
         uint8_t offset = *(getNextByte());
@@ -2154,7 +2156,7 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
         break;
     case 0xFE:
         printf("CP %X", readNextByte());
-        CP(z80->a, getNextByte(), z80->f);
+        CP(*z80->a, *getNextByte(), z80->f);
         break;
     case 0xFF:
         printf("RST 38H");
@@ -2187,10 +2189,10 @@ uint8_t getLOByte(uint16_t *word)
 }
 
 // Returns the HO byte of a word
-uint8_t getHObyte(uint16_t *word)
+uint8_t getHOByte(uint16_t *word)
 {
     return ((*word ^ 0xff) >>
-            8); // XOR the word with 1111111100000000 to zeros the HO byte then
+            8); // XOR the word with 1111111100000000 to zeros the LO byte then
                 // bit shift 8 places to the right
 }
 
@@ -2242,7 +2244,11 @@ uint8_t *getByteAt(uint16_t addrs)
 
 uint16_t *getWordAt(uint16_t *addrs) { return getWord(*addrs); }
 // Read word at memory location
+uint16_t read_word_at(uint16_t addrs) { return read_word(addrs); }
+
+// deprecate this method it gets the endianness wrong
 uint16_t readWordAt(uint16_t *addrs) { return *(getWord(*addrs)); }
+
 uint16_t readByteAt(uint16_t addrs) { return *(getByte(addrs)); }
 // Write byte to memory given 16-bit address
 void writeByte(uint16_t addrs, uint8_t val)
@@ -2250,15 +2256,17 @@ void writeByte(uint16_t addrs, uint8_t val)
     // setByte(addrs, val);
 }
 
-// ** Used internally to read in data from ports and if needed the address bus
-// **/ Read the port at the given 8-bit address on the lower-half of the address
-// bus. Note this param is a WORD as the address the Bus is still 16-bits wide.
+// ** Used internally to read in data from ports and if needed the address
+// bus
+// **/ Read the port at the given 8-bit address on the lower-half of the
+// address bus. Note this param is a WORD as the address the Bus is still
+// 16-bits wide.
 
 uint8_t readPort(uint16_t portAddrs)
 {
 
-    // If called from IN r,(C) then only need to be concerned with lower-half
-    // port address 0x00FE
+    // If called from IN r,(C) then only need to be concerned with
+    // lower-half port address 0x00FE
     if (portAddrs == 0x00FE)
     {
         return 0x1F;
@@ -2299,7 +2307,7 @@ uint8_t readPort(uint16_t portAddrs)
     return 0;
 }
 
-z80_instruction singleByteInstructionLookup[] = {
+z80_instruction single_byte_instruction_lookup[] = {
     {"NOP", 1, NOP},                     /*0x00*/
     {"LD BC,+%X", 1, NI},                /*0x01*/
     {"LD(BC),A", 1, NI},                 /*0x02*/
@@ -2335,12 +2343,12 @@ z80_instruction singleByteInstructionLookup[] = {
     {"JR NZ,%d", 1, JRNZ},               /*0x20*/
     {"LD HL,+%X", 1, NI},                /*0x21*/
     {"LD (%X),HL", 1, NI},               /*0x22*/
-    {"INC HL", 1, NI},                   /*0x23*/
+    {"INC HL", 1, INC_HL},               /*0x23*/
     {"INC H", 1, NI},                    /*0x24*/
     {"DEC H", 1, NI},                    /*0x25*/
     {"LD H,+%X", 1, NI},                 /*0x26*/
     {"DAA", 1, NI},                      /*0x27*/
-    {"JR Z,+%X", 1, NI},                 /*0x28*/
+    {"JR Z,+%X", 2, JRZ},                /*0x28*/
     {"ADD HL,HL", 1, NI},                /*0x29*/
     {"LD HL,(%X)", 1, NI},               /*0x2A*/
     {"DEC HL", 1, DEC_HL},               /*0x2B*/
@@ -2348,12 +2356,12 @@ z80_instruction singleByteInstructionLookup[] = {
     {"DEC L", 1, NI},                    /*0x2D*/
     {"LD L,+%X", 1, NI},                 /*0x2E*/
     {"CPL", 1, NI},                      /*0x2F*/
-    {"JR NC,%d", 1, NI},                 /*0x30*/
+    {"JR NC,%d", 2, JR_NC_n},            /*0x30*/
     {"LD SP,+%X", 1, NI},                /*0x31*/
     {"LD (%X),A", 1, NI},                /*0x32*/
     {"INC SP", 1, NI},                   /*0x33*/
     {"INC (HL)", 1, NI},                 /*0x34*/
-    {"DEC (HL)", 1, NI},                 /*0x35*/
+    {"DEC (HL)", 1, DEC_AT_ADDR_HL},     /*0x35*/
     {"LD (HL),+%X", 1, LD_ADDR_AT_HL_N}, /*0x36*/
     {"SCF", 1, NI},                      /*0x37*/
     {"JR C,%d", 1, NI},                  /*0x38*/
@@ -2517,7 +2525,7 @@ z80_instruction singleByteInstructionLookup[] = {
     {"SUB %X", 1, NI},                   /*0xD6*/
     {"RST", 1, NI},                      /*0xD7*/
     {"RET C", 1, NI},                    /*0xD8*/
-    {"EXX", 1, NI},                      /*0xD9*/
+    {"EXX", 1, EXX},                     /*0xD9*/
     {"JP C,%X", 1, NI},                  /*0xDA*/
     {"IN A,(C)", 1, NI},                 /*0xDB*/
     {"CALL C,%X", 1, NI},                /*0xDC*/
@@ -2557,3 +2565,524 @@ z80_instruction singleByteInstructionLookup[] = {
     {"CP, %X", 1, NI},                   /*0xFE*/
     {"RST 38H", 1, NI}                   /*0xFF*/
 };
+
+z80_instruction ed_multi_byte_instruction_lookup[] = {
+    {"", 1, NI},                  /*0x00*/
+    {"", 1, NI},                  /*0x01*/
+    {"", 1, NI},                  /*0x02*/
+    {"", 1, NI},                  /*0x03*/
+    {"", 1, NI},                  /*0x04*/
+    {"", 1, NI},                  /*0x05*/
+    {"", 1, NI},                  /*0x06*/
+    {"", 1, NI},                  /*0x07*/
+    {"", 1, NI},                  /*0x08*/
+    {"", 1, NI},                  /*0x09*/
+    {"", 1, NI},                  /*0x0a*/
+    {"", 1, NI},                  /*0x0b*/
+    {"", 1, NI},                  /*0x0c*/
+    {"", 1, NI},                  /*0x0d*/
+    {"", 1, NI},                  /*0x0e*/
+    {"", 1, NI},                  /*0x0f*/
+    {"", 1, NI},                  /*0x10*/
+    {"", 1, NI},                  /*0x11*/
+    {"", 1, NI},                  /*0x12*/
+    {"", 1, NI},                  /*0x13*/
+    {"", 1, NI},                  /*0x14*/
+    {"", 1, NI},                  /*0x15*/
+    {"", 1, NI},                  /*0x16*/
+    {"", 1, NI},                  /*0x17*/
+    {"", 1, NI},                  /*0x18*/
+    {"", 1, NI},                  /*0x19*/
+    {"", 1, NI},                  /*0x1a*/
+    {"", 1, NI},                  /*0x1b*/
+    {"", 1, NI},                  /*0x1c*/
+    {"", 1, NI},                  /*0x1d*/
+    {"", 1, NI},                  /*0x1e*/
+    {"", 1, NI},                  /*0x1f*/
+    {"", 1, NI},                  /*0x20*/
+    {"", 1, NI},                  /*0x21*/
+    {"", 1, NI},                  /*0x22*/
+    {"", 1, NI},                  /*0x23*/
+    {"", 1, NI},                  /*0x24*/
+    {"", 1, NI},                  /*0x25*/
+    {"", 1, NI},                  /*0x26*/
+    {"", 1, NI},                  /*0x27*/
+    {"", 1, NI},                  /*0x28*/
+    {"", 1, NI},                  /*0x29*/
+    {"", 1, NI},                  /*0x2a*/
+    {"", 1, NI},                  /*0x2b*/
+    {"", 1, NI},                  /*0x2c*/
+    {"", 1, NI},                  /*0x2d*/
+    {"", 1, NI},                  /*0x2e*/
+    {"", 1, NI},                  /*0x2f*/
+    {"", 1, NI},                  /*0x30*/
+    {"", 1, NI},                  /*0x31*/
+    {"", 1, NI},                  /*0x32*/
+    {"", 1, NI},                  /*0x33*/
+    {"", 1, NI},                  /*0x34*/
+    {"", 1, NI},                  /*0x35*/
+    {"", 1, NI},                  /*0x36*/
+    {"", 1, NI},                  /*0x37*/
+    {"", 1, NI},                  /*0x38*/
+    {"", 1, NI},                  /*0x39*/
+    {"", 1, NI},                  /*0x3a*/
+    {"", 1, NI},                  /*0x3b*/
+    {"", 1, NI},                  /*0x3c*/
+    {"", 1, NI},                  /*0x3d*/
+    {"", 1, NI},                  /*0x3e*/
+    {"", 1, NI},                  /*0x3f*/
+    {"", 1, NI},                  /*0x40*/
+    {"", 1, NI},                  /*0x41*/
+    {"", 1, NI},                  /*0x42*/
+    {"", 1, NI},                  /*0x43*/
+    {"", 1, NI},                  /*0x44*/
+    {"", 1, NI},                  /*0x45*/
+    {"", 1, NI},                  /*0x46*/
+    {"LD I, A", 1, LD_I_A},       /*0x47*/
+    {"", 1, NI},                  /*0x48*/
+    {"", 1, NI},                  /*0x49*/
+    {"", 1, NI},                  /*0x4a*/
+    {"", 1, NI},                  /*0x4b*/
+    {"", 1, NI},                  /*0x4c*/
+    {"", 1, NI},                  /*0x4d*/
+    {"", 1, NI},                  /*0x4e*/
+    {"", 1, NI},                  /*0x4f*/
+    {"", 1, NI},                  /*0x50*/
+    {"", 1, NI},                  /*0x51*/
+    {"SBC HL, DE", 2, SBC_HL_DE}, /*0x52*/
+    {"", 1, NI},                  /*0x53*/
+    {"", 1, NI},                  /*0x54*/
+    {"", 1, NI},                  /*0x55*/
+    {"", 1, NI},                  /*0x56*/
+    {"", 1, NI},                  /*0x57*/
+    {"", 1, NI},                  /*0x58*/
+    {"", 1, NI},                  /*0x59*/
+    {"", 1, NI},                  /*0x5a*/
+    {"", 1, NI},                  /*0x5b*/
+    {"", 1, NI},                  /*0x5c*/
+    {"", 1, NI},                  /*0x5d*/
+    {"", 1, NI},                  /*0x5e*/
+    {"", 1, NI},                  /*0x5f*/
+    {"", 1, NI},                  /*0x60*/
+    {"", 1, NI},                  /*0x61*/
+    {"", 1, NI},                  /*0x62*/
+    {"", 1, NI},                  /*0x63*/
+    {"", 1, NI},                  /*0x64*/
+    {"", 1, NI},                  /*0x65*/
+    {"", 1, NI},                  /*0x66*/
+    {"", 1, NI},                  /*0x67*/
+    {"", 1, NI},                  /*0x68*/
+    {"", 1, NI},                  /*0x69*/
+    {"", 1, NI},                  /*0x6a*/
+    {"", 1, NI},                  /*0x6b*/
+    {"", 1, NI},                  /*0x6c*/
+    {"", 1, NI},                  /*0x6d*/
+    {"", 1, NI},                  /*0x6e*/
+    {"", 1, NI},                  /*0x6f*/
+    {"", 1, NI},                  /*0x70*/
+    {"", 1, NI},                  /*0x71*/
+    {"", 1, NI},                  /*0x72*/
+    {"", 1, NI},                  /*0x73*/
+    {"", 1, NI},                  /*0x74*/
+    {"", 1, NI},                  /*0x75*/
+    {"", 1, NI},                  /*0x76*/
+    {"", 1, NI},                  /*0x77*/
+    {"", 1, NI},                  /*0x78*/
+    {"", 1, NI},                  /*0x79*/
+    {"", 1, NI},                  /*0x7a*/
+    {"", 1, NI},                  /*0x7b*/
+    {"", 1, NI},                  /*0x7c*/
+    {"", 1, NI},                  /*0x7d*/
+    {"", 1, NI},                  /*0x7e*/
+    {"", 1, NI},                  /*0x7f*/
+    {"", 1, NI},                  /*0x80*/
+    {"", 1, NI},                  /*0x81*/
+    {"", 1, NI},                  /*0x82*/
+    {"", 1, NI},                  /*0x83*/
+    {"", 1, NI},                  /*0x84*/
+    {"", 1, NI},                  /*0x85*/
+    {"", 1, NI},                  /*0x86*/
+    {"", 1, NI},                  /*0x87*/
+    {"", 1, NI},                  /*0x88*/
+    {"", 1, NI},                  /*0x89*/
+    {"", 1, NI},                  /*0x8a*/
+    {"", 1, NI},                  /*0x8b*/
+    {"", 1, NI},                  /*0x8c*/
+    {"", 1, NI},                  /*0x8d*/
+    {"", 1, NI},                  /*0x8e*/
+    {"", 1, NI},                  /*0x8f*/
+    {"", 1, NI},                  /*0x90*/
+    {"", 1, NI},                  /*0x91*/
+    {"", 1, NI},                  /*0x92*/
+    {"", 1, NI},                  /*0x93*/
+    {"", 1, NI},                  /*0x94*/
+    {"", 1, NI},                  /*0x95*/
+    {"", 1, NI},                  /*0x96*/
+    {"", 1, NI},                  /*0x97*/
+    {"", 1, NI},                  /*0x98*/
+    {"", 1, NI},                  /*0x99*/
+    {"", 1, NI},                  /*0x9a*/
+    {"", 1, NI},                  /*0x9b*/
+    {"", 1, NI},                  /*0x9c*/
+    {"", 1, NI},                  /*0x9d*/
+    {"", 1, NI},                  /*0x9e*/
+    {"", 1, NI},                  /*0x9f*/
+    {"", 1, NI},                  /*0xa0*/
+    {"", 1, NI},                  /*0xa1*/
+    {"", 1, NI},                  /*0xa2*/
+    {"", 1, NI},                  /*0xa3*/
+    {"", 1, NI},                  /*0xa4*/
+    {"", 1, NI},                  /*0xa5*/
+    {"", 1, NI},                  /*0xa6*/
+    {"", 1, NI},                  /*0xa7*/
+    {"", 1, NI},                  /*0xa8*/
+    {"", 1, NI},                  /*0xa9*/
+    {"", 1, NI},                  /*0xaa*/
+    {"", 1, NI},                  /*0xab*/
+    {"", 1, NI},                  /*0xac*/
+    {"", 1, NI},                  /*0xad*/
+    {"", 1, NI},                  /*0xae*/
+    {"", 1, NI},                  /*0xaf*/
+    {"", 1, NI},                  /*0xb0*/
+    {"", 1, NI},                  /*0xb1*/
+    {"", 1, NI},                  /*0xb2*/
+    {"", 1, NI},                  /*0xb3*/
+    {"", 1, NI},                  /*0xb4*/
+    {"", 1, NI},                  /*0xb5*/
+    {"", 1, NI},                  /*0xb6*/
+    {"", 1, NI},                  /*0xb7*/
+    {"", 1, NI},                  /*0xb8*/
+    {"", 1, NI},                  /*0xb9*/
+    {"", 1, NI},                  /*0xba*/
+    {"", 1, NI},                  /*0xbb*/
+    {"", 1, NI},                  /*0xbc*/
+    {"", 1, NI},                  /*0xbd*/
+    {"", 1, NI},                  /*0xbe*/
+    {"", 1, NI},                  /*0xbf*/
+    {"", 1, NI},                  /*0xc0*/
+    {"", 1, NI},                  /*0xc1*/
+    {"", 1, NI},                  /*0xc2*/
+    {"", 1, NI},                  /*0xc3*/
+    {"", 1, NI},                  /*0xc4*/
+    {"", 1, NI},                  /*0xc5*/
+    {"", 1, NI},                  /*0xc6*/
+    {"", 1, NI},                  /*0xc7*/
+    {"", 1, NI},                  /*0xc8*/
+    {"", 1, NI},                  /*0xc9*/
+    {"", 1, NI},                  /*0xca*/
+    {"", 1, NI},                  /*0xcb*/
+    {"", 1, NI},                  /*0xcc*/
+    {"", 1, NI},                  /*0xcd*/
+    {"", 1, NI},                  /*0xce*/
+    {"", 1, NI},                  /*0xcf*/
+    {"", 1, NI},                  /*0xd0*/
+    {"", 1, NI},                  /*0xd1*/
+    {"", 1, NI},                  /*0xd2*/
+    {"", 1, NI},                  /*0xd3*/
+    {"", 1, NI},                  /*0xd4*/
+    {"", 1, NI},                  /*0xd5*/
+    {"", 1, NI},                  /*0xd6*/
+    {"", 1, NI},                  /*0xd7*/
+    {"", 1, NI},                  /*0xd8*/
+    {"", 1, NI},                  /*0xd9*/
+    {"", 1, NI},                  /*0xda*/
+    {"", 1, NI},                  /*0xdb*/
+    {"", 1, NI},                  /*0xdc*/
+    {"", 1, NI},                  /*0xdd*/
+    {"", 1, NI},                  /*0xde*/
+    {"", 1, NI},                  /*0xdf*/
+    {"", 1, NI},                  /*0xe0*/
+    {"", 1, NI},                  /*0xe1*/
+    {"", 1, NI},                  /*0xe2*/
+    {"", 1, NI},                  /*0xe3*/
+    {"", 1, NI},                  /*0xe4*/
+    {"", 1, NI},                  /*0xe5*/
+    {"", 1, NI},                  /*0xe6*/
+    {"", 1, NI},                  /*0xe7*/
+    {"", 1, NI},                  /*0xe8*/
+    {"", 1, NI},                  /*0xe9*/
+    {"", 1, NI},                  /*0xea*/
+    {"", 1, NI},                  /*0xeb*/
+    {"", 1, NI},                  /*0xec*/
+    {"", 1, NI},                  /*0xed*/
+    {"", 1, NI},                  /*0xee*/
+    {"", 1, NI},                  /*0xef*/
+    {"", 1, NI},                  /*0xf0*/
+    {"", 1, NI},                  /*0xf1*/
+    {"", 1, NI},                  /*0xf2*/
+    {"", 1, NI},                  /*0xf3*/
+    {"", 1, NI},                  /*0xf4*/
+    {"", 1, NI},                  /*0xf5*/
+    {"", 1, NI},                  /*0xf6*/
+    {"", 1, NI},                  /*0xf7*/
+    {"", 1, NI},                  /*0xf8*/
+    {"", 1, NI},                  /*0xf9*/
+    {"", 1, NI},                  /*0xfa*/
+    {"", 1, NI},                  /*0xfb*/
+    {"", 1, NI},                  /*0xfc*/
+    {"", 1, NI},                  /*0xfd*/
+    {"", 1, NI},                  /*0xfe*/
+    {"", 1, NI},                  /*0xff*/
+};
+
+z80_instruction fd_multi_byte_instruction_lookup[] = {};
+z80_instruction cb_multi_byte_instruction_lookup[] = {
+    {"RLC B", 1, NI},       /*0x00*/
+    {"RLC C", 1, NI},       /*0x01*/
+    {"RLC D", 1, NI},       /*0x02*/
+    {"RLC E", 1, NI},       /*0x03*/
+    {"RLC H", 1, NI},       /*0x04*/
+    {"RLC L", 1, NI},       /*0x05*/
+    {"RLC (HL)", 1, NI},    /*0x06*/
+    {"RLC A", 1, NI},       /*0x07*/
+    {"RRC B", 1, NI},       /*0x08*/
+    {"RRC C", 1, NI},       /*0x09*/
+    {"RRC D", 1, NI},       /*0x0A*/
+    {"RRC E", 1, NI},       /*0x0B*/
+    {"RRC H", 1, NI},       /*0x0C*/
+    {"RRC L", 1, NI},       /*0x0D*/
+    {"RRC (HL)", 1, NI},    /*0x0E*/
+    {"RRC A", 1, NI},       /*0x0F*/
+    {"RL B", 1, NI},        /*0x10*/
+    {"RL C", 1, NI},        /*0x11*/
+    {"RL D", 1, NI},        /*0x12*/
+    {"RL E", 1, NI},        /*0x13*/
+    {"RL H", 1, NI},        /*0x14*/
+    {"RL L", 1, NI},        /*0x15*/
+    {"RL (HL)", 1, NI},     /*0x16*/
+    {"RL A", 1, NI},        /*0x17*/
+    {"RR B", 1, NI},        /*0x18*/
+    {"RR C", 1, NI},        /*0x19*/
+    {"RR D", 1, NI},        /*0x1A*/
+    {"RR E", 1, NI},        /*0x1B*/
+    {"RR H", 1, NI},        /*0x1C*/
+    {"RR L", 1, NI},        /*0x1D*/
+    {"RR (HL)", 1, NI},     /*0x1E*/
+    {"RR A", 1, NI},        /*0x1F*/
+    {"SLA B", 1, NI},       /*0x20*/
+    {"SLA C", 1, NI},       /*0x21*/
+    {"SLA D", 1, NI},       /*0x22*/
+    {"SLA E", 1, NI},       /*0x23*/
+    {"SLA H", 1, NI},       /*0x24*/
+    {"SLA L", 1, NI},       /*0x25*/
+    {"SLA (HL)", 1, NI},    /*0x26*/
+    {"SLA A", 1, NI},       /*0x27*/
+    {"SRA B", 1, NI},       /*0x28*/
+    {"SRA B", 1, NI},       /*0x29*/
+    {"SRA D", 1, NI},       /*0x2A*/
+    {"SRA E", 1, NI},       /*0x2B*/
+    {"SRA H", 1, NI},       /*0x2C*/
+    {"SRA L", 1, NI},       /*0x2D*/
+    {"SRA (HL)", 1, NI},    /*0x2E*/
+    {"unused", 1, NI},      /*0x2F*/
+    {"unused", 1, NI},      /*0x30*/
+    {"unused", 1, NI},      /*0x31*/
+    {"unused", 1, NI},      /*0x32*/
+    {"unused", 1, NI},      /*0x33*/
+    {"unused", 1, NI},      /*0x34*/
+    {"unused", 1, NI},      /*0x35*/
+    {"unused", 1, NI},      /*0x36*/
+    {"unused", 1, NI},      /*0x37*/
+    {"SRL B", 1, NI},       /*0x38*/
+    {"SRL C", 1, NI},       /*0x39*/
+    {"SRL D", 1, NI},       /*0x3A*/
+    {"SRL E", 1, NI},       /*0x3B*/
+    {"SRL H", 1, NI},       /*0x3C*/
+    {"SRL L", 1, NI},       /*0x3D*/
+    {"SRL (HL)", 1, NI},    /*0x3E*/
+    {"SRL A", 1, NI},       /*0x3F*/
+    {"BIT 0", 1, NI},       /*0x40*/
+    {"BIT 0", 1, NI},       /*0x41*/
+    {"BIT 0", 1, NI},       /*0x42*/
+    {"BIT 0", 1, NI},       /*0x43*/
+    {"BIT 0", 1, NI},       /*0x44*/
+    {"BIT 0", 1, NI},       /*0x45*/
+    {"BIT 0", 1, NI},       /*0x46*/
+    {"BIT 0", 1, NI},       /*0x47*/
+    {"BIT 1", 1, NI},       /*0x48*/
+    {"BIT 1", 1, NI},       /*0x49*/
+    {"BIT 1", 1, NI},       /*0x4A*/
+    {"BIT 1", 1, NI},       /*0x4B*/
+    {"BIT 1", 1, NI},       /*0x4C*/
+    {"BIT 1", 1, NI},       /*0x4D*/
+    {"BIT 1", 1, NI},       /*0x4E*/
+    {"BIT 1", 1, NI},       /*0x4F*/
+    {"BIT 2", 1, NI},       /*0x50*/
+    {"BIT 2", 1, NI},       /*0x51*/
+    {"BIT 2", 1, NI},       /*0x52*/
+    {"BIT 2", 1, NI},       /*0x53*/
+    {"BIT 2", 1, NI},       /*0x54*/
+    {"BIT 2", 1, NI},       /*0x55*/
+    {"BIT 2", 1, NI},       /*0x56*/
+    {"BIT 2", 1, NI},       /*0x57*/
+    {"BIT 3", 1, NI},       /*0x58*/
+    {"BIT 3", 1, NI},       /*0x59*/
+    {"BIT 3,D", 1, NI},     /*0x5A*/
+    {"BIT 3", 1, NI},       /*0x5B*/
+    {"BIT 3", 1, NI},       /*0x5C*/
+    {"BIT 3", 1, NI},       /*0x5D*/
+    {"BIT 3", 1, NI},       /*0x5E*/
+    {"BIT 3", 1, NI},       /*0x5F*/
+    {"BIT 4", 1, NI},       /*0x60*/
+    {"BIT 4", 1, NI},       /*0x61*/
+    {"BIT 4", 1, NI},       /*0x62*/
+    {"BIT 4", 1, NI},       /*0x63*/
+    {"BIT 4", 1, NI},       /*0x64*/
+    {"BIT 4", 1, NI},       /*0x65*/
+    {"BIT 4", 1, NI},       /*0x66*/
+    {"BIT 4", 1, NI},       /*0x67*/
+    {"BIT 5", 1, NI},       /*0x68*/
+    {"BIT 5", 1, NI},       /*0x69*/
+    {"BIT 5", 1, NI},       /*0x6A*/
+    {"BIT 5", 1, NI},       /*0x6B*/
+    {"BIT 5", 1, NI},       /*0x6C*/
+    {"BIT 5", 1, NI},       /*0x6D*/
+    {"BIT 5, (HL)", 1, NI}, /*0x6E*/
+    {"BIT 5", 1, NI},       /*0x6F*/
+    {"BIT 6, (HL)", 1, NI}, /*0x70*/
+    {"BIT 6, (HL)", 1, NI}, /*0x71*/
+    {"BIT 6, (HL)", 1, NI}, /*0x72*/
+    {"BIT 6, (HL)", 1, NI}, /*0x73*/
+    {"BIT 6, (HL)", 1, NI}, /*0x74*/
+    {"BIT 6, (HL)", 1, NI}, /*0x75*/
+    {"BIT 6, (HL)", 1, NI}, /*0x76*/
+    {"BIT 6, (HL)", 1, NI}, /*0x77*/
+    {"BIT 7, (HL)", 1, NI}, /*0x78*/
+    {"BIT 7, (HL)", 1, NI}, /*0x79*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7A*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7B*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7C*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7D*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7E*/
+    {"BIT 7, (HL)", 1, NI}, /*0x7F*/
+    {"RES 0, (HL)", 1, NI}, /*0x80*/
+    {"RES 0, (HL)", 1, NI}, /*0x81*/
+    {"RES 0, (HL)", 1, NI}, /*0x82*/
+    {"RES 0, (HL)", 1, NI}, /*0x83*/
+    {"RES 0, (HL)", 1, NI}, /*0x84*/
+    {"RES 0, (HL)", 1, NI}, /*0x85*/
+    {"RES 0, (HL)", 1, NI}, /*0x86*/
+    {"RES 0, (HL)", 1, NI}, /*0x87*/
+    {"RES 1, (HL)", 1, NI}, /*0x88*/
+    {"RES 1, (HL)", 1, NI}, /*0x89*/
+    {"RES 1, (HL)", 1, NI}, /*0x8A*/
+    {"RES 1, (HL)", 1, NI}, /*0x8B*/
+    {"RES 1, (HL)", 1, NI}, /*0x8C*/
+    {"RES 1, (HL)", 1, NI}, /*0x8D*/
+    {"RES 1, (HL)", 1, NI}, /*0x8E*/
+    {"RES 1, (HL)", 1, NI}, /*0x8F*/
+    {"RES 2, (HL)", 1, NI}, /*0x90*/
+    {"RES 2, (HL)", 1, NI}, /*0x91*/
+    {"RES 2, (HL)", 1, NI}, /*0x92*/
+    {"RES 2, (HL)", 1, NI}, /*0x93*/
+    {"RES 2, (HL)", 1, NI}, /*0x94*/
+    {"RES 2, (HL)", 1, NI}, /*0x95*/
+    {"RES 2, (HL)", 1, NI}, /*0x96*/
+    {"RES 2, (HL)", 1, NI}, /*0x97*/
+    {"RES 3, (HL)", 1, NI}, /*0x98*/
+    {"RES 3, (HL)", 1, NI}, /*0x99*/
+    {"RES 3, (HL)", 1, NI}, /*0x9A*/
+    {"RES 3, (HL)", 1, NI}, /*0x9B*/
+    {"RES 3, (HL)", 1, NI}, /*0x9C*/
+    {"RES 3, (HL)", 1, NI}, /*0x9D*/
+    {"RES 3, (HL)", 1, NI}, /*0x9E*/
+    {"RES 3, (HL)", 1, NI}, /*0x9F*/
+    {"RES 4, (HL)", 1, NI}, /*0xA0*/
+    {"RES 4, (HL)", 1, NI}, /*0xA1*/
+    {"RES 4, (HL)", 1, NI}, /*0xA2*/
+    {"RES 4, (HL)", 1, NI}, /*0xA3*/
+    {"RES 4, (HL)", 1, NI}, /*0xA4*/
+    {"RES 4, (HL)", 1, NI}, /*0xA5*/
+    {"RES 4, (HL)", 1, NI}, /*0xA6*/
+    {"RES 4, (HL)", 1, NI}, /*0xA7*/
+    {"RES 5, (HL)", 1, NI}, /*0xA8*/
+    {"RES 5, (HL)", 1, NI}, /*0xA9*/
+    {"RES 5, (HL)", 1, NI}, /*0xAA*/
+    {"RES 5, (HL)", 1, NI}, /*0xAB*/
+    {"RES 5, (HL)", 1, NI}, /*0xAC*/
+    {"RES 5, (HL)", 1, NI}, /*0xAD*/
+    {"RES 5, (HL)", 1, NI}, /*0xAE*/
+    {"RES 5, (HL)", 1, NI}, /*0xAF*/
+    {"RES 6, (HL)", 1, NI}, /*0xB0*/
+    {"RES 6, (HL)", 1, NI}, /*0xB1*/
+    {"RES 6, (HL)", 1, NI}, /*0xB2*/
+    {"RES 6, (HL)", 1, NI}, /*0xB3*/
+    {"RES 6, (HL)", 1, NI}, /*0xB4*/
+    {"RES 6, (HL)", 1, NI}, /*0xB5*/
+    {"RES 6, (HL)", 1, NI}, /*0xB6*/
+    {"RES 6, (HL)", 1, NI}, /*0xB7*/
+    {"RES 7, (HL)", 1, NI}, /*0xB8*/
+    {"RES 7, (HL)", 1, NI}, /*0xB9*/
+    {"RES 7, (HL)", 1, NI}, /*0xBA*/
+    {"RES 7, (HL)", 1, NI}, /*0xBB*/
+    {"RES 7, (HL)", 1, NI}, /*0xBC*/
+    {"RES 7, (HL)", 1, NI}, /*0xBD*/
+    {"RES 7, H", 1, NI},    /*0xBE*/
+    {"RES 7, (HL)", 1, NI}, /*0xBF*/
+    {"SET 0, (HL)", 1, NI}, /*0xC0*/
+    {"SET 0, (HL)", 1, NI}, /*0xC1*/
+    {"SET 0, (HL)", 1, NI}, /*0xC2*/
+    {"SET 0, (HL)", 1, NI}, /*0xC3*/
+    {"SET 0, (HL)", 1, NI}, /*0xC4*/
+    {"SET 0, (HL)", 1, NI}, /*0xC5*/
+    {"SET 0, (HL)", 1, NI}, /*0xC6*/
+    {"SET 0, (HL)", 1, NI}, /*0xC7*/
+    {"SET 1, (HL)", 1, NI}, /*0xC8*/
+    {"SET 1, (HL)", 1, NI}, /*0xC9*/
+    {"SET 1, (HL)", 1, NI}, /*0xCA*/
+    {"SET 1, (HL)", 1, NI}, /*0xCB*/
+    {"SET 1, (HL)", 1, NI}, /*0xCC*/
+    {"SET 1, (HL)", 1, NI}, /*0xCD*/
+    {"SET 1, (HL)", 1, NI}, /*0xCE*/
+    {"SET 1, (HL)", 1, NI}, /*0xCF*/
+    {"SET 2, (HL)", 1, NI}, /*0xD0*/
+    {"SET 2, (HL)", 1, NI}, /*0xD1*/
+    {"SET 2, (HL)", 1, NI}, /*0xD2*/
+    {"SET 2, (HL)", 1, NI}, /*0xD3*/
+    {"SET 2, (HL)", 1, NI}, /*0xD4*/
+    {"SET 2, (HL)", 1, NI}, /*0xD5*/
+    {"SET 2, (HL)", 1, NI}, /*0xD6*/
+    {"SET 2, (HL)", 1, NI}, /*0xD7*/
+    {"SET 3, (HL)", 1, NI}, /*0xD8*/
+    {"SET 3, (HL)", 1, NI}, /*0xD9*/
+    {"SET 3, (HL)", 1, NI}, /*0xDA*/
+    {"SET 3, (HL)", 1, NI}, /*0xDB*/
+    {"SET 3, (HL)", 1, NI}, /*0xDC*/
+    {"SET 3, (HL)", 1, NI}, /*0xDD*/
+    {"SET 3, (HL)", 1, NI}, /*0xDE*/
+    {"SET 3, (HL)", 1, NI}, /*0xDF*/
+    {"SET 4, (HL)", 1, NI}, /*0xE0*/
+    {"SET 4, (HL)", 1, NI}, /*0xE1*/
+    {"SET 4, (HL)", 1, NI}, /*0xE2*/
+    {"SET 4, (HL)", 1, NI}, /*0xE3*/
+    {"SET 4, (HL)", 1, NI}, /*0xE4*/
+    {"SET 4, (HL)", 1, NI}, /*0xE5*/
+    {"SET 4, (HL)", 1, NI}, /*0xE6*/
+    {"SET 4, (HL)", 1, NI}, /*0xE7*/
+    {"SET 5, (HL)", 1, NI}, /*0xE8*/
+    {"SET 5, (HL)", 1, NI}, /*0xE9*/
+    {"SET 5, (HL)", 1, NI}, /*0xEA*/
+    {"SET 5, (HL)", 1, NI}, /*0xEB*/
+    {"SET 5, (HL)", 1, NI}, /*0xEC*/
+    {"SET 5, (HL)", 1, NI}, /*0xED*/
+    {"SET 5, (HL)", 1, NI}, /*0xEE*/
+    {"SET 5, (HL)", 1, NI}, /*0xEF*/
+    {"SET 6, (HL)", 1, NI}, /*0xF0*/
+    {"SET 6, (HL)", 1, NI}, /*0xF1*/
+    {"SET 6, (HL)", 1, NI}, /*0xF2*/
+    {"SET 6, (HL)", 1, NI}, /*0xF3*/
+    {"SET 6, (HL)", 1, NI}, /*0xF4*/
+    {"SET 6, (HL)", 1, NI}, /*0xF5*/
+    {"SET 6, (HL)", 1, NI}, /*0xF6*/
+    {"SET 6, (HL)", 1, NI}, /*0xF7*/
+    {"SET 7, (HL)", 1, NI}, /*0xF8*/
+    {"SET 7, (HL)", 1, NI}, /*0xF9*/
+    {"SET 7, (HL)", 1, NI}, /*0xFA*/
+    {"SET 7, (HL)", 1, NI}, /*0xFB*/
+    {"SET 7, (HL)", 1, NI}, /*0xFC*/
+    {"SET 7, (HL)", 1, NI}, /*0xFD*/
+    {"SET 7, (HL)", 1, NI}, /*0xFE*/
+    {"SET 7, L", 1, NI},    /*0xFF*/
+};
+
+z80_instruction dd_multi_byte_instruction_lookup[] = {};

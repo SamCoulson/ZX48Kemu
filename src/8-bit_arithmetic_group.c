@@ -281,28 +281,13 @@ uint8_t AND_A(Z80 *z80)
 // OpCodes: 0xFDA6
 void AND(uint8_t *reg, uint8_t *val, uint8_t *fReg)
 {
-
     uint8_t result = *reg & *val;
 
     // S is one if result is signed
-    if (getBit(&result, 7) == 0x01)
-    {
-        setBit(fReg, 7, 1);
-    }
-    else
-    {
-        setBit(fReg, 7, 0);
-    }
+    setBit(fReg, 7, getBit(&result, 7) == 0x01);
 
-    // Z is one if result is zero
-    if (result == 0x0)
-    {
-        setBit(fReg, 6, 1);
-    }
-    else
-    {
-        setBit(fReg, 6, 0);
-    }
+    // Z is set if result is zero
+    setBit(fReg, 6, result == 0x0);
 
     // H is set
     setBit(fReg, 4, 1);
@@ -469,7 +454,7 @@ void XOR(uint8_t *dstReg, uint8_t *srcVal, uint8_t *fReg)
 // Logical CP an a 8-bit value with the accumulater
 uint8_t CP_H(Z80 *z80)
 {
-    CP(z80->a, z80->h, z80->f);
+    CP(*z80->a, *z80->h, z80->f);
     *z80->pc += 1;
     return 4;
 }
@@ -487,53 +472,28 @@ uint8_t CP_H(Z80 *z80)
 // CP A,(IY+d)
 // Logical CP the value at address of IX plus offset with register A
 // OpCodes: 0xFDBE
-void CP(uint8_t *reg, uint8_t *val, uint8_t *fReg)
+void CP(uint8_t reg, uint8_t val, uint8_t *fReg)
 {
-
-    // This is supposed to be a subtraction without updating the register
-    // only the flags are altered.
-
-    uint8_t result = *reg + (~(*val)) + 1;
+    // subtraction without updating the register, only the flags are altered.
+    uint8_t result = reg - val;
 
     // S (Signed) is 1 if result is negative
-    getBit(&result, 7) ? setBit(fReg, 7, 1) : setBit(fReg, 7, 0);
+    setBit(fReg, 7, getBit(&result, 7));
 
     // Z (Zero) is 1 if result is 0
-    result == 0x00 ? setBit(fReg, 6, 1) : setBit(fReg, 6, 0);
+    setBit(fReg, 6, result == 0x00);
 
-    // H is 1 if a carry occurs between bits 3 and 4, 0 if no carry occurs
-    // NOTE: might not have to worry about this only for BCD instructions
-    if (getBit(&result, 3) == 0x01 && getBit(val, 3) == 0x01 &&
-        getBit(reg, 4) == 0x00)
-    {
-        // half carry occured
-        setBit(fReg, 4, 1);
-    }
-    else
-    {
-        setBit(fReg, 4, 0);
-    }
+    // H is 1 if a borrow occurs between bits 3 and 4, 0 if no carry occurs
+    setBit(fReg, 4, (reg > val));
 
     // P/V is 1 if overflow
-    if ((getBit(reg, 7) == getBit(val, 7)) &&
-        (getBit(&result, 7) != getBit(reg, 7)))
-    {
-        // Set to 1 overflow
-        setBit(fReg, 2, 1);
-    }
-    else
-    {
-        setBit(fReg, 2, 0);
-    }
+    setBit(fReg, 2, (reg > val));
 
     // N is set to 1 because we are subtracting
     setBit(fReg, 1, 1);
 
-    // C is 1 if borrow or is otherwise 0 - Presumably if result is less than 0
-    // and 1 must be carried in from the left, remember with carry we are only
-    // interested in the unsigned values. whatever the case if the top number is
-    // smaller than the bottom then a borrow will have occurred
-    ((int8_t)result < 0) ? setBit(fReg, 0, 1) : setBit(fReg, 0, 0);
+    // C is 1 if borrow or is otherwise 0
+    setBit(fReg, 0, (reg > val));
 }
 
 // INC r
@@ -596,6 +556,13 @@ void INC(uint8_t *val, uint8_t *fReg)
 // DEC(HL)
 // Decrement the contents on address pointed to by HL register
 // OpCodes: 0x35
+uint8_t DEC_AT_ADDR_HL(Z80 *z80)
+{
+    DEC(getByteAt(*z80->hl), z80->f);
+    ++*z80->pc;
+    return 6;
+}
+
 // DEC(IX+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xDD35
@@ -628,7 +595,7 @@ void DEC(uint8_t *val, uint8_t *fReg)
         setBit(fReg, 7, 0);
     }
 
-    // Z is one if result is zero
+    // Z is one if value is zero
     if (*val == 0)
     {
         setBit(fReg, 6, 1);

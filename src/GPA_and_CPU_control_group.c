@@ -67,7 +67,7 @@ uint8_t NOP(Z80 *z80)
 
 uint8_t NI(Z80 *z80)
 {
-    printf("%X %XNot yet implemented\n!", *z80->pc, *getNextByte());
+    printf("%X %X Not yet implemented\n!", *z80->pc, *getNextByte());
     exit(1);
 }
 // HALT

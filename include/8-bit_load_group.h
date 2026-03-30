@@ -90,7 +90,7 @@ uint8_t LD_ADDR_AT_HL_N(Z80 *z80);
 // LD I,A
 // Copy value in 8-bit register I to 8-bit register A
 // OpCodes: 0xED47
-
+uint8_t LD_I_A(Z80 *z80);
 // LD R,A
 // Copy value in 8-bit register R to 8-bit register A
 // OpCodes: 0xED4F

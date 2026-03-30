@@ -56,12 +56,13 @@ void JRC(uint16_t *pc, uint8_t *val, uint8_t *fReg);
 // JR NC,e
 // Jump relative when c not 0 - Jump by val if c flag is non-zero *check this*
 // OpCodes: 0x30
+uint8_t JR_NC_n(Z80 *z80);
 void JRNC(uint16_t *pc, uint8_t *val, uint8_t *fReg);
 
 // JR Z, e
 // Jump relative when z flag is 0
 // OpCodes: 0x28
-void JRZ(uint16_t *pc, uint8_t *val, uint8_t *fReg);
+uint8_t JRZ(Z80 *z80);
 
 // JR NZ, e
 // Jump relative when z not 0 - Jump by val if Z in flags is non-zero

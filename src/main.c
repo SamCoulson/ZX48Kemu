@@ -17,7 +17,7 @@ int main()
     // Copy loaded system ROM data into system memory
     loadROMintoMemory(romMemPtr, romFileSize);
 
-    initDisassInstructionsBuffer();
+    init_disass_instruction_buffer();
     // Start at address 0x00
     // initCPU();
     initULA();
@@ -45,7 +45,7 @@ void run(uint16_t start_addrs)
 
     // Begin executing from 0x0000
     *z80->pc = start_addrs;
-    printf("address = %04X, byte at %02X\n", *z80->pc, memory[*z80->pc]);
+    // printf("address = %04X, byte at %02X\n", *z80->pc, memory[*z80->pc]);
     // DEBUG
     *z80->pc = 0x0000;
 
@@ -68,23 +68,21 @@ void run(uint16_t start_addrs)
             if (!stepping)
             {
                 continue;
+                printf("before run 3 HL %X = %X\n", *z80->hl + 1,
+                       readByteAt(*z80->hl + 1));
             }
         }
 
-        if (screenUpdateCount > 100)
+        if (screenUpdateCount > 250)
         {
             readVideoRAM(memory);
             updateScreen();
             screenUpdateCount = 0;
-            // printf("out of updatescreen\n");
         }
         screenUpdateCount++;
 
-        // printf("just about to execute\n");
-
         // Execute the instruction pointed to by pc
         execute(&memory[*z80->pc]);
-
         clock_gettime(CLOCK_MONOTONIC, &end);
 
         uint64_t elapsed_ns =
