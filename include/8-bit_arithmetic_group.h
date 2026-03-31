@@ -116,9 +116,12 @@ void OR(uint8_t *dstReg, uint8_t *srcVal, uint8_t *fReg);
 
 // XOR,s
 // Logical XOR an a 8-bit value with the accumulater
-uint8_t XOR_A(Z80 *cpu);
+
 // XOR A,r
 // OpCodes: 0xA8, 0xA9,0xAA, 0xAB, 0xAC, 0xAD, 0xAF
+uint8_t XOR_A(Z80 *cpu);
+uint8_t XOR_B(Z80 *cpu);
+
 // XOR A,n
 // Logical XOR an 8-bit integer with register A
 // OpCodes: 0xEE
@@ -156,6 +159,7 @@ void CP(uint8_t reg, uint8_t val, uint8_t *fReg);
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,
+uint8_t INC_B(Z80 *z80);
 // INC(HL)
 // Increment the contents on address pointed to by HL register
 // OpCodes: 0x34

@@ -18,6 +18,7 @@
 // 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6F,
 // 						      0x78, 0x79, 0x7A, 0x7B,
 // 0x7C, 0x7D, 0x7F
+uint8_t LD_E_H(Z80 *z80);
 uint8_t LD_B_A(Z80 *z80);
 uint8_t LD_H_D(Z80 *z80);
 uint8_t LD_L_E(Z80 *z80);
@@ -62,6 +63,7 @@ uint8_t LD_ADDR_AT_HL_N(Z80 *z80);
 // LD (IY+d),n
 // Copy integer value in 8-bit register to address in IY+d
 // OpCodes: 0xFD36
+uint8_t DEC_nn(Z80 *z80);
 
 // LD A,(BC)
 // Copy value in address of BC into 8-bit register A
@@ -86,6 +88,7 @@ uint8_t LD_ADDR_AT_HL_N(Z80 *z80);
 // LD (nn),A
 // Copy 16-bit integer value at 16-bit register address to 8-bit register
 // OpCodes: 0x32
+uint8_t LD_16_A(Z80 *z80);
 
 // LD I,A
 // Copy value in 8-bit register I to 8-bit register A

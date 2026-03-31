@@ -183,12 +183,12 @@ void execute(uint8_t *opcode)
     if (*opcode == 0xCB || *opcode == 0xDD || *opcode == 0xED ||
         *opcode == 0xFD)
     {
-        // printf("executing multi byte opcode %X\n", *opcode);
+        printf("executing multi byte opcode %X\n", *opcode);
         execute_multi_byte_opcode(opcode);
     }
     else if (*opcode >= 0x00 && *opcode <= 0xFF)
     {
-        // printf("executing single byte opcode\n");
+        printf("executing single byte opcode\n");
 
         execute_single_byte_opcode(opcode);
 
@@ -1149,11 +1149,14 @@ void execute_multi_byte_opcode(uint8_t *opcode)
         uint8_t op = *getNextByte();
         // printf("executing instruction %X\n", op);
         z80_instruction instruction = ed_multi_byte_instruction_lookup[op];
-        uint8_t t_cycles = instruction.func(z80);
-        // execute_multi_byte_opcode_ED(opcode);
+        instruction.func(z80);
         break;
     case 0xFD:
-        execute_multi_byte_opcode_FD(opcode);
+        uint8_t fd_op = *getNextByte();
+        printf("executing instruction %X\n", fd_op);
+        z80_instruction fd_instruction =
+            fd_multi_byte_instruction_lookup[fd_op];
+        fd_instruction.func(z80);
         break;
     default:
         break;
@@ -1473,7 +1476,7 @@ void execute_multi_byte_opcode_DD(uint8_t *opcode)
         ADD16(z80->ix, z80->bc, z80->f);
         break;
     case 0x21:
-        printf("LD IX,+%X", readNextWord());
+        printf("LD IX,+%X", read_next_word());
         LD16(z80->ix, getNextWord());
         break;
     case 0x22:
@@ -1484,7 +1487,7 @@ void execute_multi_byte_opcode_DD(uint8_t *opcode)
         INC16(z80->ix);
         break;
     case 0x2A:
-        printf("LD IX(%X)", readNextWord());
+        printf("LD IX(%X)", read_next_word());
         LD16(z80->ix, getWordAt(getNextWord()));
         break;
     case 0x2B:
@@ -1492,100 +1495,100 @@ void execute_multi_byte_opcode_DD(uint8_t *opcode)
         DEC16(z80->ix);
         break;
     case 0x34:
-        printf("INC IX+%X", (int8_t)readNextByte());
+        printf("INC IX+%X", (int8_t)read_next_byte());
         INC(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x35:
-        printf("DEC IX +%X", (int8_t)readNextByte());
+        printf("DEC IX +%X", (int8_t)read_next_byte());
         DEC(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x36:
-        printf("LD (IX+%X),+%X", (int8_t)readNextByte(),
-               readNextByte() + 1); // BROKEN second param is incorrect
+        printf("LD (IX+%X),+%X", (int8_t)read_next_byte(),
+               read_next_byte() + 1); // BROKEN second param is incorrect
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), getNextByte());
         break;
     case 0x46:
-        printf("LD B,(IX+%X)", (int8_t)readNextByte());
+        printf("LD B,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->b, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x4E:
-        printf("LD C,(IX+%X)", (int8_t)readNextByte());
+        printf("LD C,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->c, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x5E:
-        printf("LD D,(IX+%X)", (int8_t)readNextByte());
+        printf("LD D,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->d, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x56:
-        printf("LD E,(IX+%X)", (int8_t)readNextByte());
+        printf("LD E,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->e, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x66:
-        printf("LD H,(IX+%X)", (int8_t)readNextByte());
+        printf("LD H,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->h, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x6E:
-        printf("LD L,(IX+%X)", (int8_t)readNextByte());
+        printf("LD L,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->l, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x70:
-        printf("LD (IX+%X),B", (int8_t)readNextByte());
+        printf("LD (IX+%X),B", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->b);
         break;
     case 0x71:
-        printf("LD (IX+%X),C", (int8_t)readNextByte());
+        printf("LD (IX+%X),C", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->c);
         break;
     case 0x72:
-        printf("LD (IX+%X),D", (int8_t)readNextByte());
+        printf("LD (IX+%X),D", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->d);
         break;
     case 0x73:
-        printf("LD (IX+%X),E", (int8_t)readNextByte());
+        printf("LD (IX+%X),E", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->e);
         break;
     case 0x74:
-        printf("LD (IX+%X),H", (int8_t)readNextByte());
+        printf("LD (IX+%X),H", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->h);
         break;
     case 0x75:
-        printf("LD (IX+%X),L", (int8_t)readNextByte());
+        printf("LD (IX+%X),L", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->l);
         break;
     case 0x77:
-        printf("LD (IX+%X),A", (int8_t)readNextByte());
+        printf("LD (IX+%X),A", (int8_t)read_next_byte());
         LD(getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->a);
         break;
     case 0x7E:
-        printf("LD A,(IX+%X)", (int8_t)readNextByte());
+        printf("LD A,(IX+%X)", (int8_t)read_next_byte());
         LD(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())));
         break;
     case 0x86:
-        printf("ADD (IX+%X)", (int8_t)readNextByte());
+        printf("ADD (IX+%X)", (int8_t)read_next_byte());
         ADD(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x8E:
-        printf("ADC (IX+%X)", (int8_t)readNextByte());
+        printf("ADC (IX+%X)", (int8_t)read_next_byte());
         ADC(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x96:
-        printf("SUB (IX+%X)", (int8_t)readNextByte());
+        printf("SUB (IX+%X)", (int8_t)read_next_byte());
         SUB(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xA6:
-        printf("AND A (IX+%X)", (int8_t)readNextByte());
+        printf("AND A (IX+%X)", (int8_t)read_next_byte());
         AND(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xAE:
-        printf("XOR (IX+%X)", (int8_t)readNextByte());
+        printf("XOR (IX+%X)", (int8_t)read_next_byte());
         XOR(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xB6:
-        printf("OR A,(IX+%X)", (int8_t)readNextByte());
+        printf("OR A,(IX+%X)", (int8_t)read_next_byte());
         OR(z80->a, getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xBE:
-        printf("CP (IX+%X)", (int8_t)readNextByte());
+        printf("CP (IX+%X)", (int8_t)read_next_byte());
         CP(*z80->a, *getByteAt(*z80->ix + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xCB:
@@ -1776,7 +1779,7 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
         SBC16(z80->hl, z80->bc, z80->f);
         break;
     case 0x43:
-        printf("LD (%X),BC", readNextWord());
+        printf("LD (%X),BC", read_next_word());
         LD16(getWordAt(getNextWord()), z80->bc);
         break;
     case 0x46:
@@ -1789,7 +1792,7 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
         *z80->pc += 2;
         break;
     case 0x4B:
-        printf("LD BC,(%X)", readNextWord());
+        printf("LD BC,(%X)", read_next_word());
         t_counter += 10;
         LD16(z80->bc, getWordAt(getNextWord()));
         break;
@@ -1804,19 +1807,19 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
         ++*z80->pc;
         break;
     case 0x53:
-        printf("LD (%X),DE", readNextWord());
+        printf("LD (%X),DE", read_next_word());
         LD16(getWordAt(getNextWord()), z80->de);
         break;
     case 0x56:
-        printf("IM 1");
-        IM1(z80->mode);
+        // printf("IM 1");
+        // IM1(z80->mode);
         break;
     case 0x57:
         printf("LD A,I");
         LDAIR(z80->a, z80->i, z80->f, z80->iff2);
         break;
     case 0x5B:
-        printf("LD DE,(%X)", readNextWord());
+        printf("LD DE,(%X)", read_next_word());
         t_counter += 20;
         LD16(z80->de, getWordAt(getNextWord()));
         break;
@@ -1837,7 +1840,7 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
         SBC16(z80->hl, z80->sp, z80->f);
         break;
     case 0x73:
-        printf("LD(%X),SP", readNextWord());
+        printf("LD(%X),SP", read_next_word());
         LD16(getNextWord(), z80->sp);
         break;
     case 0x78:
@@ -1847,7 +1850,7 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
            z80->f);
         break;
     case 0x7B:
-        printf("LD SP,(%X)", readNextWord());
+        printf("LD SP,(%X)", read_next_word());
         LD16(z80->sp, getWordAt(getNextWord()));
         break; /*
  case 0xA0:
@@ -1867,18 +1870,20 @@ void execute_multi_byte_opcode_ED(uint8_t *opcode)
          CPD();
  break;*/
     case 0xB0:
-        printf("LDIR");
-        LDIR(getWordAt(z80->hl), getWordAt(z80->de), z80->hl, z80->de, z80->bc,
-             z80->pc, z80->f);
+        // printf("LDIR");
+        // LDIR(getWordAt(z80->hl), getWordAt(z80->de), z80->hl, z80->de,
+        // z80->bc,
+        //      z80->pc, z80->f);
         break; /*
  case 0xB1:
          //printf( "CPIR");
          CPIR();
          break;*/
     case 0xB8:
-        printf("LDDR");
-        LDDR(getWordAt(z80->hl), getWordAt(z80->de), z80->hl, z80->de, z80->bc,
-             z80->f);
+        // printf("LDDR");
+        // LDDR(getWordAt(z80->hl), getWordAt(z80->de), z80->hl, z80->de,
+        // z80->bc,
+        //      z80->f);
         break;
     case 0xB9:
         // printf( "CPDR");
@@ -1894,11 +1899,11 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
     switch (*(getNextByte()))
     {
     case 0x21:
-        printf("LD IY,+%X", readNextWord());
+        printf("LD IY,+%X", read_next_word());
         LD16(z80->iy, getNextWord());
         break;
     case 0x22:
-        printf("LD (%X),IY", readNextWord());
+        printf("LD (%X),IY", read_next_word());
         LD16(getWordAt(getNextWord()), z80->iy);
         break;
     case 0x23:
@@ -1906,7 +1911,7 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
         INC16(z80->ix);
         break;
     case 0x2A:
-        printf("LD IY(%X)", readNextWord());
+        printf("LD IY(%X)", read_next_word());
         LD16(z80->iy, getWordAt(getNextWord()));
         break;
     case 0x2B:
@@ -1914,102 +1919,102 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
         DEC16(z80->iy);
         break;
     case 0x34:
-        printf("INC IY+%X", readNextByte());
+        printf("INC IY+%X", read_next_byte());
         INC(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x35:
-        printf("DEC IY+%X", readNextByte());
+        printf("DEC IY+%X", read_next_byte());
         DEC(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x36:
-        printf("LD (IY+%X),%02X**", (int8_t)readNextByte(),
-               readByteAt(*z80->pc + 2));
+        printf("LD (IY+%X),%02X**", (int8_t)read_next_byte(),
+               read_byte_at(*z80->pc + 2));
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())),
            getByteAt(*z80->pc + 2));
         getNextByte();
         break;
     case 0x46:
-        printf("LD B,(IY+%X)", (int8_t)readNextByte());
+        printf("LD B,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->b, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x4E:
-        printf("LD C,(IY+%X)", (int8_t)readNextByte());
+        printf("LD C,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->c, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x56:
-        printf("LD D,(IY+%X)", (int8_t)readNextByte());
+        printf("LD D,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->d, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x5E:
-        printf("LD E,(IY+%X)", (int8_t)readNextByte());
+        printf("LD E,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->e, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x66:
-        printf("LD H,(IY+%X)", (int8_t)readNextByte());
+        printf("LD H,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->h, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x6E:
-        printf("LD L,(IY+%X)", (int8_t)readNextByte());
+        printf("LD L,(IY+%X)", (int8_t)read_next_byte());
         LD(z80->l, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x70:
-        printf("LD (IY+%X),B", (int8_t)readNextByte());
+        printf("LD (IY+%X),B", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->b);
         break;
     case 0x71:
-        printf("LD (IY+%X),C", (int8_t)readNextByte());
+        printf("LD (IY+%X),C", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->c);
         break;
     case 0x72:
-        printf("LD (IY+%X),D", (int8_t)readNextByte());
+        printf("LD (IY+%X),D", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->d);
         break;
     case 0x73:
-        printf("LD (IY+%X),E", (int8_t)readNextByte());
+        printf("LD (IY+%X),E", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->e);
         break;
     case 0x74:
-        printf("LD (IY+%X),H", (int8_t)readNextByte());
+        printf("LD (IY+%X),H", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->h);
         break;
     case 0x75:
-        printf("LD (IY+%X),L", (int8_t)readNextByte());
+        printf("LD (IY+%X),L", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->l);
         break;
     case 0x77:
-        printf("LD (IY+%X),A", (int8_t)readNextByte());
+        printf("LD (IY+%X),A", (int8_t)read_next_byte());
         LD(getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->a);
         break;
     case 0x7E:
-        printf("LD A,(IY+%X", (int8_t)readNextByte());
+        printf("LD A,(IY+%X", (int8_t)read_next_byte());
         LD(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())));
         break;
     case 0x86:
-        printf("ADD (IY+%X)", (int8_t)readNextByte());
+        printf("ADD (IY+%X)", (int8_t)read_next_byte());
         ADD(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x8E:
-        printf("ADC (IY+%X)", (int8_t)readNextByte());
+        printf("ADC (IY+%X)", (int8_t)read_next_byte());
         ADC(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0x96:
-        printf("SUB (IY+%X)", (int8_t)readNextByte());
+        printf("SUB (IY+%X)", (int8_t)read_next_byte());
         SUB(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xA6:
-        printf("AND A (IY+%X)", (int8_t)readNextByte());
+        printf("AND A (IY+%X)", (int8_t)read_next_byte());
         AND(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xAE:
-        printf("XOR (IY+%X)", (int8_t)readNextByte());
+        printf("XOR (IY+%X)", (int8_t)read_next_byte());
         XOR(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xB6:
-        printf("OR A,(IY+%X)", (int8_t)readNextByte());
+        printf("OR A,(IY+%X)", (int8_t)read_next_byte());
         OR(z80->a, getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xBE:
-        printf("CP (IY+%X)", (int8_t)readNextByte());
+        printf("CP (IY+%X)", (int8_t)read_next_byte());
         CP(*z80->a, *getByteAt(*z80->iy + (int8_t)*(getNextByte())), z80->f);
         break;
     case 0xCB:
@@ -2155,7 +2160,7 @@ static void execute_multi_byte_opcode_FD(uint8_t *opcode)
         LD16(z80->sp, z80->iy);
         break;
     case 0xFE:
-        printf("CP %X", readNextByte());
+        printf("CP %X", read_next_byte());
         CP(*z80->a, *getNextByte(), z80->f);
         break;
     case 0xFF:
@@ -2207,7 +2212,7 @@ uint8_t *getNextByte()
 }
 
 // Read the next byte along, does not progress pc
-uint8_t readNextByte()
+uint8_t read_next_byte()
 {
     // Dereference into the memory location and return the value, progress pc by
     // 1
@@ -2227,7 +2232,7 @@ uint16_t *getNextWord()
 }
 
 // read next word along, does not progress pc
-uint16_t readNextWord()
+uint16_t read_next_word()
 {
     // Dereference into the memory location and return the word of the next to
     // bytes
@@ -2249,7 +2254,7 @@ uint16_t read_word_at(uint16_t addrs) { return read_word(addrs); }
 // deprecate this method it gets the endianness wrong
 uint16_t readWordAt(uint16_t *addrs) { return *(getWord(*addrs)); }
 
-uint16_t readByteAt(uint16_t addrs) { return *(getByte(addrs)); }
+uint16_t read_byte_at(uint16_t addrs) { return *(getByte(addrs)); }
 // Write byte to memory given 16-bit address
 void writeByte(uint16_t addrs, uint8_t val)
 {
@@ -2309,10 +2314,10 @@ uint8_t readPort(uint16_t portAddrs)
 
 z80_instruction single_byte_instruction_lookup[] = {
     {"NOP", 1, NOP},                     /*0x00*/
-    {"LD BC,+%X", 1, NI},                /*0x01*/
+    {"LD BC,+%X", 3, LD_BC_16},          /*0x01*/
     {"LD(BC),A", 1, NI},                 /*0x02*/
     {"INC BC", 1, NI},                   /*0x03*/
-    {"INC B", 1, NI},                    /*0x04*/
+    {"INC B", 1, INC_B},                 /*0x04*/
     {"DEC B", 1, NI},                    /*0x05*/
     {"LD B,+%X", 1, NI},                 /*0x06*/
     {"RLCA", 1, NI},                     /*0x07*/
@@ -2341,8 +2346,8 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"LD E,+%X", 1, NI},                 /*0x1E*/
     {"RRA", 1, NI},                      /*0x1F*/
     {"JR NZ,%d", 1, JRNZ},               /*0x20*/
-    {"LD HL,+%X", 1, NI},                /*0x21*/
-    {"LD (%X),HL", 1, NI},               /*0x22*/
+    {"LD HL,+%X", 3, LD_HL_16},          /*0x21*/
+    {"LD (%X), HL", 3, LD_nn_HL},        /*0x22*/
     {"INC HL", 1, INC_HL},               /*0x23*/
     {"INC H", 1, NI},                    /*0x24*/
     {"DEC H", 1, NI},                    /*0x25*/
@@ -2350,7 +2355,7 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"DAA", 1, NI},                      /*0x27*/
     {"JR Z,+%X", 2, JRZ},                /*0x28*/
     {"ADD HL,HL", 1, NI},                /*0x29*/
-    {"LD HL,(%X)", 1, NI},               /*0x2A*/
+    {"LD HL,(%X)", 3, LD_HL_nn},         /*0x2A*/
     {"DEC HL", 1, DEC_HL},               /*0x2B*/
     {"INC L", 1, NI},                    /*0x2C*/
     {"DEC L", 1, NI},                    /*0x2D*/
@@ -2358,11 +2363,11 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"CPL", 1, NI},                      /*0x2F*/
     {"JR NC,%d", 2, JR_NC_n},            /*0x30*/
     {"LD SP,+%X", 1, NI},                /*0x31*/
-    {"LD (%X),A", 1, NI},                /*0x32*/
+    {"LD (%X),A", 3, LD_16_A},           /*0x32*/
     {"INC SP", 1, NI},                   /*0x33*/
     {"INC (HL)", 1, NI},                 /*0x34*/
     {"DEC (HL)", 1, DEC_AT_ADDR_HL},     /*0x35*/
-    {"LD (HL),+%X", 1, LD_ADDR_AT_HL_N}, /*0x36*/
+    {"LD (HL),+%X", 2, LD_ADDR_AT_HL_N}, /*0x36*/
     {"SCF", 1, NI},                      /*0x37*/
     {"JR C,%d", 1, NI},                  /*0x38*/
     {"ADD HL,SP", 1, NI},                /*0x39*/
@@ -2400,7 +2405,7 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"LD E,C", 1, NI},                   /*0x59*/
     {"LD E,D", 1, NI},                   /*0x5A*/
     {"LD E,E", 1, NI},                   /*0x5B*/
-    {"LD E,H", 1, NI},                   /*0x5C*/
+    {"LD E,H", 1, LD_E_H},               /*0x5C*/
     {"LD E,L", 1, NI},                   /*0x5D*/
     {"LD E,(HL)", 1, NI},                /*0x5E*/
     {"LD E,A", 1, NI},                   /*0x5F*/
@@ -2476,7 +2481,7 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"AND L", 1, NI},                    /*0xA5*/
     {"AND (HL)", 1, NI},                 /*0xA6*/
     {"AND A", 1, AND_A},                 /*0xA7*/
-    {"XOR B", 1, NI},                    /*0xA8*/
+    {"XOR B", 1, XOR_B},                 /*0xA8*/
     {"XOR C", 1, NI},                    /*0xA9*/
     {"XOR D", 1, NI},                    /*0xAA*/
     {"XOR E", 1, NI},                    /*0xAB*/
@@ -2543,7 +2548,7 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"RET PE,%X", 1, NI},                /*0xE8*/
     {"JP (HL)", 1, NI},                  /*0xE9*/
     {"JP PE,%X", 1, NI},                 /*0xEA*/
-    {"EX DE,HL", 1, NI},                 /*0xEB*/
+    {"EX DE,HL", 1, EX_DE_HL},           /*0xEB*/
     {"CALL PE,%X", 1, NI},               /*0xEC*/
     {"Multi-byte ED", 1, NI},            /*0xED*/
     {"XOR %X", 1, NI},                   /*0xEE*/
@@ -2557,9 +2562,9 @@ z80_instruction single_byte_instruction_lookup[] = {
     {"OR %X", 1, NI},                    /*0xF6*/
     {"RST 31H", 0, NI},                  /*0xF7*/
     {"RET M,%X", 1, NI},                 /*0xF8*/
-    {"LD SP,HL", 1, NI},                 /*0xF9*/
+    {"LD SP,HL", 1, LD_SP_HL},           /*0xF9*/
     {"JP M,%X", 1, NI},                  /*0xFA*/
-    {"EI", 1, NI},                       /*0xFB*/
+    {"EI", 1, EI},                       /*0xFB*/
     {"CALL M,%X", 1, NI},                /*0xFC*/
     {"Multi-byte FD", 1, NI},            /*0xFD*/
     {"CP, %X", 1, NI},                   /*0xFE*/
@@ -2634,7 +2639,7 @@ z80_instruction ed_multi_byte_instruction_lookup[] = {
     {"", 1, NI},                  /*0x40*/
     {"", 1, NI},                  /*0x41*/
     {"", 1, NI},                  /*0x42*/
-    {"", 1, NI},                  /*0x43*/
+    {"LD (%X), BC", 4, LD_nn_BC}, /*0x43*/
     {"", 1, NI},                  /*0x44*/
     {"", 1, NI},                  /*0x45*/
     {"", 1, NI},                  /*0x46*/
@@ -2650,10 +2655,10 @@ z80_instruction ed_multi_byte_instruction_lookup[] = {
     {"", 1, NI},                  /*0x50*/
     {"", 1, NI},                  /*0x51*/
     {"SBC HL, DE", 2, SBC_HL_DE}, /*0x52*/
-    {"", 1, NI},                  /*0x53*/
+    {"LD (%X), DE", 4, LD_nn_DE}, /*0x53*/
     {"", 1, NI},                  /*0x54*/
     {"", 1, NI},                  /*0x55*/
-    {"", 1, NI},                  /*0x56*/
+    {"IM1", 1, IM1},              /*0x56*/
     {"", 1, NI},                  /*0x57*/
     {"", 1, NI},                  /*0x58*/
     {"", 1, NI},                  /*0x59*/
@@ -2743,7 +2748,7 @@ z80_instruction ed_multi_byte_instruction_lookup[] = {
     {"", 1, NI},                  /*0xad*/
     {"", 1, NI},                  /*0xae*/
     {"", 1, NI},                  /*0xaf*/
-    {"", 1, NI},                  /*0xb0*/
+    {"LDIR", 2, LDIR},            /*0xb0*/
     {"", 1, NI},                  /*0xb1*/
     {"", 1, NI},                  /*0xb2*/
     {"", 1, NI},                  /*0xb3*/
@@ -2751,7 +2756,7 @@ z80_instruction ed_multi_byte_instruction_lookup[] = {
     {"", 1, NI},                  /*0xb5*/
     {"", 1, NI},                  /*0xb6*/
     {"", 1, NI},                  /*0xb7*/
-    {"", 1, NI},                  /*0xb8*/
+    {"LDDR", 2, LDDR},            /*0xb8*/
     {"", 1, NI},                  /*0xb9*/
     {"", 1, NI},                  /*0xba*/
     {"", 1, NI},                  /*0xbb*/
@@ -2825,7 +2830,265 @@ z80_instruction ed_multi_byte_instruction_lookup[] = {
     {"", 1, NI},                  /*0xff*/
 };
 
-z80_instruction fd_multi_byte_instruction_lookup[] = {};
+z80_instruction fd_multi_byte_instruction_lookup[] = {
+    {"", 1, NI},               /*0x00*/
+    {"", 1, NI},               /*0x01*/
+    {"", 1, NI},               /*0x02*/
+    {"", 1, NI},               /*0x03*/
+    {"", 1, NI},               /*0x04*/
+    {"", 1, NI},               /*0x05*/
+    {"", 1, NI},               /*0x06*/
+    {"", 1, NI},               /*0x07*/
+    {"", 1, NI},               /*0x08*/
+    {"", 1, NI},               /*0x09*/
+    {"", 1, NI},               /*0x0a*/
+    {"", 1, NI},               /*0x0b*/
+    {"", 1, NI},               /*0x0c*/
+    {"", 1, NI},               /*0x0d*/
+    {"", 1, NI},               /*0x0e*/
+    {"", 1, NI},               /*0x0f*/
+    {"", 1, NI},               /*0x10*/
+    {"", 1, NI},               /*0x11*/
+    {"", 1, NI},               /*0x12*/
+    {"", 1, NI},               /*0x13*/
+    {"", 1, NI},               /*0x14*/
+    {"", 1, NI},               /*0x15*/
+    {"", 1, NI},               /*0x16*/
+    {"", 1, NI},               /*0x17*/
+    {"", 1, NI},               /*0x18*/
+    {"", 1, NI},               /*0x19*/
+    {"", 1, NI},               /*0x1a*/
+    {"", 1, NI},               /*0x1b*/
+    {"", 1, NI},               /*0x1c*/
+    {"", 1, NI},               /*0x1d*/
+    {"", 1, NI},               /*0x1e*/
+    {"", 1, NI},               /*0x1f*/
+    {"", 1, NI},               /*0x20*/
+    {"LD IY %X", 1, LD_IY_nn}, /*0x21*/
+    {"", 1, NI},               /*0x22*/
+    {"", 1, NI},               /*0x23*/
+    {"", 1, NI},               /*0x24*/
+    {"", 1, NI},               /*0x25*/
+    {"", 1, NI},               /*0x26*/
+    {"", 1, NI},               /*0x27*/
+    {"", 1, NI},               /*0x28*/
+    {"", 1, NI},               /*0x29*/
+    {"", 1, NI},               /*0x2a*/
+    {"", 1, NI},               /*0x2b*/
+    {"", 1, NI},               /*0x2c*/
+    {"", 1, NI},               /*0x2d*/
+    {"", 1, NI},               /*0x2e*/
+    {"", 1, NI},               /*0x2f*/
+    {"", 1, NI},               /*0x30*/
+    {"", 1, NI},               /*0x31*/
+    {"", 1, NI},               /*0x32*/
+    {"", 1, NI},               /*0x33*/
+    {"", 1, NI},               /*0x34*/
+    {"DEC (IY+d)", 3, DEC_nn}, /*0x35*/
+    {"", 1, NI},               /*0x36*/
+    {"", 1, NI},               /*0x37*/
+    {"", 1, NI},               /*0x38*/
+    {"", 1, NI},               /*0x39*/
+    {"", 1, NI},               /*0x3a*/
+    {"", 1, NI},               /*0x3b*/
+    {"", 1, NI},               /*0x3c*/
+    {"", 1, NI},               /*0x3d*/
+    {"", 1, NI},               /*0x3e*/
+    {"", 1, NI},               /*0x3f*/
+    {"", 1, NI},               /*0x40*/
+    {"", 1, NI},               /*0x41*/
+    {"", 1, NI},               /*0x42*/
+    {"", 1, NI},               /*0x43*/
+    {"", 1, NI},               /*0x44*/
+    {"", 1, NI},               /*0x45*/
+    {"", 1, NI},               /*0x46*/
+    {"", 1, NI},               /*0x47*/
+    {"", 1, NI},               /*0x48*/
+    {"", 1, NI},               /*0x49*/
+    {"", 1, NI},               /*0x4a*/
+    {"", 1, NI},               /*0x4b*/
+    {"", 1, NI},               /*0x4c*/
+    {"", 1, NI},               /*0x4d*/
+    {"", 1, NI},               /*0x4e*/
+    {"", 1, NI},               /*0x4f*/
+    {"", 1, NI},               /*0x50*/
+    {"", 1, NI},               /*0x51*/
+    {"", 1, NI},               /*0x52*/
+    {"", 1, NI},               /*0x53*/
+    {"", 1, NI},               /*0x54*/
+    {"", 1, NI},               /*0x55*/
+    {"", 1, NI},               /*0x56*/
+    {"", 1, NI},               /*0x57*/
+    {"", 1, NI},               /*0x58*/
+    {"", 1, NI},               /*0x59*/
+    {"", 1, NI},               /*0x5a*/
+    {"", 1, NI},               /*0x5b*/
+    {"", 1, NI},               /*0x5c*/
+    {"", 1, NI},               /*0x5d*/
+    {"", 1, NI},               /*0x5e*/
+    {"", 1, NI},               /*0x5f*/
+    {"", 1, NI},               /*0x60*/
+    {"", 1, NI},               /*0x61*/
+    {"", 1, NI},               /*0x62*/
+    {"", 1, NI},               /*0x63*/
+    {"", 1, NI},               /*0x64*/
+    {"", 1, NI},               /*0x65*/
+    {"", 1, NI},               /*0x66*/
+    {"", 1, NI},               /*0x67*/
+    {"", 1, NI},               /*0x68*/
+    {"", 1, NI},               /*0x69*/
+    {"", 1, NI},               /*0x6a*/
+    {"", 1, NI},               /*0x6b*/
+    {"", 1, NI},               /*0x6c*/
+    {"", 1, NI},               /*0x6d*/
+    {"", 1, NI},               /*0x6e*/
+    {"", 1, NI},               /*0x6f*/
+    {"", 1, NI},               /*0x70*/
+    {"", 1, NI},               /*0x71*/
+    {"", 1, NI},               /*0x72*/
+    {"", 1, NI},               /*0x73*/
+    {"", 1, NI},               /*0x74*/
+    {"", 1, NI},               /*0x75*/
+    {"", 1, NI},               /*0x76*/
+    {"", 1, NI},               /*0x77*/
+    {"", 1, NI},               /*0x78*/
+    {"", 1, NI},               /*0x79*/
+    {"", 1, NI},               /*0x7a*/
+    {"", 1, NI},               /*0x7b*/
+    {"", 1, NI},               /*0x7c*/
+    {"", 1, NI},               /*0x7d*/
+    {"", 1, NI},               /*0x7e*/
+    {"", 1, NI},               /*0x7f*/
+    {"", 1, NI},               /*0x80*/
+    {"", 1, NI},               /*0x81*/
+    {"", 1, NI},               /*0x82*/
+    {"", 1, NI},               /*0x83*/
+    {"", 1, NI},               /*0x84*/
+    {"", 1, NI},               /*0x85*/
+    {"", 1, NI},               /*0x86*/
+    {"", 1, NI},               /*0x87*/
+    {"", 1, NI},               /*0x88*/
+    {"", 1, NI},               /*0x89*/
+    {"", 1, NI},               /*0x8a*/
+    {"", 1, NI},               /*0x8b*/
+    {"", 1, NI},               /*0x8c*/
+    {"", 1, NI},               /*0x8d*/
+    {"", 1, NI},               /*0x8e*/
+    {"", 1, NI},               /*0x8f*/
+    {"", 1, NI},               /*0x90*/
+    {"", 1, NI},               /*0x91*/
+    {"", 1, NI},               /*0x92*/
+    {"", 1, NI},               /*0x93*/
+    {"", 1, NI},               /*0x94*/
+    {"", 1, NI},               /*0x95*/
+    {"", 1, NI},               /*0x96*/
+    {"", 1, NI},               /*0x97*/
+    {"", 1, NI},               /*0x98*/
+    {"", 1, NI},               /*0x99*/
+    {"", 1, NI},               /*0x9a*/
+    {"", 1, NI},               /*0x9b*/
+    {"", 1, NI},               /*0x9c*/
+    {"", 1, NI},               /*0x9d*/
+    {"", 1, NI},               /*0x9e*/
+    {"", 1, NI},               /*0x9f*/
+    {"", 1, NI},               /*0xa0*/
+    {"", 1, NI},               /*0xa1*/
+    {"", 1, NI},               /*0xa2*/
+    {"", 1, NI},               /*0xa3*/
+    {"", 1, NI},               /*0xa4*/
+    {"", 1, NI},               /*0xa5*/
+    {"", 1, NI},               /*0xa6*/
+    {"", 1, NI},               /*0xa7*/
+    {"", 1, NI},               /*0xa8*/
+    {"", 1, NI},               /*0xa9*/
+    {"", 1, NI},               /*0xaa*/
+    {"", 1, NI},               /*0xab*/
+    {"", 1, NI},               /*0xac*/
+    {"", 1, NI},               /*0xad*/
+    {"", 1, NI},               /*0xae*/
+    {"", 1, NI},               /*0xaf*/
+    {"", 1, NI},               /*0xb0*/
+    {"", 1, NI},               /*0xb1*/
+    {"", 1, NI},               /*0xb2*/
+    {"", 1, NI},               /*0xb3*/
+    {"", 1, NI},               /*0xb4*/
+    {"", 1, NI},               /*0xb5*/
+    {"", 1, NI},               /*0xb6*/
+    {"", 1, NI},               /*0xb7*/
+    {"", 1, NI},               /*0xb8*/
+    {"", 1, NI},               /*0xb9*/
+    {"", 1, NI},               /*0xba*/
+    {"", 1, NI},               /*0xbb*/
+    {"", 1, NI},               /*0xbc*/
+    {"", 1, NI},               /*0xbd*/
+    {"", 1, NI},               /*0xbe*/
+    {"", 1, NI},               /*0xbf*/
+    {"", 1, NI},               /*0xc0*/
+    {"", 1, NI},               /*0xc1*/
+    {"", 1, NI},               /*0xc2*/
+    {"", 1, NI},               /*0xc3*/
+    {"", 1, NI},               /*0xc4*/
+    {"", 1, NI},               /*0xc5*/
+    {"", 1, NI},               /*0xc6*/
+    {"", 1, NI},               /*0xc7*/
+    {"", 1, NI},               /*0xc8*/
+    {"", 1, NI},               /*0xc9*/
+    {"", 1, NI},               /*0xca*/
+    {"", 1, NI},               /*0xcb*/
+    {"", 1, NI},               /*0xcc*/
+    {"", 1, NI},               /*0xcd*/
+    {"", 1, NI},               /*0xce*/
+    {"", 1, NI},               /*0xcf*/
+    {"", 1, NI},               /*0xd0*/
+    {"", 1, NI},               /*0xd1*/
+    {"", 1, NI},               /*0xd2*/
+    {"", 1, NI},               /*0xd3*/
+    {"", 1, NI},               /*0xd4*/
+    {"", 1, NI},               /*0xd5*/
+    {"", 1, NI},               /*0xd6*/
+    {"", 1, NI},               /*0xd7*/
+    {"", 1, NI},               /*0xd8*/
+    {"", 1, NI},               /*0xd9*/
+    {"", 1, NI},               /*0xda*/
+    {"", 1, NI},               /*0xdb*/
+    {"", 1, NI},               /*0xdc*/
+    {"", 1, NI},               /*0xdd*/
+    {"", 1, NI},               /*0xde*/
+    {"", 1, NI},               /*0xdf*/
+    {"", 1, NI},               /*0xe0*/
+    {"", 1, NI},               /*0xe1*/
+    {"", 1, NI},               /*0xe2*/
+    {"", 1, NI},               /*0xe3*/
+    {"", 1, NI},               /*0xe4*/
+    {"", 1, NI},               /*0xe5*/
+    {"", 1, NI},               /*0xe6*/
+    {"", 1, NI},               /*0xe7*/
+    {"", 1, NI},               /*0xe8*/
+    {"", 1, NI},               /*0xe9*/
+    {"", 1, NI},               /*0xea*/
+    {"", 1, NI},               /*0xeb*/
+    {"", 1, NI},               /*0xec*/
+    {"", 1, NI},               /*0xed*/
+    {"", 1, NI},               /*0xee*/
+    {"", 1, NI},               /*0xef*/
+    {"", 1, NI},               /*0xf0*/
+    {"", 1, NI},               /*0xf1*/
+    {"", 1, NI},               /*0xf2*/
+    {"", 1, NI},               /*0xf3*/
+    {"", 1, NI},               /*0xf4*/
+    {"", 1, NI},               /*0xf5*/
+    {"", 1, NI},               /*0xf6*/
+    {"", 1, NI},               /*0xf7*/
+    {"", 1, NI},               /*0xf8*/
+    {"", 1, NI},               /*0xf9*/
+    {"", 1, NI},               /*0xfa*/
+    {"", 1, NI},               /*0xfb*/
+    {"", 1, NI},               /*0xfc*/
+    {"", 1, NI},               /*0xfd*/
+    {"", 1, NI},               /*0xfe*/
+    {"", 1, NI},               /*0xff*/
+};
+
 z80_instruction cb_multi_byte_instruction_lookup[] = {
     {"RLC B", 1, NI},       /*0x00*/
     {"RLC C", 1, NI},       /*0x01*/

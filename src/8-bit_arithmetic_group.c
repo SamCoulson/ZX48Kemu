@@ -383,13 +383,20 @@ void OR(uint8_t *dstReg, uint8_t *srcVal, uint8_t *fReg)
 // Logical XOR an a 8-bit value with the accumulater
 // XOR A,r
 // OpCodes: 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAF
+uint8_t XOR_B(Z80 *z80)
+{
+    XOR(z80->a, z80->b, z80->f);
+    *z80->pc += 1;
+    return 4;
+}
+
 // XOR A,n
 // Logical XOR an 8-bit integer with register A
 // OpCodes: 0xEE
-uint8_t XOR_A(Z80 *cpu)
+uint8_t XOR_A(Z80 *z80)
 {
-    XOR(cpu->a, cpu->a, cpu->f);
-    *cpu->pc += 1;
+    XOR(z80->a, z80->a, z80->f);
+    *z80->pc += 1;
     return 4;
 }
 
@@ -499,6 +506,13 @@ void CP(uint8_t reg, uint8_t val, uint8_t *fReg)
 // INC r
 // Increment an 8-Bit register
 // OpCodes: 0x3C, 0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C,
+uint8_t INC_B(Z80 *z80)
+{
+    INC(z80->b, z80->f);
+    ++*z80->pc;
+    return 4;
+}
+
 // INC(HL)
 // Increment the contents on address pointed to by HL register
 // OpCodes: 0x34
@@ -524,24 +538,10 @@ void INC(uint8_t *val, uint8_t *fReg)
     ++*val;
 
     // S is one if result is negative
-    if (getBit(val, 7) == 0x01)
-    {
-        setBit(fReg, 7, 1);
-    }
-    else
-    {
-        setBit(fReg, 7, 0);
-    }
+    setBit(fReg, 7, getBit(val, 7) == 0x01);
 
     // Z is one if result is zero
-    if (*val == 0x0)
-    {
-        setBit(fReg, 6, 1); // Should be 1
-    }
-    else
-    {
-        setBit(fReg, 6, 0);
-    }
+    setBit(fReg, 6, *val == 0x0); // Should be 1
 
     // H is set to 1 if borrow bit 4??
     // setBit( fReg, 4, 0 );
@@ -569,6 +569,15 @@ uint8_t DEC_AT_ADDR_HL(Z80 *z80)
 // DEC(IY+d)
 // Decrement the contents of address plus offset in IX register
 // OpCodes: 0xFD35
+uint8_t DEC_nn(Z80 *z80)
+{
+    ++*z80->pc;
+    uint8_t value = read_byte_at(*z80->iy + read_next_byte());
+    DEC(&value, z80->f);
+    ++*z80->pc;
+    return 23;
+}
+
 void DEC(uint8_t *val, uint8_t *fReg)
 {
 

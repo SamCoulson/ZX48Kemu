@@ -16,7 +16,9 @@ uint16_t read_word(uint16_t addrs);
 uint16_t *getWord(uint16_t addrs);
 
 // Writes an 8-bit value to the 16-bit address location in memory
-void setByte(uint16_t loc, uint8_t val);
+void write_byte(uint16_t loc, uint8_t val);
+
+void write_word(uint16_t addr, uint16_t value);
 
 // Total 64K Spectrum memory
 extern unsigned char memory[65536];

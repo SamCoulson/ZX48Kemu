@@ -48,7 +48,7 @@ typedef struct
 
 PixelValue pixel_values[TOTAL_SCREEN_PIXELS];
 
-// void test_video();
+void test_video();
 // this methiod should live in ULA.c
 void build_video_mem_map()
 {
@@ -79,11 +79,12 @@ void build_video_mem_map()
             for (int k = 0; k < 8; k++)
             {
                 x = SCREEN_X_START;
-                // printf("\nvidBufLoc = %X\n", vidBufLoc);
+
                 // 32 blocks of 8 bits per row.
+                // loop over from left to right 8 bit then move to next block
                 for (int l = 0; l < 32; l++)
                 {
-                    // Read spec video mem buffer and get pixel status +
+                    // Read spectrum video mem buffer and get pixel status +
                     // determine color
                     uint8_t pixel = memory[vidBufLoc];
 
@@ -91,8 +92,8 @@ void build_video_mem_map()
                     // pixel and bit 0 LSD right most pixel)
                     for (bit = 7; bit > -1; bit--)
                     {
-                        pixel_values[index].x = x;
-                        pixel_values[index].y = y;
+                        // pixel_values[index].x = x;
+                        // pixel_values[index].y = y;
 
                         // Set on pixel to forground color
                         if (pixel & (1 << (bit)))
@@ -106,21 +107,22 @@ void build_video_mem_map()
                             DrawPixel(x, y, WHITE);
                         }
 
-                        pixel_values[index].index = vidBufLoc;
+                        // pixel_values[index].index = vidBufLoc;
 
-                        index++;
+                        // index++;
                         x++;
                     }
                     vidBufLoc++;
                 }
                 vidBufLoc += 224; // Advance to next set of bytes for next row
+                                  // (as in block row not pixel row)
                 y++;
             }
             vidStart +=
                 32; // Advance start offset by 32 bytes for next pixel line
         }
-        vidStart += 1792; // Move pointer forwards to start of the next set of
-                          // bytes for the next third
+        vidStart += 1792; // Move pointer forwards to start of the next set
+        // of bytes for the next third
     }
 }
 
@@ -439,7 +441,7 @@ void test_video()
 {
 
     // Test 8x8 block for screen
-    memory[0x4000] = 0x00;
+    // memory[0x4000] = 0x00;
     memory[0x4100] = 0x3C;
     memory[0x4200] = 0x42;
     memory[0x4300] = 0x04;

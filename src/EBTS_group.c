@@ -1,11 +1,20 @@
+#include "../include/EBTS_group.h"
 #include "../include/cpu.h"
+#include "../include/memory.h"
 #include "../include/util_bit_operations.h"
+#include <stdio.h>
 
 // ***EXCHANGE, BLOCK TRANSFER AND SEARCH GROUPS***
 
 // EX DE,HL
 // Swap DE and HL register values
 // OpCodes: 0xEB
+uint8_t EX_DE_HL(Z80 *z80)
+{
+    EX(z80->de, z80->hl);
+    ++*z80->pc;
+    return 4;
+}
 
 // EX AF,AF'
 // Swap register values between AF and alternative AF
@@ -105,41 +114,33 @@ void CPU::LDI(){
 // Copy value at address in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void LDIR(uint16_t *hlVal, uint16_t *deVal, uint16_t *hl, uint16_t *de,
-          uint16_t *bc, uint16_t *pc, uint8_t *fReg)
+uint8_t LDIR(Z80 *z80)
 {
-
-    // If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-    if (*bc == 0x0000)
-    {
-        *bc = 0xFA00;
-    }
+    // Reset flags H, P/V, and N
+    setBit(z80->f, 4, 0);
+    setBit(z80->f, 2, 0);
+    setBit(z80->f, 1, 0);
 
     // Keep copying data from one memory loaction to another until BC is 0
-    if (*bc != 0x0000)
+    if (*z80->bc != 0x0000)
     {
         // Transfer byte pointed to by HL to location pointed to by BC
-        *deVal = *hlVal;
+        write_word(*z80->de, read_word_at(*z80->hl));
 
         // Increment HL and DE
-        ++*hl;
-        ++*de;
+        ++*z80->hl;
+        ++*z80->de;
 
         // Decrement BC
-        --*bc;
+        --*z80->bc;
 
-        // Reset PC back
-        if (*bc != 0x0000)
-        {
-            --*pc;
-            --*pc;
-        }
+        --*z80->pc;
+
+        return 5;
     }
 
-    // Reset flags H, P/V, and N
-    setBit(fReg, 4, 0);
-    setBit(fReg, 2, 0);
-    setBit(fReg, 1, 0);
+    *z80->pc += 2;
+    return 4;
 }
 /*
 // LDD *Changes flags*
@@ -189,36 +190,41 @@ void CPU::LDD(){
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC.
 // OpCodes: 0xEDB8
-void LDDR(uint16_t *hlVal, uint16_t *deVal, uint16_t *hl, uint16_t *de,
-          uint16_t *bc, uint8_t *fReg)
+uint8_t LDDR(Z80 *z80)
 {
-
     // If BC = 0x00 set to 0xFA00 (64) so it can loop over again of 64K
-    if (*bc == 0x0000)
-    {
-        *bc = 0xFA00;
-    }
-
-    // Keep copying data from one memory loaction to another until BC is 0
-    while (*bc != 0x0000)
-    {
-        // Transfer byte pointed to by HL to location pointed to by BC
-        *deVal = *hlVal;
-
-        // Decrement HL and DE
-        --*hl;
-        --*de;
-
-        // Decrement BC
-        --*bc;
-    }
+    // if (*z80->bc == 0x0000)
+    // {
+    //     *z80->bc = 0xFA00;
+    // }
 
     // Reset flags H, P/V, and N
-    setBit(fReg, 4, 0);
-    setBit(fReg, 2, 0);
-    setBit(fReg, 1, 0);
-} /*
+    setBit(z80->f, 4, 0);
+    setBit(z80->f, 2, 0);
+    setBit(z80->f, 1, 0);
 
+    // Keep copying data from one memory loaction to another until BC is 0
+    if (*z80->bc != 0x0000)
+    {
+        // Transfer byte pointed to by HL to location pointed to by BC
+        write_word(*z80->de, read_word_at(*z80->hl));
+
+        // Decrement HL and DE
+        --*z80->hl;
+        --*z80->de;
+
+        // Decrement BC
+        --*z80->bc;
+
+        --*z80->pc;
+        return 21;
+    }
+
+    *z80->pc += 1;
+
+    return 4;
+}
+/*
  // CPI *Changes flags*
  // Contents of HL compared with contents of A
  // OpCodes: 0xEDA1

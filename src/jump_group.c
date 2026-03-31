@@ -10,7 +10,7 @@
 // 8-bit values OpCodes: 0xC3, 0xE9, 0xDDE9, 0xEDE9
 uint8_t JP_16(Z80 *z80)
 {
-    *z80->pc = readNextWord();
+    *z80->pc = read_next_word();
     return 10;
 }
 
@@ -173,7 +173,7 @@ uint8_t JRZ(Z80 *z80)
     if (getBit(z80->f, 6) == 0x01)
     {
         // Add value to pc
-        *z80->pc += (int8_t)readNextByte();
+        *z80->pc += (int8_t)read_next_byte();
         return 12;
     }
     // Else do nothing and move to next instruction
@@ -190,7 +190,7 @@ uint8_t JRNZ(Z80 *z80)
     if (getBit(z80->f, 6) == 0x00)
     {
         // printf("number of bytes %d\n", (int8_t)readNextByte());
-        *z80->pc += (int8_t)readNextByte();
+        *z80->pc += (int8_t)read_next_byte();
         *z80->pc += 2;
         return 12;
     }

@@ -7,6 +7,7 @@
 // EX DE,HL
 // Swap DE and HL register values
 // OpCodes: 0xEB
+uint8_t EX_DE_HL(Z80 *z80);
 
 // EX AF,AF'
 // Swap register values between AF and alternative AF
@@ -41,8 +42,7 @@ void LDI();
 // Copy value at adress in HL register to address in DE register
 // Increment both HL and BC, and decrement BC
 // OpCodes: 0xEDB0
-void LDIR(uint16_t *hlVal, uint16_t *deVal, uint16_t *hl, uint16_t *de,
-          uint16_t *bc, uint16_t *pc, uint8_t *fReg);
+uint8_t LDIR(Z80 *z80);
 
 /*
 // LDD *Changes flags*
@@ -56,8 +56,7 @@ void LDD();
 // Copy value at adress in HL register to address in DE register
 // Decrement both HL and BC, and decrement BC
 // OpCodes: 0xEDB8
-void LDDR(uint16_t *hlVal, uint16_t *deVal, uint16_t *hl, uint16_t *de,
-          uint16_t *bc, uint8_t *fReg);
+uint8_t LDDR(Z80 *z80);
 
 /*
 // CPI *Changes flags*

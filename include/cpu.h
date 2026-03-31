@@ -137,10 +137,10 @@ uint16_t *getNextWord();
 uint16_t read_word_at(uint16_t addrs);
 
 // Read the next byte along, does not progress pc
-uint8_t readNextByte();
+uint8_t read_next_byte();
 
 // read next word along, does not progress pc
-uint16_t readNextWord();
+uint16_t read_next_word();
 
 // Get the byte specified memory location
 uint8_t *getByteAt(uint16_t addrs);
@@ -152,7 +152,7 @@ uint16_t *getWordAt(uint16_t *addrs);
 uint16_t readWordAt(uint16_t *addrs);
 
 // Read byte at memory location
-uint16_t readByteAt(uint16_t addrs);
+uint16_t read_byte_at(uint16_t addrs);
 
 // Write byte to memory given 16-bit address
 void writeByte(uint16_t addrs, uint8_t val);

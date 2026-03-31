@@ -58,6 +58,8 @@ uint16_t read_word(uint16_t addrs)
     // OR 16-bit word with lo
     return ((uint16_t)memory[addrs + 1] | ((uint16_t)memory[addrs] << 8));
 }
+void write_word(uint16_t addr, uint16_t value) { memory[addr] = value; }
+void write_byte(uint16_t addr, uint8_t val) { memory[addr] = val; }
 
 uint16_t *getWord(uint16_t addrs)
 {

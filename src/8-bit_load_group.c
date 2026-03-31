@@ -14,6 +14,12 @@
 // 0x5C, 0x5D, 0x5F, 	    0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67,
 // 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6F,
 // 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7F
+uint8_t LD_E_H(Z80 *z80)
+{
+    *z80->e = *z80->h;
+    *z80->pc += 1;
+    return 4;
+}
 uint8_t LD_B_A(Z80 *z80)
 {
     *z80->b = *z80->a;
@@ -39,7 +45,7 @@ uint8_t LD_L_E(Z80 *z80)
 // OpCodes: 0x0E, 0x1E, 0x2E, 0x3E, 0x06, 0x16, 0x26
 uint8_t LD_A_N(Z80 *z80)
 {
-    *z80->a = readNextByte();
+    *z80->a = read_next_byte();
     *z80->pc += 2;
     return 7;
 }
@@ -72,7 +78,7 @@ uint8_t LD_A_N(Z80 *z80)
 // OpCodes: 0x36
 uint8_t LD_ADDR_AT_HL_N(Z80 *z80)
 {
-    memory[*z80->hl] = readNextByte();
+    memory[*z80->hl] = read_next_byte();
     *z80->pc += 2;
     return 10;
 }
@@ -106,8 +112,14 @@ uint8_t LD_ADDR_AT_HL_N(Z80 *z80)
 // OpCodes: 0x12
 
 // LD (nn),A
-// Copy 16-bit integer value at 16-bit register address to 8-bit register
+// Copy the value in the A register to the address at nn
 // OpCodes: 0x32
+uint8_t LD_16_A(Z80 *z80)
+{
+    write_word(read_next_word(), *z80->a);
+    *z80->pc += 2;
+    return 13;
+}
 
 // LD I,A
 // Copy value in 8-bit register I to 8-bit register A

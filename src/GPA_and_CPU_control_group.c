@@ -88,14 +88,16 @@ uint8_t DI(Z80 *z80)
 // EI
 // Enable interupt instruction sets, sets both IFF1 and IFF2.
 // OpCodes: 0xFB
-void EI(int *iff1, int *iff2)
+uint8_t EI(Z80 *z80)
 {
-    *iff1 = 1;
-    *iff2 = 1;
+    *z80->iff1 = 1;
+    *z80->iff2 = 1;
 
     // May need to set interrupt count down back one as the next instruction
     // after an EI needs to be allowed to execute because it might be a return
     // instruction.
+    ++*z80->pc;
+    return 4;
 }
 
 // IM 0
@@ -106,10 +108,12 @@ void IM0(int *mode) { *mode = 0; }
 // IM 1
 // Set interrupt mode 1
 // opCodes: 0xED56
-void IM1(int *mode)
+uint8_t IM1(Z80 *z80)
 {
     // responds to an interrupt by execuing restart to 0038h
-    *mode = 1;
+    // *mode = 1;
+    ++*z80->pc;
+    return 8;
 }
 
 // IM 2

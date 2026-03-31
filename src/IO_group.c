@@ -97,7 +97,7 @@ void INDR();
 uint8_t OUTA(Z80 *z80)
 {
     // Write value to the 0xFE "port"
-    ports[readNextByte()] = *z80->a;
+    ports[read_next_byte()] = *z80->a;
     *z80->pc += 2;
     return 11;
 }

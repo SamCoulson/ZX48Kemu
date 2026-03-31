@@ -69,11 +69,11 @@ void run(uint16_t start_addrs)
             {
                 continue;
                 printf("before run 3 HL %X = %X\n", *z80->hl + 1,
-                       readByteAt(*z80->hl + 1));
+                       read_byte_at(*z80->hl + 1));
             }
         }
 
-        if (screenUpdateCount > 250)
+        if (screenUpdateCount > 850)
         {
             readVideoRAM(memory);
             updateScreen();
