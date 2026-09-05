@@ -1,10 +1,9 @@
 # taken from http://stackoverflow.com/questions/1484817/how-do-i-make-a-simple-makefile-gcc
 
 CC=gcc
-
+CPPFLAGS = -Iinclude
 CFLAGS= -O0 -Wall -std=c99
-
-LDFLAGS=-I ./include/ -I./raylib/include
+LDFLAGS= -L./lib
 
 TARGET=-o z80
 

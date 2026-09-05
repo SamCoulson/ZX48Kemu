@@ -1,7 +1,7 @@
-#include "../include/IO_group.h"
+#include "IO_group.h"
 // #include "../include/ULA.h"
-#include "../include/cpu.h"
-#include "../include/util_bit_operations.h"
+#include "cpu.h"
+#include "util_bit_operations.h"
 #include <stdio.h>
 
 // *** Input and Output group ***

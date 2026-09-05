@@ -1,7 +1,7 @@
-#include "../include/EBTS_group.h"
-#include "../include/cpu.h"
-#include "../include/memory.h"
-#include "../include/util_bit_operations.h"
+#include "EBTS_group.h"
+#include "cpu.h"
+#include "memory.h"
+#include "util_bit_operations.h"
 #include <stdio.h>
 
 // ***EXCHANGE, BLOCK TRANSFER AND SEARCH GROUPS***

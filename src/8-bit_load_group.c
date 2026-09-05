@@ -1,6 +1,6 @@
-#include "../include/8-bit_load_group.h"
-#include "../include/cpu.h"
-#include "../include/memory.h"
+#include "8-bit_load_group.h"
+#include "cpu.h"
+#include "memory.h"
 #include <stdint.h>
 // LOAD data methods for 8-bit groups
 

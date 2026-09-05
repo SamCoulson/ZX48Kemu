@@ -1,6 +1,6 @@
-#include "../include/jump_group.h"
-#include "../include/cpu.h"
-#include "../include/util_bit_operations.h"
+#include "jump_group.h"
+#include "cpu.h"
+#include "util_bit_operations.h"
 #include <stdio.h>
 
 // *** Jump group ***

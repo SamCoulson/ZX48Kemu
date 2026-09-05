@@ -1,6 +1,6 @@
-#include "../include/disassembler.h"
-#include "../include/cpu.h"
-#include "../include/memory.h"
+#include "disassembler.h"
+#include "cpu.h"
+#include "memory.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

@@ -1,4 +1,4 @@
-#include "../include/memory.h"
+#include "memory.h"
 #include <stdio.h>
 
 unsigned char memory[65536];

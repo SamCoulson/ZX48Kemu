@@ -1,7 +1,7 @@
-#include "../include/ula.h"
-#include "../include/cpu.h"
-#include "../include/keyboard.h"
-#include "../include/screen.h"
+#include "ula.h"
+#include "cpu.h"
+#include "keyboard.h"
+#include "screen.h"
 #include <stdio.h>
 
 bool shouldUpdateScreen;

@@ -1,6 +1,6 @@
-#include "../include/16-bit_load_group.h"
-#include "../include/cpu.h"
-#include "../include/memory.h"
+#include "16-bit_load_group.h"
+#include "cpu.h"
+#include "memory.h"
 #include <stdio.h> // Debug output
 // LOAD data methods for 16-bit groups
 

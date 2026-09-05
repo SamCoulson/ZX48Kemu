@@ -1,5 +1,5 @@
-#include "../include/GPA_and_CPU_control_group.h"
-#include "../include/util_bit_operations.h"
+#include "GPA_and_CPU_control_group.h"
+#include "util_bit_operations.h"
 // ***General-Purpose Arithmetic and CPU Control Group***
 
 // DAA

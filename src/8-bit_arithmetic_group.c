@@ -1,6 +1,6 @@
-#include "../include/8-bit_arithmetic_group.h"
-#include "../include/cpu.h"
-#include "../include/util_bit_operations.h"
+#include "8-bit_arithmetic_group.h"
+#include "cpu.h"
+#include "util_bit_operations.h"
 
 const uint8_t parityTable[256] = {1};
 

@@ -1,9 +1,9 @@
-#include "../include/main.h"
+#include "main.h"
 #include <stdint.h>
 #include <stdio.h>
 #define RAYGUI_IMPLEMENTATION
-#include "../include/debugger.h"
-#include "../include/raygui.h"
+#include "debugger.h"
+#include <raygui.h>
 
 int main()
 {

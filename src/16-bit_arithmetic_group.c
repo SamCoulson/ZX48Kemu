@@ -1,6 +1,6 @@
-#include "../include/16-bit_arithmetic_group.h"
-#include "../include/cpu.h"
-#include "../include/util_bit_operations.h"
+#include "16-bit_arithmetic_group.h"
+#include "cpu.h"
+#include "util_bit_operations.h"
 
 #include <stdint.h>
 

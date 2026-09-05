@@ -1,6 +1,6 @@
-#include "../include/screen.h"
-#include "../include/debugger.h"
-#include "../include/disassembler.h"
+#include "screen.h"
+#include "debugger.h"
+#include "disassembler.h"
 #include <stdint.h>
 #include <stdio.h>
 
