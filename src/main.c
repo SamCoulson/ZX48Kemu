@@ -1,16 +1,15 @@
 #include "main.h"
 #include "cpu.h"
+#include "debugger.h"
 #include "disassembler.h"
 #include "memory.h"
+#include "raygui.h"
 #include "romloader.h"
 #include "screen.h"
 #include "ula.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-#define RAYGUI_IMPLEMENTATION
-#include "debugger.h"
-#include <raygui.h>
 
 int main()
 {

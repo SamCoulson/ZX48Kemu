@@ -1,8 +1,6 @@
 #ifndef INC_SCREEN_H
 #define INC_SCREEN_H
 
-#include "raygui.h"
-
 int initWindow();
 
 void updateScreen();
