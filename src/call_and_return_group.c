@@ -1,6 +1,6 @@
 #include "call_and_return_group.h"
 #include "util_bit_operations.h"
-//////////////////////////////////////////////////////////////////////////
+#include <stdio.h>
 
 // *** Call and Return group ***
 

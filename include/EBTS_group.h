@@ -1,7 +1,7 @@
 #ifndef INC_EBTS_H
 #define INC_EBTS_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 // ***EXCHANGE, BLOCK TRANSFER AND SEARCH GROUPS***
 
 // EX DE,HL

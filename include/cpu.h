@@ -2,8 +2,6 @@
 #define INC_CPU_H
 
 #include <stdint.h>
-#include <stdio.h>
-// #include "memory.h"
 
 #define READ 0
 #define WRITE 1

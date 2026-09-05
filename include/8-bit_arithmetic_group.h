@@ -1,7 +1,7 @@
 #ifndef INC_8BITARITHMETICGROUP_H
 #define INC_8BITARITHMETICGROUP_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 #include <stdint.h>
 
 // *** 8-Bit Arithmetic group***

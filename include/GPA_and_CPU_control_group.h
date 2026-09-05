@@ -1,10 +1,8 @@
 #ifndef INC_GPAANDCPUCONTGROP_H
 #define INC_GPAANDCPUCONTGROP_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 #include <stdint.h>
-#include <stdlib.h>
-////////////////////////////////////////////////////////////////////////////////////////////
 
 // ***General-Purpose Arithmetic and CPU Control Group***
 

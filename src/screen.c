@@ -1,6 +1,8 @@
 #include "screen.h"
 #include "debugger.h"
 #include "disassembler.h"
+#include "memory.h"
+#include "util_bit_operations.h"
 #include <stdint.h>
 #include <stdio.h>
 

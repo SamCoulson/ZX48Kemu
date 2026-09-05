@@ -1,8 +1,8 @@
 #ifndef INC_8BITLOADGROUP_H
 #define INC_8BITLOADGROUP_H
 
-#include "../include/cpu.h"
 #include "../include/util_bit_operations.h"
+#include "cpu.h"
 #include <stdint.h>
 
 // LOAD data methods for 8-bit groups

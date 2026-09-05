@@ -1,4 +1,6 @@
 #include "romloader.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 unsigned char *romMemPtr;
 int romFileSize;

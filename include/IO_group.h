@@ -1,9 +1,8 @@
 #ifndef INC_IOGROUP_H
 #define INC_IOGROUP_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 #include <stdint.h>
-//////////////////////////////////////////////////////////////////////////
 
 // *** Input and Output group ***
 

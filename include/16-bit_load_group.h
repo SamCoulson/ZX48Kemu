@@ -1,7 +1,7 @@
 #ifndef INC_16BITLOADGROUP_H
 #define INC_16BITLOADGROUP_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 #include <stdint.h>
 // *** 16-BIT LOAD GROUP ***
 
