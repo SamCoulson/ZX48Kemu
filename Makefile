@@ -11,9 +11,13 @@ OBJECTS := $(SOURCES:.c=.o)
 
 SDIR=./src
 
+.PHONY: clean test
+
 z80 : ${OBJECTS}
 	${CC} ${LDFLAGS} -o $@ $^ ${LDLIBS} 
 
 clean:
-	-rm $(SDIR)/*.o
-	-rm z80
+	$(RM) $(OBJECTS) z80
+
+test:
+	$(MAKE) -C test run

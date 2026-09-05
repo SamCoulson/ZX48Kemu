@@ -25,6 +25,7 @@
 *.x86_64
 *.hex
 /z80
+/test/z80test
 
 # ROM files
 *.rom

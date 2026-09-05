@@ -1,26 +1,48 @@
-# taken from http://stackoverflow.com/questions/1484817/how-do-i-make-a-simple-makefile-gcc
+CC := gcc
 
-CC=gcc
-CPPFLAGS= -I../include/
-CFLAGS=-Wall -std=c99 
+CPPFLAGS := -I../include
+CFLAGS := -O0 -Wall -std=c99
 
-LDFLAGS= -L.\lib 
+TARGET := z80test
+BUILD_DIR := build
 
-TARGET=-o z80test 
+CORE_MODULES := \
+	cpu \
+	memory \
+	util_bit_operations \
+	16-bit_arithmetic_group \
+	16-bit_load_group \
+	8-bit_arithmetic_group \
+	8-bit_load_group \
+	BSR_and_test_group \
+	call_and_return_group \
+	EBTS_group \
+	GPA_and_CPU_control_group \
+	IO_group \
+	jump_group \
+	rotate_and_shift_group
 
-SDIR=src
+CORE_OBJECTS := $(addprefix $(BUILD_DIR)/,$(addsuffix .o,$(CORE_MODULES)))
+OBJECTS := $(BUILD_DIR)/z80test.o $(CORE_OBJECTS)
 
-ODIR=obj
-	  
-z80test : z80test.o ../src/romloader.o ../src/memory.o ../src/8-bit_load_group.o ../src/GPA_and_CPU_control_group.o \
-	../src/util_bit_operations.o ../src/16-bit_load_group.o ../src/jump_group.o ../src/8-bit_arithmetic_group.o \
-	../src/IO_group.o ../src/16-bit_arithmetic_group.o ../src/EBTS_group.o ../src/BSR_and_test_group.c \
-	../src/call_and_return_group.o ../src/rotate_and_shift_group.o ../src/ula.o
-	${CC} ${CFLAGS} ${LDFLAGS} ${TARGET} z80test.o ../src/romloader.o ../src/memory.o ../src/8-bit_load_group.o ../src/GPA_and_CPU_control_group.o \
-	../src/util_bit_operations.o ../src/16-bit_load_group.o ../src/jump_group.o ../src/8-bit_arithmetic_group.o \
-	../src/IO_group.o ../src/16-bit_arithmetic_group.o ../src/EBTS_group.o ../src/BSR_and_test_group.c \
-	../src/call_and_return_group.o ../src/rotate_and_shift_group.o ../src/ula.o
+.PHONY: all run clean
+
+all: $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+$(BUILD_DIR)/z80test.o: z80test.c | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: ../src/%.c | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR):
+	mkdir -p $@
 
 clean:
-	-del $(SDIR)\*.o
-	-del z80test
+	$(RM) -r $(BUILD_DIR) $(TARGET)

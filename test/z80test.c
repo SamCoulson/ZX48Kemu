@@ -9,76 +9,29 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// Declare and initialise a register set for testing
-Z80 _z80 = {
-    // Assign const pointers to main z80 reg register
-    .a = &af._af[1],
-    .f = &af._af[0],
-    .af = &af.af,
-    .b = &bc._bc[1],
-    .c = &bc._bc[0],
-    .bc = &bc.bc,
-    .d = &de._de[1],
-    .e = &de._de[0],
-    .de = &de.de,
-    .h = &hl._hl[1],
-    .l = &hl._hl[0],
-    .hl = &hl.hl,
-    // Assign const pointers to alternative z80 register
-    .alta = &altaf._af[1],
-    .altf = &altaf._af[0],
-    .altaf = &altaf.af,
-    .altb = &altbc._bc[1],
-    .altc = &altbc._bc[0],
-    .altbc = &altbc.bc,
-    .altd = &altde._de[1],
-    .alte = &altde._de[0],
-    .altde = &altde.de,
-    .alth = &althl._hl[1],
-    .altl = &althl._hl[0],
-    .althl = &althl.hl,
-    // 8-bit Special z80 register - interrupt vector and refresh z80ister
-    .i = &ir._ir[1],
-    .r = &ir._ir[0],
-    .ir = &ir.ir,
-    // 16-bit index z80 register
-    .ix = &ix,
-    .iy = &iy,
-    // 16-bit stack pointer and program pointer
-    .sp = &sp,
-    .pc = &pc,
-    // IFF (Interrupt enabled flip-flop)
-    .iff1 = &iff1,
-    .iff2 = &iff2,
-    // CPU Mode
-    .mode = &mode};
-
-// Pointer to the register structure
-Z80 *z80 = &_z80;
-
-// Allows the CPU registers to be zero'd out
+// Allows the CPU z80isters to be zero'd out
 int resetCPU()
 {
-    // Initialise registers to starting values, this can be used for testing
-    *reg->af = 0x0000;
-    *reg->bc = 0x0000;
-    *reg->de = 0x0000;
-    *reg->hl = 0x0000;
+    // Initialise z80isters to starting values, this can be used for testing
+    *z80->af = 0x0000;
+    *z80->bc = 0x0000;
+    *z80->de = 0x0000;
+    *z80->hl = 0x0000;
 
-    *reg->altaf = 0x0000;
-    *reg->altbc = 0x0000;
-    *reg->altde = 0x0000;
-    *reg->althl = 0x0000;
+    *z80->altaf = 0x0000;
+    *z80->altbc = 0x0000;
+    *z80->altde = 0x0000;
+    *z80->althl = 0x0000;
 
-    *reg->ir = 0x00;
-    *reg->ix = 0x00;
-    *reg->iy = 0x00;
+    *z80->ir = 0x00;
+    *z80->ix = 0x00;
+    *z80->iy = 0x00;
 
-    *reg->sp = 0x00;
-    *reg->pc = 0x00;
+    *z80->sp = 0x00;
+    *z80->pc = 0x00;
 
-    *reg->iff1 = 0x00;
-    *reg->iff2 = 0x00;
+    *z80->iff1 = 0x00;
+    *z80->iff2 = 0x00;
 
     return 0;
 }
@@ -100,34 +53,34 @@ static void test_8bit_add()
 
     // Test Carry flag
     resetCPU();
-    *reg->a = 128;
-    *reg->b = 128;
-    ADD(reg->a, reg->b, reg->f);
-    assert(*reg->a == 0 && getBit(reg->f, 0) == 0x01 &&
+    *z80->a = 128;
+    *z80->b = 128;
+    ADD(z80->a, z80->b, z80->f);
+    assert(*z80->a == 0 && getBit(z80->f, 0) == 0x01 &&
            "test_8bit_add() - Carry Flag");
 
     // Test N(Addition/Subtraction) flag
     resetCPU();
-    *reg->a = 1;
-    *reg->b = 1;
-    ADD(reg->a, reg->b, reg->f);
-    assert(*reg->a == 2 && getBit(reg->f, 1) == 0x00 &&
+    *z80->a = 1;
+    *z80->b = 1;
+    ADD(z80->a, z80->b, z80->f);
+    assert(*z80->a == 2 && getBit(z80->f, 1) == 0x00 &&
            "test_8bit_add() - N Flag");
 
     // Test P/V flag (parity / overflow)
     resetCPU();
-    *reg->a = 64; // 0100 0000
-    *reg->b = 64; // 0100 0000
-    ADD(reg->a, reg->b, reg->f);
-    assert(*reg->a == 128 && getBit(reg->f, 2) == 0x01 &&
+    *z80->a = 64; // 0100 0000
+    *z80->b = 64; // 0100 0000
+    ADD(z80->a, z80->b, z80->f);
+    assert(*z80->a == 128 && getBit(z80->f, 2) == 0x01 &&
            "test_8bit_add() - P/V Flag");
 
     // Test H (Half carry) flag
     // resetCPU();
-    //*reg->a = 4;
-    //*reg->b = 4;
-    // ADD( reg->a, reg->b, reg->f );
-    // assert( *reg->a == 8 && getBit( reg->f, 4 ) == 0x01  && "test_8bit_add()
+    //*z80->a = 4;
+    //*z80->b = 4;
+    // ADD( z80->a, z80->b, z80->f );
+    // assert( *z80->a == 8 && getBit( z80->f, 4 ) == 0x01  && "test_8bit_add()
     // - H Flag" );
 
     const uint8_t values[6] = {0, 1, 127, 128, 129, 255};
@@ -136,23 +89,23 @@ static void test_8bit_add()
     for (int i = 0; i < sizeof(values); i++)
     {
 
-        *reg->a = values[i];
+        *z80->a = values[i];
         printf("Uint Sint  Uint Sint\n");
 
         for (int j = 0; j < sizeof(values); j++)
         {
 
-            *reg->b = values[j];
+            *z80->b = values[j];
 
-            printf("%3d(%4d) + %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b,
-                   (int8_t)*reg->b);
+            printf("%3d(%4d) + %3d(%4d) = ", *z80->a, (int8_t)*z80->a, *z80->b,
+                   (int8_t)*z80->b);
 
-            ADD(reg->a, reg->b, reg->f);
+            ADD(z80->a, z80->b, z80->f);
 
-            printf(" %3d(%4d) C = %d V = %d\n", *reg->a, (int8_t)*reg->a,
-                   getBit(reg->f, 0), getBit(reg->f, 2));
+            printf(" %3d(%4d) C = %d V = %d\n", *z80->a, (int8_t)*z80->a,
+                   getBit(z80->f, 0), getBit(z80->f, 2));
             // Reset a
-            *reg->a = values[i];
+            *z80->a = values[i];
         }
     }
 }
@@ -161,34 +114,34 @@ static void test_8bit_sub()
 {
     // Test Carry flag
     resetCPU();
-    *reg->a = 0;
-    *reg->b = 2;
-    SUB(reg->a, reg->b, reg->f);
-    assert((int8_t)*reg->a < 0 && getBit(reg->f, 0) == 0x01 &&
+    *z80->a = 0;
+    *z80->b = 2;
+    SUB(z80->a, z80->b, z80->f);
+    assert((int8_t)*z80->a < 0 && getBit(z80->f, 0) == 0x01 &&
            "test_8bit_sub() - Carry Flag");
 
     // Test N(Addition/Subtraction) flag
     resetCPU();
-    *reg->a = 1;
-    *reg->b = 1;
-    SUB(reg->a, reg->b, reg->f);
-    assert(*reg->a == 0 && getBit(reg->f, 1) == 0x01 &&
+    *z80->a = 1;
+    *z80->b = 1;
+    SUB(z80->a, z80->b, z80->f);
+    assert(*z80->a == 0 && getBit(z80->f, 1) == 0x01 &&
            "test_8bit_sub() - N Flag");
 
     // Test P/V flag (parity / overflow)
     resetCPU();
-    *reg->a = 128; // 0100 0000
-    *reg->b = 128; // 0100 0000
-    SUB(reg->a, reg->b, reg->f);
-    assert(*reg->a == 0 && getBit(reg->f, 2) == 0x01 &&
+    *z80->a = 128; // 0100 0000
+    *z80->b = 128; // 0100 0000
+    SUB(z80->a, z80->b, z80->f);
+    assert(*z80->a == 0 && getBit(z80->f, 2) == 0x01 &&
            "test_8bit_sub() - P/V Flag");
 
     // Test H (Half carry) flag
     // resetCPU();
-    //*reg->a = 4;
-    //*reg->b = 4;
-    // ADD( reg->a, reg->b, reg->f );
-    // assert( *reg->a == 8 && getBit( reg->f, 4 ) == 0x01  && "test_8bit_add()
+    //*z80->a = 4;
+    //*z80->b = 4;
+    // ADD( z80->a, z80->b, z80->f );
+    // assert( *z80->a == 8 && getBit( z80->f, 4 ) == 0x01  && "test_8bit_add()
     // - H Flag" );
 
     const uint8_t values[6] = {0, 1, 127, 128, 129, 255};
@@ -197,23 +150,23 @@ static void test_8bit_sub()
     for (int i = 0; i < sizeof(values); i++)
     {
 
-        *reg->a = values[i];
+        *z80->a = values[i];
         printf("Uint Sint  Uint Sint\n");
 
         for (int j = 0; j < sizeof(values); j++)
         {
 
-            *reg->b = values[j];
+            *z80->b = values[j];
 
-            printf("%3d(%4d) - %3d(%4d) = ", *reg->a, (int8_t)*reg->a, *reg->b,
-                   (int8_t)*reg->b);
+            printf("%3d(%4d) - %3d(%4d) = ", *z80->a, (int8_t)*z80->a, *z80->b,
+                   (int8_t)*z80->b);
 
-            SUB(reg->a, reg->b, reg->f);
+            SUB(z80->a, z80->b, z80->f);
 
-            printf(" %3d(%4d) C = %d V = %d\n", *reg->a, (int8_t)*reg->a,
-                   getBit(reg->f, 0), getBit(reg->f, 2));
+            printf(" %3d(%4d) C = %d V = %d\n", *z80->a, (int8_t)*z80->a,
+                   getBit(z80->f, 0), getBit(z80->f, 2));
             // Reset a
-            *reg->a = values[i];
+            *z80->a = values[i];
         }
     }
 }
@@ -222,24 +175,24 @@ static void test_16bit_add()
 {
     // Test carry flag
     resetCPU();
-    *reg->bc = 32768;
-    *reg->de = 32768;
-    printf("%d + %d", *reg->bc, *reg->de);
-    ADD16(reg->bc, reg->de, reg->f);
-    printf(" = %d\n", *reg->bc);
-    printf("Carry flag = %d\n", getBit(reg->f, 0));
-    assert(*reg->bc == 0x00 && getBit(reg->f, 0) == 0x01 &&
+    *z80->bc = 32768;
+    *z80->de = 32768;
+    printf("%d + %d", *z80->bc, *z80->de);
+    ADD16(z80->bc, z80->de, z80->f);
+    printf(" = %d\n", *z80->bc);
+    printf("Carry flag = %d\n", getBit(z80->f, 0));
+    assert(*z80->bc == 0x00 && getBit(z80->f, 0) == 0x01 &&
            "test_16bit_sub() - Carry Flag");
 
     // test half carry
     resetCPU();
-    *reg->bc = 128;
-    *reg->de = 128;
-    printf("%d + %d", *reg->bc, *reg->de);
-    ADD16(reg->bc, reg->de, reg->f);
-    printf(" = %d\n", *reg->bc);
-    printf("Half Carry flag = %d\n", getBit(reg->f, 4));
-    assert(*reg->bc == 256 && getBit(reg->f, 4) == 0x01 &&
+    *z80->bc = 128;
+    *z80->de = 128;
+    printf("%d + %d", *z80->bc, *z80->de);
+    ADD16(z80->bc, z80->de, z80->f);
+    printf(" = %d\n", *z80->bc);
+    printf("Half Carry flag = %d\n", getBit(z80->f, 4));
+    assert(*z80->bc == 256 && getBit(z80->f, 4) == 0x01 &&
            "test_16bit_sub() - Carry Flag");
 }
 
