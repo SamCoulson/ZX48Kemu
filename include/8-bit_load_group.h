@@ -1,7 +1,6 @@
 #ifndef INC_8BITLOADGROUP_H
 #define INC_8BITLOADGROUP_H
 
-#include "../include/util_bit_operations.h"
 #include "cpu.h"
 #include <stdint.h>
 

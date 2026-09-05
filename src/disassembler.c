@@ -79,6 +79,7 @@ z80_instruction disassemble_multi_byte_opcode(uint8_t *group, uint8_t *opcode)
         return cb_multi_byte_instruction_lookup[*opcode];
         break;
     case 0xDD:
+        return dd_multi_byte_instruction_lookup[*opcode];
         break;
     case 0xED:
         return ed_multi_byte_instruction_lookup[*opcode];

@@ -1,7 +1,7 @@
 #ifndef INC_JUMPGROUP_H
 #define INC_JUMPGROUP_H
 
-#include "../include/cpu.h"
+#include "cpu.h"
 #include <stdint.h>
 
 // *** Jump group ***
